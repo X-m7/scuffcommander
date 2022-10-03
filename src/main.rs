@@ -1,4 +1,4 @@
-use actix_web::{error, get, App, HttpResponse, HttpServer, Responder, Result};
+use actix_web::{error, get, web, App, HttpResponse, HttpServer, Responder, Result};
 use derive_more::{Display, Error};
 use scuffcommander::plugins::obs::OBSConnector;
 
@@ -10,7 +10,7 @@ async fn hello() -> impl Responder {
 #[derive(Debug, Display, Error)]
 #[display(fmt = "plugin error: {}", contents)]
 struct PluginError {
-    contents: &'static str,
+    contents: String,
 }
 
 // Use default implementation for `error_response()` method
@@ -23,23 +23,42 @@ async fn obstest() -> Result<impl Responder, PluginError> {
         return Err(PluginError { contents: e });
     }
 
-    let obs_ok = obs.unwrap();
+    let obs = obs.unwrap();
 
-    if let (Ok(version), Ok(scene_list)) = (obs_ok.obs_version().await, obs_ok.scene_list().await) {
+    if let (Ok(version), Ok(scene_list)) = (obs.obs_version().await, obs.scene_list().await) {
         Ok(HttpResponse::Ok().body(format!(
             "Hello from OBS {:?}\nScenes are: {:?}",
             version, scene_list
         )))
     } else {
         Err(PluginError {
-            contents: "OBS connection lost",
+            contents: "OBS connection lost".to_string(),
         })
+    }
+}
+
+#[get("/click/{button}")]
+async fn click(path: web::Path<String>) -> String {
+    let obs = OBSConnector::new("localhost", 4455, Some("1234567890")).await;
+    if let Err(e) = obs {
+        return e;
+    }
+
+    let obs = obs.unwrap();
+
+    let button = path.into_inner();
+    match button.as_str() {
+        "1" => match obs.scene_change_current("Waiting").await {
+            Ok(_) => "Success".to_string(),
+            Err(e) => e,
+        },
+        _ => "Unrecognised button".to_string(),
     }
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| App::new().service(hello).service(obstest))
+    HttpServer::new(|| App::new().service(hello).service(obstest).service(click))
         .bind(("127.0.0.1", 8080))?
         .run()
         .await

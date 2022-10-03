@@ -10,24 +10,31 @@ impl OBSConnector {
         addr: &str,
         port: u16,
         password: Option<&str>,
-    ) -> Result<OBSConnector, &'static str> {
+    ) -> Result<OBSConnector, String> {
         match Client::connect(addr, port, password).await {
             Ok(c) => Ok(OBSConnector { client: c }),
-            Err(_) => Err("OBS connection failure"),
+            Err(e) => Err(e.to_string()),
         }
     }
 
-    pub async fn obs_version(&self) -> Result<Version, &'static str> {
+    pub async fn obs_version(&self) -> Result<Version, String> {
         match self.client.general().version().await {
             Ok(v) => Ok(v.obs_version),
-            Err(_) => Err("OBS connection failure"),
+            Err(e) => Err(e.to_string()),
         }
     }
 
-    pub async fn scene_list(&self) -> Result<Vec<Scene>, &'static str> {
+    pub async fn scene_list(&self) -> Result<Vec<Scene>, String> {
         match self.client.scenes().list().await {
             Ok(s) => Ok(s.scenes),
-            Err(_) => Err("OBS connection failure"),
+            Err(e) => Err(e.to_string()),
+        }
+    }
+
+    pub async fn scene_change_current(&self, scene: &str) -> Result<(), String> {
+        match self.client.scenes().set_current_program_scene(scene).await {
+            Ok(_) => Ok(()),
+            Err(e) => Err(e.to_string()),
         }
     }
 }
