@@ -1,33 +1,40 @@
-use actix_web::{get, App, HttpResponse, HttpServer, Responder};
-use obws::Client;
+use actix_web::{error, get, App, HttpResponse, HttpServer, Responder, Result};
+use derive_more::{Display, Error};
+use scuffcommander::plugins::obs::OBSConnector;
 
 #[get("/")]
 async fn hello() -> impl Responder {
     HttpResponse::Ok().body("Hello world!")
 }
 
-#[get("/obstest")]
-async fn obstest() -> impl Responder {
-    let client = Client::connect("localhost", 4455, Some("1234567890"))
-        .await
-        .expect("OBS connection failure");
-    let version = client
-        .general()
-        .version()
-        .await
-        .expect("OBS connection failure")
-        .obs_version;
-    let scene_list = client
-        .scenes()
-        .list()
-        .await
-        .expect("OBS connection failure")
-        .scenes;
+#[derive(Debug, Display, Error)]
+#[display(fmt = "plugin error: {}", contents)]
+struct PluginError {
+    contents: &'static str,
+}
 
-    HttpResponse::Ok().body(format!(
-        "Hello from OBS {:?}\nScenes are: {:?}",
-        version, scene_list
-    ))
+// Use default implementation for `error_response()` method
+impl error::ResponseError for PluginError {}
+
+#[get("/obstest")]
+async fn obstest() -> Result<impl Responder, PluginError> {
+    let obs = OBSConnector::new("localhost", 4455, Some("1234567890")).await;
+    if let Err(e) = obs {
+        return Err(PluginError { contents: e });
+    }
+
+    let obs_ok = obs.unwrap();
+
+    if let (Ok(version), Ok(scene_list)) = (obs_ok.obs_version().await, obs_ok.scene_list().await) {
+        Ok(HttpResponse::Ok().body(format!(
+            "Hello from OBS {:?}\nScenes are: {:?}",
+            version, scene_list
+        )))
+    } else {
+        Err(PluginError {
+            contents: "OBS connection lost",
+        })
+    }
 }
 
 #[actix_web::main]
