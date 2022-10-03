@@ -1,6 +1,7 @@
 use actix_web::{error, get, web, App, HttpResponse, HttpServer, Responder, Result};
 use derive_more::{Display, Error};
 use scuffcommander::plugins::obs::OBSConnector;
+use scuffcommander::plugins::vts::VTSConnector;
 
 #[get("/")]
 async fn hello() -> impl Responder {
@@ -39,19 +40,26 @@ async fn obstest() -> Result<impl Responder, PluginError> {
 
 #[get("/click/{button}")]
 async fn click(path: web::Path<String>) -> String {
-    let obs = OBSConnector::new("localhost", 4455, Some("1234567890")).await;
-    if let Err(e) = obs {
-        return e;
-    }
-
-    let obs = obs.unwrap();
-
     let button = path.into_inner();
     match button.as_str() {
-        "1" => match obs.scene_change_current("Waiting").await {
-            Ok(_) => "Success".to_string(),
-            Err(e) => e,
-        },
+        "1" => {
+            let obs = OBSConnector::new("localhost", 4455, Some("1234567890")).await;
+            if let Err(e) = obs {
+                return e;
+            }
+            match obs.unwrap().scene_change_current("Waiting").await {
+                Ok(_) => "Success".to_string(),
+                Err(e) => e,
+            }
+        }
+        "2" => {
+            let mut vts = VTSConnector::new("ws://localhost:8001").await;
+            println!("connect ok?");
+            match vts.vts_version().await {
+                Ok(v) => v,
+                Err(e) => e,
+            }
+        }
         _ => "Unrecognised button".to_string(),
     }
 }
