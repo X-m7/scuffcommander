@@ -38,6 +38,15 @@ async fn obstest() -> Result<impl Responder, PluginError> {
     }
 }
 
+#[get("/vtstest")]
+async fn vtstest() -> String {
+    let mut vts = VTSConnector::new("ws://localhost:8001").await;
+    match vts.vts_version().await {
+        Ok(v) => v,
+        Err(e) => e,
+    }
+}
+
 #[get("/click/{button}")]
 async fn click(path: web::Path<String>) -> String {
     let button = path.into_inner();
@@ -54,9 +63,8 @@ async fn click(path: web::Path<String>) -> String {
         }
         "2" => {
             let mut vts = VTSConnector::new("ws://localhost:8001").await;
-            println!("connect ok?");
-            match vts.vts_version().await {
-                Ok(v) => v,
+            match vts.toggle_expression("Qt.exp3.json").await {
+                Ok(_) => "Success".to_string(),
                 Err(e) => e,
             }
         }
@@ -66,7 +74,7 @@ async fn click(path: web::Path<String>) -> String {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| App::new().service(hello).service(obstest).service(click))
+    HttpServer::new(|| App::new().service(hello).service(obstest).service(vtstest).service(click))
         .bind(("127.0.0.1", 8080))?
         .run()
         .await
