@@ -21,6 +21,22 @@ impl OBSConnector {
         }
     }
 
+    pub async fn from_option(conf: Option<OBSConfig>) -> Option<OBSConnector> {
+        // If config not present don't bother
+        if let Some(c) = conf {
+            // If issue when setting up connection then print error
+            match OBSConnector::new(c).await {
+                Ok(o) => Some(o),
+                Err(e) => {
+                    println!("{}", e);
+                    None
+                }
+            }
+        } else {
+            None
+        }
+    }
+
     pub async fn obs_version(&self) -> Result<Version, String> {
         match self.client.general().version().await {
             Ok(v) => Ok(v.obs_version),

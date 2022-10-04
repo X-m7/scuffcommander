@@ -47,6 +47,14 @@ impl VTSConnector {
         VTSConnector { client }
     }
 
+    // could have just used Option::map here if async was not needed
+    pub async fn from_option(conf: Option<VTSConfig>) -> Option<VTSConnector> {
+        match conf {
+            Some(c) => Some(VTSConnector::new(c).await),
+            None => None,
+        }
+    }
+
     pub async fn vts_version(&mut self) -> Result<String, String> {
         let resp = self.client.send(&StatisticsRequest {}).await;
         match resp {

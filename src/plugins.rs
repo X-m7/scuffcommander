@@ -20,28 +20,8 @@ pub struct PluginState {
 impl PluginState {
     pub async fn init(conf: PluginConfig) -> PluginState {
         PluginState {
-            obs: Mutex::new({
-                // If config not present don't bother
-                if let Some(obs_conf) = conf.obs {
-                    // If issue when setting up connection then print error
-                    match OBSConnector::new(obs_conf).await {
-                        Ok(o) => Some(o),
-                        Err(e) => {
-                            println!("{}", e);
-                            None
-                        }
-                    }
-                } else {
-                    None
-                }
-            }),
-            vts: Mutex::new({
-                if let Some(vts_conf) = conf.vts {
-                    Some(VTSConnector::new(vts_conf).await)
-                } else {
-                    None
-                }
-            }),
+            obs: Mutex::new(OBSConnector::from_option(conf.obs).await),
+            vts: Mutex::new(VTSConnector::from_option(conf.vts).await),
         }
     }
 }
