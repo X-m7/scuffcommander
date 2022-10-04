@@ -1,13 +1,6 @@
 use actix_web::{error, get, web, App, HttpResponse, HttpServer, Responder, Result};
-use async_std::sync::Mutex;
 use derive_more::{Display, Error};
-use scuffcommander::plugins::obs::OBSConnector;
-use scuffcommander::plugins::vts::VTSConnector;
-
-struct AppState {
-    obs: Mutex<Option<OBSConnector>>,
-    vts: Mutex<Option<VTSConnector>>,
-}
+use scuffcommander::plugins::PluginState;
 
 #[get("/")]
 async fn hello() -> impl Responder {
@@ -24,7 +17,7 @@ struct PluginError {
 impl error::ResponseError for PluginError {}
 
 #[get("/obstest")]
-async fn obstest(data: web::Data<AppState>) -> Result<impl Responder, PluginError> {
+async fn obstest(data: web::Data<PluginState>) -> Result<impl Responder, PluginError> {
     let opt = &*data.obs.lock().await;
     if opt.is_none() {
         return Err(PluginError {
@@ -47,7 +40,7 @@ async fn obstest(data: web::Data<AppState>) -> Result<impl Responder, PluginErro
 }
 
 #[get("/vtstest")]
-async fn vtstest(data: web::Data<AppState>) -> String {
+async fn vtstest(data: web::Data<PluginState>) -> String {
     let opt = &mut *data.vts.lock().await;
     if opt.is_none() {
         return "VTS plugin not configured".to_string();
@@ -62,7 +55,7 @@ async fn vtstest(data: web::Data<AppState>) -> String {
 }
 
 #[get("/click/{button}")]
-async fn click(path: web::Path<String>, data: web::Data<AppState>) -> String {
+async fn click(path: web::Path<String>, data: web::Data<PluginState>) -> String {
     let button = path.into_inner();
     match button.as_str() {
         "1" => {
@@ -119,18 +112,7 @@ async fn click(path: web::Path<String>, data: web::Data<AppState>) -> String {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let obs_conn = OBSConnector::new("localhost", 4455, Some("1234567890")).await;
-    let mut obs = None;
-    if let Ok(o) = obs_conn {
-        obs = Some(o);
-    }
-
-    let vts = VTSConnector::new("ws://localhost:8001").await;
-
-    let state = web::Data::new(AppState {
-        obs: Mutex::new(obs),
-        vts: Mutex::new(Some(vts)),
-    });
+    let state = web::Data::new(PluginState::init().await);
 
     HttpServer::new(move || {
         App::new()
