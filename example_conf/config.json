@@ -1,0 +1,15 @@
+{
+  "addr": "localhost",
+  "port": 8080,
+  "plugins": {
+  "obs": {
+      "addr": "localhost",
+      "port": 4455,
+      "password": "1234567890"
+    },
+    "vts": {
+      "addr": "ws://localhost:8001",
+      "token_file": "vts_token.txt"
+    }
+  }
+}

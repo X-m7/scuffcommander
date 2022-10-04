@@ -1,4 +1,4 @@
 /target
 vts_token.txt
-config_plugin.json
-!/example_conf/config_plugin.json
+config.json
+!/example_conf/config.json

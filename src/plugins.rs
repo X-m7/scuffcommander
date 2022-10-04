@@ -1,7 +1,6 @@
 pub mod obs;
 pub mod vts;
 
-use async_std::fs::read_to_string;
 use async_std::sync::Mutex;
 use obs::{OBSConfig, OBSConnector};
 use serde::{Deserialize, Serialize};
@@ -19,23 +18,7 @@ pub struct PluginState {
 }
 
 impl PluginState {
-    pub async fn init() -> PluginState {
-        let conf: PluginConfig = serde_json::from_str(
-            &read_to_string("config_plugin.json")
-                .await
-                .unwrap_or_else(|e| {
-                    println!("{}", e);
-                    String::new()
-                }),
-        )
-        .unwrap_or_else(|e| {
-            println!("Unable to parse plugin config: {}", e);
-            PluginConfig {
-                obs: None,
-                vts: None,
-            }
-        });
-
+    pub async fn init(conf: PluginConfig) -> PluginState {
         PluginState {
             obs: Mutex::new({
                 // If config not present don't bother

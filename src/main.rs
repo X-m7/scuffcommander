@@ -1,6 +1,7 @@
 use actix_web::{error, get, web, App, HttpResponse, HttpServer, Responder, Result};
 use derive_more::{Display, Error};
 use scuffcommander::plugins::PluginState;
+use scuffcommander::AppConfig;
 
 #[get("/")]
 async fn hello() -> impl Responder {
@@ -112,7 +113,9 @@ async fn click(path: web::Path<String>, data: web::Data<PluginState>) -> String 
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let state = web::Data::new(PluginState::init().await);
+    let conf = AppConfig::from_file("config.json").await;
+
+    let state = web::Data::new(PluginState::init(conf.plugins).await);
 
     HttpServer::new(move || {
         App::new()
@@ -122,7 +125,7 @@ async fn main() -> std::io::Result<()> {
             .service(click)
             .app_data(state.clone())
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind((conf.addr, conf.port))?
     .run()
     .await
 }
