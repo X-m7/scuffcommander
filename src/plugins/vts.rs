@@ -3,6 +3,11 @@ use async_std::fs::{read_to_string, write};
 use vtubestudio::data::{ExpressionActivationRequest, ExpressionStateRequest, StatisticsRequest};
 use vtubestudio::Client;
 
+pub struct VTSConfig<'a> {
+    pub addr: &'a str,
+    pub token_file: &'a str,
+}
+
 pub struct VTSConnector {
     client: Client,
 }
@@ -16,21 +21,21 @@ impl VTSConnector {
         }
     }
 
-    pub async fn new(addr: &str) -> VTSConnector {
-        let token_file = "vts_token.txt";
-
+    pub async fn new(conf: &VTSConfig<'_>) -> VTSConnector {
         let (client, mut new_tokens) = Client::builder()
-            .auth_token(Self::read_token(token_file).await)
-            .url(addr)
+            .auth_token(Self::read_token(conf.token_file).await)
+            .url(conf.addr)
             .authentication("VTScuffCommander", "ScuffCommanderDevs", None)
             .build_tungstenite();
+
+        let token_file = conf.token_file.to_string();
 
         spawn(async move {
             // This returns whenever the authentication middleware receives a new auth token.
             // We can handle it by saving it somewhere, etc.
             while let Some(token) = new_tokens.next().await {
                 println!("Got new auth token: {}", token);
-                match write(token_file, token).await {
+                match write(&token_file, token).await {
                     Ok(_) => println!("Saved new token to {}", token_file),
                     Err(e) => println!("Failed to save token: {}", e),
                 }
