@@ -1,11 +1,13 @@
 use actix_rt::spawn;
 use async_std::fs::{read_to_string, write};
+use serde::{Deserialize, Serialize};
 use vtubestudio::data::{ExpressionActivationRequest, ExpressionStateRequest, StatisticsRequest};
 use vtubestudio::Client;
 
-pub struct VTSConfig<'a> {
-    pub addr: &'a str,
-    pub token_file: &'a str,
+#[derive(Serialize, Deserialize)]
+pub struct VTSConfig {
+    pub addr: String,
+    pub token_file: String,
 }
 
 pub struct VTSConnector {
@@ -21,9 +23,9 @@ impl VTSConnector {
         }
     }
 
-    pub async fn new(conf: &VTSConfig<'_>) -> VTSConnector {
+    pub async fn new(conf: VTSConfig) -> VTSConnector {
         let (client, mut new_tokens) = Client::builder()
-            .auth_token(Self::read_token(conf.token_file).await)
+            .auth_token(Self::read_token(&conf.token_file).await)
             .url(conf.addr)
             .authentication("VTScuffCommander", "ScuffCommanderDevs", None)
             .build_tungstenite();

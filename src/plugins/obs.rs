@@ -1,10 +1,12 @@
 use obws::responses::scenes::Scene;
 use obws::{Client, Version};
+use serde::{Deserialize, Serialize};
 
-pub struct OBSConfig<'a> {
-    pub addr: &'a str,
+#[derive(Serialize, Deserialize)]
+pub struct OBSConfig {
+    pub addr: String,
     pub port: u16,
-    pub password: Option<&'a str>,
+    pub password: Option<String>,
 }
 
 pub struct OBSConnector {
@@ -12,7 +14,7 @@ pub struct OBSConnector {
 }
 
 impl OBSConnector {
-    pub async fn new(conf: &OBSConfig<'_>) -> Result<OBSConnector, String> {
+    pub async fn new(conf: OBSConfig) -> Result<OBSConnector, String> {
         match Client::connect(conf.addr, conf.port, conf.password).await {
             Ok(c) => Ok(OBSConnector { client: c }),
             Err(e) => Err(e.to_string()),

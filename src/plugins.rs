@@ -1,13 +1,16 @@
 pub mod obs;
 pub mod vts;
 
+use async_std::fs::read_to_string;
 use async_std::sync::Mutex;
 use obs::{OBSConfig, OBSConnector};
+use serde::{Deserialize, Serialize};
 use vts::{VTSConfig, VTSConnector};
 
-pub struct PluginConfig<'a> {
-    pub obs: Option<OBSConfig<'a>>,
-    pub vts: Option<VTSConfig<'a>>,
+#[derive(Serialize, Deserialize)]
+pub struct PluginConfig {
+    pub obs: Option<OBSConfig>,
+    pub vts: Option<VTSConfig>,
 }
 
 pub struct PluginState {
@@ -16,24 +19,27 @@ pub struct PluginState {
 }
 
 impl PluginState {
-    // TODO: make this load from a file
     pub async fn init() -> PluginState {
-        let conf = PluginConfig {
-            obs: Some(OBSConfig {
-                addr: "localhost",
-                port: 4455,
-                password: Some("1234567890"),
-            }),
-            vts: Some(VTSConfig {
-                addr: "ws://localhost:8001",
-                token_file: "vts_token.txt",
-            }),
-        };
+        let conf: PluginConfig = serde_json::from_str(
+            &read_to_string("config_plugin.json")
+                .await
+                .unwrap_or_else(|e| {
+                    println!("{}", e);
+                    String::new()
+                }),
+        )
+        .unwrap_or_else(|e| {
+            println!("Unable to parse plugin config: {}", e);
+            PluginConfig {
+                obs: None,
+                vts: None,
+            }
+        });
 
         PluginState {
             obs: Mutex::new({
                 // If config not present don't bother
-                if let Some(obs_conf) = &conf.obs {
+                if let Some(obs_conf) = conf.obs {
                     // If issue when setting up connection then print error
                     match OBSConnector::new(obs_conf).await {
                         Ok(o) => Some(o),
@@ -47,7 +53,7 @@ impl PluginState {
                 }
             }),
             vts: Mutex::new({
-                if let Some(vts_conf) = &conf.vts {
+                if let Some(vts_conf) = conf.vts {
                     Some(VTSConnector::new(vts_conf).await)
                 } else {
                     None
