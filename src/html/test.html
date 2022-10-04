@@ -3,13 +3,18 @@
   <head>
     <meta charset="utf-8">
     <title>ScuffCommander</title>
+    <script>
+        const xhr = new XMLHttpRequest();
+        function action(id) {
+            xhr.open("GET", "http://localhost:8080/click/" + id);
+            xhr.send()
+        }
+    </script>
   </head>
   <body>
-    <form action="http://localhost:8080/click/1">
-      <button type="submit">Action 1</button>
-    </form>
-    <form action="http://localhost:8080/click/2">
-      <button type="submit">Action 2</button>
-    </form>
+    <button type="button" onclick="action(1)">OBS Waiting Scene</button>
+    <button type="button" onclick="action(2)">OBS Desktop+VTS Scene</button>
+    <button type="button" onclick="action(3)">VTS Qt Toggle</button>
+    <button type="button" onclick="action(4)">VTS xD Toggle</button>
   </body>
 </html>

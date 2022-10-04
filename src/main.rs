@@ -62,8 +62,25 @@ async fn click(path: web::Path<String>) -> String {
             }
         }
         "2" => {
+            let obs = OBSConnector::new("localhost", 4455, Some("1234567890")).await;
+            if let Err(e) = obs {
+                return e;
+            }
+            match obs.unwrap().scene_change_current("Desktop + VTS").await {
+                Ok(_) => "Success".to_string(),
+                Err(e) => e,
+            }
+        }
+        "3" => {
             let mut vts = VTSConnector::new("ws://localhost:8001").await;
             match vts.toggle_expression("Qt.exp3.json").await {
+                Ok(_) => "Success".to_string(),
+                Err(e) => e,
+            }
+        }
+        "4" => {
+            let mut vts = VTSConnector::new("ws://localhost:8001").await;
+            match vts.toggle_expression("expressiong.exp3.json").await {
                 Ok(_) => "Success".to_string(),
                 Err(e) => e,
             }
