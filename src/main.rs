@@ -1,7 +1,13 @@
 use actix_web::{error, get, web, App, HttpResponse, HttpServer, Responder, Result};
+use async_std::sync::Mutex;
 use derive_more::{Display, Error};
 use scuffcommander::plugins::obs::OBSConnector;
 use scuffcommander::plugins::vts::VTSConnector;
+
+struct AppState {
+    obs: Mutex<Option<OBSConnector>>,
+    vts: Mutex<Option<VTSConnector>>,
+}
 
 #[get("/")]
 async fn hello() -> impl Responder {
@@ -18,13 +24,15 @@ struct PluginError {
 impl error::ResponseError for PluginError {}
 
 #[get("/obstest")]
-async fn obstest() -> Result<impl Responder, PluginError> {
-    let obs = OBSConnector::new("localhost", 4455, Some("1234567890")).await;
-    if let Err(e) = obs {
-        return Err(PluginError { contents: e });
+async fn obstest(data: web::Data<AppState>) -> Result<impl Responder, PluginError> {
+    let opt = &*data.obs.lock().await;
+    if opt.is_none() {
+        return Err(PluginError {
+            contents: "OBS plugin not configured".to_string(),
+        });
     }
 
-    let obs = obs.unwrap();
+    let obs = opt.as_ref().unwrap();
 
     if let (Ok(version), Ok(scene_list)) = (obs.obs_version().await, obs.scene_list().await) {
         Ok(HttpResponse::Ok().body(format!(
@@ -39,8 +47,14 @@ async fn obstest() -> Result<impl Responder, PluginError> {
 }
 
 #[get("/vtstest")]
-async fn vtstest() -> String {
-    let mut vts = VTSConnector::new("ws://localhost:8001").await;
+async fn vtstest(data: web::Data<AppState>) -> String {
+    let opt = &mut *data.vts.lock().await;
+    if opt.is_none() {
+        return "VTS plugin not configured".to_string();
+    }
+
+    let vts = opt.as_mut().unwrap();
+
     match vts.vts_version().await {
         Ok(v) => v,
         Err(e) => e,
@@ -48,38 +62,52 @@ async fn vtstest() -> String {
 }
 
 #[get("/click/{button}")]
-async fn click(path: web::Path<String>) -> String {
+async fn click(path: web::Path<String>, data: web::Data<AppState>) -> String {
     let button = path.into_inner();
     match button.as_str() {
         "1" => {
-            let obs = OBSConnector::new("localhost", 4455, Some("1234567890")).await;
-            if let Err(e) = obs {
-                return e;
+            let opt = &*data.obs.lock().await;
+            if opt.is_none() {
+                return "OBS plugin not configured".to_string();
             }
-            match obs.unwrap().scene_change_current("Waiting").await {
+
+            let obs = opt.as_ref().unwrap();
+            match obs.scene_change_current("Waiting").await {
                 Ok(_) => "Success".to_string(),
                 Err(e) => e,
             }
         }
         "2" => {
-            let obs = OBSConnector::new("localhost", 4455, Some("1234567890")).await;
-            if let Err(e) = obs {
-                return e;
+            let opt = &*data.obs.lock().await;
+            if opt.is_none() {
+                return "OBS plugin not configured".to_string();
             }
-            match obs.unwrap().scene_change_current("Desktop + VTS").await {
+
+            let obs = opt.as_ref().unwrap();
+            match obs.scene_change_current("Desktop + VTS").await {
                 Ok(_) => "Success".to_string(),
                 Err(e) => e,
             }
         }
         "3" => {
-            let mut vts = VTSConnector::new("ws://localhost:8001").await;
+            let opt = &mut *data.vts.lock().await;
+            if opt.is_none() {
+                return "VTS plugin not configured".to_string();
+            }
+
+            let vts = opt.as_mut().unwrap();
             match vts.toggle_expression("Qt.exp3.json").await {
                 Ok(_) => "Success".to_string(),
                 Err(e) => e,
             }
         }
         "4" => {
-            let mut vts = VTSConnector::new("ws://localhost:8001").await;
+            let opt = &mut *data.vts.lock().await;
+            if opt.is_none() {
+                return "VTS plugin not configured".to_string();
+            }
+
+            let vts = opt.as_mut().unwrap();
             match vts.toggle_expression("expressiong.exp3.json").await {
                 Ok(_) => "Success".to_string(),
                 Err(e) => e,
@@ -91,8 +119,28 @@ async fn click(path: web::Path<String>) -> String {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| App::new().service(hello).service(obstest).service(vtstest).service(click))
-        .bind(("127.0.0.1", 8080))?
-        .run()
-        .await
+    let obs_conn = OBSConnector::new("localhost", 4455, Some("1234567890")).await;
+    let mut obs = None;
+    if let Ok(o) = obs_conn {
+        obs = Some(o);
+    }
+
+    let vts = VTSConnector::new("ws://localhost:8001").await;
+
+    let state = web::Data::new(AppState {
+        obs: Mutex::new(obs),
+        vts: Mutex::new(Some(vts)),
+    });
+
+    HttpServer::new(move || {
+        App::new()
+            .service(hello)
+            .service(obstest)
+            .service(vtstest)
+            .service(click)
+            .app_data(state.clone())
+    })
+    .bind(("127.0.0.1", 8080))?
+    .run()
+    .await
 }
