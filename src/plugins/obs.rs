@@ -3,6 +3,21 @@ use obws::{Client, Version};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
+pub enum OBSAction {
+    SceneChange(String),
+    CheckConnection,
+}
+
+impl OBSAction {
+    pub async fn run(&self, conn: &OBSConnector) -> Result<(), String> {
+        match self {
+            OBSAction::SceneChange(scene) => conn.scene_change_current(scene).await,
+            OBSAction::CheckConnection => conn.obs_version().await.map(|_| ()),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize)]
 pub struct OBSConfig {
     pub addr: String,
     pub port: u16,
@@ -18,22 +33,6 @@ impl OBSConnector {
         match Client::connect(conf.addr, conf.port, conf.password).await {
             Ok(c) => Ok(OBSConnector { client: c }),
             Err(e) => Err(e.to_string()),
-        }
-    }
-
-    pub async fn from_option(conf: Option<OBSConfig>) -> Option<OBSConnector> {
-        // If config not present don't bother
-        if let Some(c) = conf {
-            // If issue when setting up connection then print error
-            match OBSConnector::new(c).await {
-                Ok(o) => Some(o),
-                Err(e) => {
-                    println!("{}", e);
-                    None
-                }
-            }
-        } else {
-            None
         }
     }
 

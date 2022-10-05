@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "3": {
+      "Single": {
+        "VTS": {
+          "ToggleExpression": "Qt.exp3.json"
+        }
+      }
+    },
+    "1": {
+      "Single": {
+        "OBS": {
+          "SceneChange": "Waiting"
+        }
+      }
+    },
+    "4": {
+      "Single": {
+        "VTS": {
+          "ToggleExpression": "expressiong.exp3.json"
+        }
+      }
+    },
+    "5": {
+      "Chain": [
+        {
+          "VTS": {
+            "ToggleExpression": "Qt.exp3.json"
+          }
+        },
+        {
+          "VTS": {
+            "ToggleExpression": "expressiong.exp3.json"
+          }
+        }
+      ]
+    },
+    "2": {
+      "Single": {
+        "OBS": {
+          "SceneChange": "Desktop + VTS"
+        }
+      }
+    }
+  }
+}

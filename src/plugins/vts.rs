@@ -5,6 +5,21 @@ use vtubestudio::data::{ExpressionActivationRequest, ExpressionStateRequest, Sta
 use vtubestudio::Client;
 
 #[derive(Serialize, Deserialize)]
+pub enum VTSAction {
+    ToggleExpression(String),
+    CheckConnection,
+}
+
+impl VTSAction {
+    pub async fn run(&self, conn: &mut VTSConnector) -> Result<(), String> {
+        match self {
+            VTSAction::ToggleExpression(expr) => conn.toggle_expression(expr).await,
+            VTSAction::CheckConnection => conn.vts_version().await.map(|_| ()),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize)]
 pub struct VTSConfig {
     pub addr: String,
     pub token_file: String,
@@ -45,14 +60,6 @@ impl VTSConnector {
         });
 
         VTSConnector { client }
-    }
-
-    // could have just used Option::map here if async was not needed
-    pub async fn from_option(conf: Option<VTSConfig>) -> Option<VTSConnector> {
-        match conf {
-            Some(c) => Some(VTSConnector::new(c).await),
-            None => None,
-        }
     }
 
     pub async fn vts_version(&mut self) -> Result<String, String> {

@@ -2,26 +2,86 @@ pub mod obs;
 pub mod vts;
 
 use async_std::sync::Mutex;
-use obs::{OBSConfig, OBSConnector};
+use derive_more::Display;
 use serde::{Deserialize, Serialize};
-use vts::{VTSConfig, VTSConnector};
+use std::collections::HashMap;
+
+use obs::{OBSAction, OBSConfig, OBSConnector};
+use vts::{VTSAction, VTSConfig, VTSConnector};
+
+#[derive(Eq, Hash, PartialEq, Display)]
+pub enum PluginType {
+    OBS,
+    VTS,
+}
+
+pub enum PluginInstance {
+    OBS(OBSConnector),
+    VTS(VTSConnector),
+}
 
 #[derive(Serialize, Deserialize)]
-pub struct PluginConfig {
-    pub obs: Option<OBSConfig>,
-    pub vts: Option<VTSConfig>,
+pub enum PluginAction {
+    OBS(OBSAction),
+    VTS(VTSAction),
 }
 
-pub struct PluginState {
-    pub obs: Mutex<Option<OBSConnector>>,
-    pub vts: Mutex<Option<VTSConnector>>,
+impl PluginAction {
+    pub async fn run(&self, plugin: &mut PluginInstance) -> Result<(), String> {
+        match (self, plugin) {
+            (PluginAction::OBS(action), PluginInstance::OBS(conn)) => action.run(conn).await,
+            (PluginAction::VTS(action), PluginInstance::VTS(conn)) => action.run(conn).await,
+            _ => Err("Mismatched action and plugin instance".to_string()),
+        }
+    }
+
+    pub fn get_required_type(&self) -> PluginType {
+        match self {
+            PluginAction::OBS(_) => PluginType::OBS,
+            PluginAction::VTS(_) => PluginType::VTS,
+        }
+    }
 }
 
-impl PluginState {
-    pub async fn init(conf: PluginConfig) -> PluginState {
-        PluginState {
-            obs: Mutex::new(OBSConnector::from_option(conf.obs).await),
-            vts: Mutex::new(VTSConnector::from_option(conf.vts).await),
+#[derive(Serialize, Deserialize)]
+pub struct PluginConfigs {
+    pub plugins: Vec<PluginConfig>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum PluginConfig {
+    OBS(OBSConfig),
+    VTS(VTSConfig),
+}
+
+pub struct PluginStates {
+    pub plugins: Mutex<HashMap<PluginType, PluginInstance>>,
+}
+
+impl PluginStates {
+    pub async fn init(conf: PluginConfigs) -> PluginStates {
+        let mut plugins = HashMap::new();
+        for plugin in conf.plugins {
+            match plugin {
+                PluginConfig::OBS(c) => match OBSConnector::new(c).await {
+                    Ok(o) => {
+                        plugins.insert(PluginType::OBS, PluginInstance::OBS(o));
+                    }
+                    Err(e) => {
+                        println!("OBS plugin init error: {}", e);
+                    }
+                },
+                PluginConfig::VTS(c) => {
+                    plugins.insert(
+                        PluginType::VTS,
+                        PluginInstance::VTS(VTSConnector::new(c).await),
+                    );
+                }
+            };
+        }
+
+        PluginStates {
+            plugins: Mutex::new(plugins),
         }
     }
 }
