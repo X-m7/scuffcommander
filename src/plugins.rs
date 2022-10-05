@@ -60,14 +60,12 @@ impl PluginStates {
         let mut plugins = HashMap::new();
         for plugin in conf {
             match plugin {
-                PluginConfig::OBS(c) => match OBSConnector::new(c).await {
-                    Ok(o) => {
-                        plugins.insert(PluginType::OBS, PluginInstance::OBS(o));
-                    }
-                    Err(e) => {
-                        println!("OBS plugin init error: {}", e);
-                    }
-                },
+                PluginConfig::OBS(c) => {
+                    plugins.insert(
+                        PluginType::OBS,
+                        PluginInstance::OBS(OBSConnector::new(c).await),
+                    );
+                }
                 PluginConfig::VTS(c) => {
                     plugins.insert(
                         PluginType::VTS,
