@@ -69,8 +69,6 @@ async fn click(
     actions_data: web::Data<ActionConfig>,
 ) -> String {
     let button = path.into_inner();
-
-    let plugins = &mut *data.plugins.lock().await;
     let actions = &actions_data.actions;
 
     if !actions.contains_key(button.as_str()) {
@@ -79,7 +77,7 @@ async fn click(
 
     let action = actions.get(button.as_str()).unwrap();
 
-    if let Err(e) = action.run(plugins).await {
+    if let Err(e) = action.run(&mut *data.plugins.lock().await).await {
         return e;
     }
 
