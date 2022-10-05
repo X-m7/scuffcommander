@@ -6,15 +6,7 @@ use std::fs::read_to_string;
 
 use plugins::{PluginAction, PluginConfig, PluginInstance, PluginType};
 
-/*
-* Code to generate the example config:
-*
-   let mut conf = AppConfig::from_file("kek");
-   conf.plugins.push(PluginConfig::OBS(OBSConfig { addr: "localhost".to_string(), port: 4455, password: Some("1234567890".to_string())}));
-   conf.plugins.push(PluginConfig::VTS(VTSConfig { addr: "ws://localhost:8001".to_string(), token_file: "vts_token.txt".to_string()}));
-   println!("{}", serde_json::to_string_pretty(&conf).unwrap());
-*
-*/
+// See src/bin/confgen.rs on how to generate the config file
 #[derive(Serialize, Deserialize)]
 pub struct AppConfig {
     pub addr: String,
