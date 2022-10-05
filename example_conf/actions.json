@@ -1,5 +1,19 @@
 {
   "actions": {
+    "2": {
+      "Single": {
+        "OBS": {
+          "SceneChange": "Desktop + VTS"
+        }
+      }
+    },
+    "4": {
+      "Single": {
+        "VTS": {
+          "ToggleExpression": "expressiong.exp3.json"
+        }
+      }
+    },
     "3": {
       "Single": {
         "VTS": {
@@ -11,13 +25,6 @@
       "Single": {
         "OBS": {
           "SceneChange": "Waiting"
-        }
-      }
-    },
-    "4": {
-      "Single": {
-        "VTS": {
-          "ToggleExpression": "expressiong.exp3.json"
         }
       }
     },
@@ -34,13 +41,6 @@
           }
         }
       ]
-    },
-    "2": {
-      "Single": {
-        "OBS": {
-          "SceneChange": "Desktop + VTS"
-        }
-      }
     }
   }
 }

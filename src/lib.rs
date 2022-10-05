@@ -1,16 +1,25 @@
 pub mod plugins;
 
-use std::fs::read_to_string;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::fs::read_to_string;
 
-use plugins::{PluginAction, PluginConfigs, PluginInstance, PluginType};
+use plugins::{PluginAction, PluginConfig, PluginInstance, PluginType};
 
+/*
+* Code to generate the example config:
+*
+   let mut conf = AppConfig::from_file("kek");
+   conf.plugins.push(PluginConfig::OBS(OBSConfig { addr: "localhost".to_string(), port: 4455, password: Some("1234567890".to_string())}));
+   conf.plugins.push(PluginConfig::VTS(VTSConfig { addr: "ws://localhost:8001".to_string(), token_file: "vts_token.txt".to_string()}));
+   println!("{}", serde_json::to_string_pretty(&conf).unwrap());
+*
+*/
 #[derive(Serialize, Deserialize)]
 pub struct AppConfig {
     pub addr: String,
     pub port: u16,
-    pub plugins: PluginConfigs,
+    pub plugins: Vec<PluginConfig>,
 }
 
 impl AppConfig {
@@ -25,14 +34,27 @@ impl AppConfig {
             AppConfig {
                 addr: "localhost".to_string(),
                 port: 8080,
-                plugins: PluginConfigs {
-                    plugins: Vec::new(),
-                },
+                plugins: Vec::new(),
             }
         })
     }
 }
 
+/*
+* Code to generate the example config:
+*
+   let mut actions = ActionConfig { actions: HashMap::new() };
+   let mut chain = Vec::new();
+   chain.push(PluginAction::VTS(VTSAction::ToggleExpression("Qt.exp3.json".to_string())));
+   chain.push(PluginAction::VTS(VTSAction::ToggleExpression("expressiong.exp3.json".to_string())));
+   actions.actions.insert("1".to_string(), Action::Single(PluginAction::OBS(OBSAction::SceneChange("Waiting".to_string()))));
+   actions.actions.insert("2".to_string(), Action::Single(PluginAction::OBS(OBSAction::SceneChange("Desktop + VTS".to_string()))));
+   actions.actions.insert("3".to_string(), Action::Single(PluginAction::VTS(VTSAction::ToggleExpression("Qt.exp3.json".to_string()))));
+   actions.actions.insert("4".to_string(), Action::Single(PluginAction::VTS(VTSAction::ToggleExpression("expressiong.exp3.json".to_string()))));
+   actions.actions.insert("5".to_string(), Action::Chain(chain));
+   println!("{}", serde_json::to_string_pretty(&actions).unwrap());
+*
+*/
 #[derive(Serialize, Deserialize)]
 pub struct ActionConfig {
     pub actions: HashMap<String, Action>,
@@ -47,7 +69,9 @@ impl ActionConfig {
         .unwrap_or_else(|e| {
             println!("Unable to parse action config: {}", e);
             println!("Using defaults");
-            ActionConfig { actions: HashMap::new() }
+            ActionConfig {
+                actions: HashMap::new(),
+            }
         })
     }
 }

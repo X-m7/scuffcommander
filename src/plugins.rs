@@ -44,24 +44,21 @@ impl PluginAction {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct PluginConfigs {
-    pub plugins: Vec<PluginConfig>,
-}
-
-#[derive(Serialize, Deserialize)]
 pub enum PluginConfig {
     OBS(OBSConfig),
     VTS(VTSConfig),
 }
 
+// Need mutex here because there can only be one of these
+// The server creates multiple threads, but there should be only one connection to OBS, VTS etc
 pub struct PluginStates {
     pub plugins: Mutex<HashMap<PluginType, PluginInstance>>,
 }
 
 impl PluginStates {
-    pub async fn init(conf: PluginConfigs) -> PluginStates {
+    pub async fn init(conf: Vec<PluginConfig>) -> PluginStates {
         let mut plugins = HashMap::new();
-        for plugin in conf.plugins {
+        for plugin in conf {
             match plugin {
                 PluginConfig::OBS(c) => match OBSConnector::new(c).await {
                     Ok(o) => {
