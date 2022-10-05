@@ -12,7 +12,10 @@ Effectively converts plain old HTTP requests to the WebSocket stuff used by OBS 
 1. Set up Rust (tested with 1.64)
 2. Run `cargo build` to compile
 
+## Configuring
+See the `example_conf` folder for example configuration files.
+
 ## Running
-1. Run `cargo run`
+1. Run `cargo run` in a directory with both `config.json` and `actions.json`
 2. Open the `src/html/test.html` file in a browser
 3. See if the buttons work
