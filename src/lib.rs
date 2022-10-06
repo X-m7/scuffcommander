@@ -1,12 +1,13 @@
 pub mod plugins;
 
+use async_recursion::async_recursion;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs::read_to_string;
 
 use plugins::{PluginAction, PluginConfig, PluginInstance, PluginType};
 
-// See src/bin/confgen.rs on how to generate the config file
+// See src/bin/confgen.rs on how to generate the config.json file
 #[derive(Serialize, Deserialize)]
 pub struct AppConfig {
     pub addr: String,
@@ -32,21 +33,7 @@ impl AppConfig {
     }
 }
 
-/*
-* Code to generate the example config:
-*
-   let mut actions = ActionConfig { actions: HashMap::new() };
-   let mut chain = Vec::new();
-   chain.push(PluginAction::VTS(VTSAction::ToggleExpression("Qt.exp3.json".to_string())));
-   chain.push(PluginAction::VTS(VTSAction::ToggleExpression("expressiong.exp3.json".to_string())));
-   actions.actions.insert("1".to_string(), Action::Single(PluginAction::OBS(OBSAction::SceneChange("Waiting".to_string()))));
-   actions.actions.insert("2".to_string(), Action::Single(PluginAction::OBS(OBSAction::SceneChange("Desktop + VTS".to_string()))));
-   actions.actions.insert("3".to_string(), Action::Single(PluginAction::VTS(VTSAction::ToggleExpression("Qt.exp3.json".to_string()))));
-   actions.actions.insert("4".to_string(), Action::Single(PluginAction::VTS(VTSAction::ToggleExpression("expressiong.exp3.json".to_string()))));
-   actions.actions.insert("5".to_string(), Action::Chain(chain));
-   println!("{}", serde_json::to_string_pretty(&actions).unwrap());
-*
-*/
+// See src/bin/actiongen.rs on how to generate the actions.json file
 #[derive(Serialize, Deserialize)]
 pub struct ActionConfig {
     pub actions: HashMap<String, Action>,
@@ -71,7 +58,7 @@ impl ActionConfig {
 #[derive(Serialize, Deserialize)]
 pub enum Action {
     Single(PluginAction),
-    Chain(Vec<PluginAction>),
+    Chain(Vec<Action>),
 }
 
 impl Action {
@@ -86,6 +73,7 @@ impl Action {
         }
     }
 
+    #[async_recursion]
     pub async fn run(
         &self,
         plugins: &mut HashMap<PluginType, PluginInstance>,
@@ -94,7 +82,7 @@ impl Action {
             Action::Single(action) => Action::run_single(action, plugins).await,
             Action::Chain(actions) => {
                 for action in actions {
-                    if let Err(e) = Action::run_single(action, plugins).await {
+                    if let Err(e) = action.run(plugins).await {
                         return Err(format!("Action chain failed: {}", e));
                     }
                 }
