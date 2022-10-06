@@ -6,8 +6,8 @@ use derive_more::Display;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-use obs::{OBSAction, OBSConfig, OBSConnector};
-use vts::{VTSAction, VTSConfig, VTSConnector};
+use obs::{OBSAction, OBSConfig, OBSConnector, OBSQuery};
+use vts::{VTSAction, VTSConfig, VTSConnector, VTSQuery};
 
 #[derive(Eq, Hash, PartialEq, Display)]
 pub enum PluginType {
@@ -18,6 +18,29 @@ pub enum PluginType {
 pub enum PluginInstance {
     OBS(OBSConnector),
     VTS(VTSConnector),
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum PluginQuery {
+    OBS(OBSQuery),
+    VTS(VTSQuery),
+}
+
+impl PluginQuery {
+    pub async fn get(&self, plugin: &mut PluginInstance) -> Result<String, String> {
+        match (self, plugin) {
+            (PluginQuery::OBS(query), PluginInstance::OBS(conn)) => query.run(conn).await,
+            (PluginQuery::VTS(query), PluginInstance::VTS(conn)) => query.run(conn).await,
+            _ => Err("Mismatched action and plugin instance".to_string()),
+        }
+    }
+
+    pub fn get_required_type(&self) -> PluginType {
+        match self {
+            PluginQuery::OBS(_) => PluginType::OBS,
+            PluginQuery::VTS(_) => PluginType::VTS,
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize)]

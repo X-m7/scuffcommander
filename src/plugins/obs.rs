@@ -1,18 +1,33 @@
 use obws::responses::scenes::Scene;
-use obws::{Client, Version};
+use obws::Client;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
+pub enum OBSQuery {
+    CurrentProgramScene,
+    Version,
+}
+
+impl OBSQuery {
+    pub async fn run(&self, conn: &mut OBSConnector) -> Result<String, String> {
+        match self {
+            OBSQuery::CurrentProgramScene => conn.get_current_program_scene().await,
+            OBSQuery::Version => conn.get_obs_version().await,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize)]
 pub enum OBSAction {
-    SceneChange(String),
+    ProgramSceneChange(String),
     CheckConnection,
 }
 
 impl OBSAction {
     pub async fn run(&self, conn: &mut OBSConnector) -> Result<(), String> {
         match self {
-            OBSAction::SceneChange(scene) => conn.scene_change_current(scene).await,
-            OBSAction::CheckConnection => conn.obs_version().await.map(|_| ()),
+            OBSAction::ProgramSceneChange(scene) => conn.change_current_program_scene(scene).await,
+            OBSAction::CheckConnection => conn.get_obs_version().await.map(|_| ()),
         }
     }
 }
@@ -53,13 +68,14 @@ impl OBSConnector {
         self.client.is_some()
     }
 
-    pub async fn obs_version(&mut self) -> Result<Version, String> {
+    // Just returns the major version (so for 28.0.2 this returns "28")
+    pub async fn get_obs_version(&mut self) -> Result<String, String> {
         if !self.check_conn().await {
             return Err("Unable to create OBS websocket connection".to_string());
         }
 
         match self.client.as_ref().unwrap().general().version().await {
-            Ok(v) => Ok(v.obs_version),
+            Ok(v) => Ok(v.obs_version.major.to_string()),
             Err(e) => {
                 self.client = None;
                 Err(e.to_string())
@@ -67,7 +83,7 @@ impl OBSConnector {
         }
     }
 
-    pub async fn scene_list(&mut self) -> Result<Vec<Scene>, String> {
+    pub async fn get_scene_list(&mut self) -> Result<Vec<Scene>, String> {
         if !self.check_conn().await {
             return Err("Unable to create OBS websocket connection".to_string());
         }
@@ -81,7 +97,28 @@ impl OBSConnector {
         }
     }
 
-    pub async fn scene_change_current(&mut self, scene: &str) -> Result<(), String> {
+    pub async fn get_current_program_scene(&mut self) -> Result<String, String> {
+        if !self.check_conn().await {
+            return Err("Unable to create OBS websocket connection".to_string());
+        }
+
+        match self
+            .client
+            .as_ref()
+            .unwrap()
+            .scenes()
+            .current_program_scene()
+            .await
+        {
+            Ok(s) => Ok(s),
+            Err(e) => {
+                self.client = None;
+                Err(e.to_string())
+            }
+        }
+    }
+
+    pub async fn change_current_program_scene(&mut self, scene: &str) -> Result<(), String> {
         if !self.check_conn().await {
             return Err("Unable to create OBS websocket connection".to_string());
         }

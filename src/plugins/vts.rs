@@ -1,12 +1,27 @@
 use actix_rt::spawn;
 use async_std::fs::{read_to_string, write};
 use serde::{Deserialize, Serialize};
-use vtubestudio::data::{ExpressionActivationRequest, ExpressionStateRequest, StatisticsRequest};
 use vtubestudio::Client;
+
+#[derive(Serialize, Deserialize)]
+pub enum VTSQuery {
+    ActiveModelId,
+    Version,
+}
+
+impl VTSQuery {
+    pub async fn run(&self, conn: &mut VTSConnector) -> Result<String, String> {
+        match self {
+            VTSQuery::ActiveModelId => conn.get_current_model_id().await,
+            VTSQuery::Version => conn.get_vts_version().await,
+        }
+    }
+}
 
 #[derive(Serialize, Deserialize)]
 pub enum VTSAction {
     ToggleExpression(String),
+    LoadModel(String),
     CheckConnection,
 }
 
@@ -14,7 +29,8 @@ impl VTSAction {
     pub async fn run(&self, conn: &mut VTSConnector) -> Result<(), String> {
         match self {
             VTSAction::ToggleExpression(expr) => conn.toggle_expression(expr).await,
-            VTSAction::CheckConnection => conn.vts_version().await.map(|_| ()),
+            VTSAction::LoadModel(model) => conn.load_model(model).await,
+            VTSAction::CheckConnection => conn.get_vts_version().await.map(|_| ()),
         }
     }
 }
@@ -62,10 +78,37 @@ impl VTSConnector {
         VTSConnector { client }
     }
 
-    pub async fn vts_version(&mut self) -> Result<String, String> {
-        let resp = self.client.send(&StatisticsRequest {}).await;
+    pub async fn get_vts_version(&mut self) -> Result<String, String> {
+        let resp = self
+            .client
+            .send(&vtubestudio::data::StatisticsRequest {})
+            .await;
         match resp {
             Ok(v) => Ok(v.vtubestudio_version),
+            Err(e) => Err(e.to_string()),
+        }
+    }
+
+    pub async fn get_current_model_id(&mut self) -> Result<String, String> {
+        let resp = self
+            .client
+            .send(&vtubestudio::data::CurrentModelRequest {})
+            .await;
+        match resp {
+            Ok(v) => Ok(v.model_id),
+            Err(e) => Err(e.to_string()),
+        }
+    }
+
+    pub async fn load_model(&mut self, model: &str) -> Result<(), String> {
+        let resp = self
+            .client
+            .send(&vtubestudio::data::ModelLoadRequest {
+                model_id: model.to_string(),
+            })
+            .await;
+        match resp {
+            Ok(_) => Ok(()),
             Err(e) => Err(e.to_string()),
         }
     }
@@ -77,7 +120,7 @@ impl VTSConnector {
     ) -> Result<(), String> {
         let resp = self
             .client
-            .send(&ExpressionActivationRequest {
+            .send(&vtubestudio::data::ExpressionActivationRequest {
                 expression_file: expr.to_string(),
                 active,
             })
@@ -91,7 +134,7 @@ impl VTSConnector {
     pub async fn toggle_expression(&mut self, expr: &str) -> Result<(), String> {
         let current_state = self
             .client
-            .send(&ExpressionStateRequest {
+            .send(&vtubestudio::data::ExpressionStateRequest {
                 details: false,
                 expression_file: Some(expr.to_string()),
             })

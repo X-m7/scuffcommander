@@ -1,18 +1,128 @@
 {
   "actions": {
-    "1": {
-      "Single": {
-        "OBS": {
-          "SceneChange": "Waiting"
+    "8": {
+      "If": [
+        {
+          "query": {
+            "VTS": "ActiveModelId"
+          },
+          "target": "d87b771d2902473bbaa0226d03ef4754"
+        },
+        {
+          "Single": {
+            "VTS": {
+              "LoadModel": "ca883c1edcac4739904f17ac2e92c768"
+            }
+          }
+        },
+        {
+          "If": [
+            {
+              "query": {
+                "VTS": "ActiveModelId"
+              },
+              "target": "ca883c1edcac4739904f17ac2e92c768"
+            },
+            {
+              "Single": {
+                "VTS": {
+                  "LoadModel": "d87b771d2902473bbaa0226d03ef4754"
+                }
+              }
+            },
+            null
+          ]
         }
-      }
+      ]
+    },
+    "7": {
+      "Chain": [
+        {
+          "If": [
+            {
+              "query": {
+                "VTS": "ActiveModelId"
+              },
+              "target": "d87b771d2902473bbaa0226d03ef4754"
+            },
+            {
+              "Single": {
+                "VTS": {
+                  "ToggleExpression": "EyesLove.exp3.json"
+                }
+              }
+            },
+            null
+          ]
+        },
+        {
+          "If": [
+            {
+              "query": {
+                "VTS": "ActiveModelId"
+              },
+              "target": "ca883c1edcac4739904f17ac2e92c768"
+            },
+            {
+              "Single": {
+                "VTS": {
+                  "ToggleExpression": "expressionb.exp3.json"
+                }
+              }
+            },
+            null
+          ]
+        }
+      ]
     },
     "2": {
       "Single": {
         "OBS": {
-          "SceneChange": "Desktop + VTS"
+          "ProgramSceneChange": "Desktop + VTS"
         }
       }
+    },
+    "4": {
+      "Single": {
+        "VTS": {
+          "ToggleExpression": "expressiong.exp3.json"
+        }
+      }
+    },
+    "6": {
+      "If": [
+        {
+          "query": {
+            "OBS": "CurrentProgramScene"
+          },
+          "target": "Desktop + VTS"
+        },
+        {
+          "Single": {
+            "OBS": {
+              "ProgramSceneChange": "Waiting"
+            }
+          }
+        },
+        {
+          "If": [
+            {
+              "query": {
+                "OBS": "CurrentProgramScene"
+              },
+              "target": "Waiting"
+            },
+            {
+              "Single": {
+                "OBS": {
+                  "ProgramSceneChange": "Desktop + VTS"
+                }
+              }
+            },
+            null
+          ]
+        }
+      ]
     },
     "3": {
       "Single": {
@@ -21,10 +131,10 @@
         }
       }
     },
-    "4": {
+    "1": {
       "Single": {
-        "VTS": {
-          "ToggleExpression": "expressiong.exp3.json"
+        "OBS": {
+          "ProgramSceneChange": "Waiting"
         }
       }
     },

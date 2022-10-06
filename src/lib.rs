@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs::read_to_string;
 
-use plugins::{PluginAction, PluginConfig, PluginInstance, PluginType};
+use plugins::{PluginAction, PluginConfig, PluginInstance, PluginQuery, PluginType};
 
 // See src/bin/confgen.rs on how to generate the config.json file
 #[derive(Serialize, Deserialize)]
@@ -56,9 +56,37 @@ impl ActionConfig {
 }
 
 #[derive(Serialize, Deserialize)]
+pub struct Condition {
+    pub query: PluginQuery,
+    pub target: String,
+}
+
+impl Condition {
+    pub async fn check(
+        &self,
+        plugins: &mut HashMap<PluginType, PluginInstance>,
+    ) -> Result<bool, String> {
+        let plugin_type = self.query.get_required_type();
+
+        let plugin = plugins.get_mut(&plugin_type);
+        if plugin.is_none() {
+            return Err(format!("Plugin {} not configured", plugin_type));
+        }
+
+        let query = self.query.get(plugin.unwrap()).await;
+        match query {
+            Ok(q) => Ok(q == self.target),
+            Err(e) => Err(e),
+        }
+    }
+}
+
+// need Box to allow recursion
+#[derive(Serialize, Deserialize)]
 pub enum Action {
     Single(PluginAction),
     Chain(Vec<Action>),
+    If(Condition, Box<Action>, Option<Box<Action>>),
 }
 
 impl Action {
@@ -88,6 +116,18 @@ impl Action {
                 }
                 Ok(())
             }
+            Action::If(cond, then, else_) => match cond.check(plugins).await {
+                Ok(proceed) => {
+                    if proceed {
+                        then.run(plugins).await
+                    } else if let Some(else_action) = else_ {
+                        else_action.run(plugins).await
+                    } else {
+                        Ok(())
+                    }
+                }
+                Err(e) => Err(e),
+            },
         }
     }
 }
