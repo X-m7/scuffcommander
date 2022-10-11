@@ -31,15 +31,24 @@ async fn click(
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let conf = AppConfig::from_file("config.json");
+    let args: Vec<String> = std::env::args().collect();
+
+    if args.len() == 1 {
+        println!("Configuration folder required");
+        return Ok(());
+    };
+
+    let conf = AppConfig::from_file(&format!("{}/config.json", args[1]));
     let state = web::Data::new(PluginStates::init(conf.plugins).await);
+
+    let actions_path = format!("{}/actions.json", args[1]);
 
     HttpServer::new(move || {
         App::new()
             .service(hello)
             .service(click)
             .app_data(state.clone())
-            .app_data(web::Data::new(ActionConfig::from_file("actions.json")))
+            .app_data(web::Data::new(ActionConfig::from_file(&actions_path)))
     })
     .bind((conf.addr, conf.port))?
     .run()
