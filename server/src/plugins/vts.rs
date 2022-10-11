@@ -1,4 +1,3 @@
-use actix_rt::spawn;
 use async_std::fs::{read_to_string, write};
 use serde::{Deserialize, Serialize};
 use vtubestudio::Client;
@@ -63,7 +62,7 @@ impl VTSConnector {
 
         let token_file = conf.token_file.to_string();
 
-        spawn(async move {
+        tokio::spawn(async move {
             // This returns whenever the authentication middleware receives a new auth token.
             // We can handle it by saving it somewhere, etc.
             while let Some(token) = new_tokens.next().await {
