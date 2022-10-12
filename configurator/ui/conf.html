@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Main</title>
+    <script src="/conf.js"></script>
+  </head>
+  <body>
+    <h1>General Configuration</h1>
+    <a href="/index.html">Back</a>
+    <button type="button" onclick="saveConfig()">Save</button>
+    <p id="saveOutput" />
+    <h2>Server Configuration</h2>
+    <form name="serverForm">
+        <label for="name">Server Name</label>
+        <input type="text" name="addr" value="localhost" /><br />
+        <label for="port">Server Port</label>
+        <input type="number" name="port" value="8080" />
+    </form>
+    <h2>OBS Configuration</h2>
+    <form name="obsForm">
+        <label for="name">WebSocket Server Address</label>
+        <input type="text" name="addr" value="localhost" /><br />
+        <label for="name">WebSocket Server Port</label>
+        <input type="number" name="port" value="4455" /><br />
+        <label for="name">WebSocket Server Password</label>
+        <input type="password" name="pw" /><br />
+        <button type="button" onclick="testObs()">Test parameters</button>
+        <p>Connection test result: <span id="obsCheck"/></p>
+    </form>
+    <h2>VTube Studio Configuration</h2>
+    <form name="vtsForm">
+        <label for="name">WebSocket Server Full Address</label>
+        <input type="text" name="addr" value="ws://localhost:8001" /><br />
+        <label for="name">Token File Path</label>
+        <input type="text" name="tokenFile" /><br />
+        <button type="button" onclick="testVts()">Test parameters</button>
+        <p>Connection test result: <span id="vtsCheck"/></p>
+    </form>
+  </body>
+</html>
