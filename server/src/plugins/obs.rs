@@ -32,7 +32,7 @@ impl OBSAction {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct OBSConfig {
     pub addr: String,
     pub port: u16,

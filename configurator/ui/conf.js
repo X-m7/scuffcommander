@@ -61,3 +61,23 @@ function saveConfig() {
         document.getElementById("saveOutput").innerHTML = "Error occurred: " + e;
     });
 }
+
+function updateView(conf) {
+    document.serverForm.addr.value = conf.addr;
+    document.serverForm.port.value = conf.port;
+
+    for (i in conf.plugins) {
+        if ("OBS" in conf.plugins[i]) {
+            document.obsForm.addr.value = conf.plugins[i].OBS.addr;
+            document.obsForm.port.value = conf.plugins[i].OBS.port;
+            document.obsForm.pw.value = conf.plugins[i].OBS.password;
+        } else if ("VTS" in conf.plugins[i]) {
+            document.vtsForm.addr.value = conf.plugins[i].VTS.addr;
+            document.vtsForm.tokenFile.value = conf.plugins[i].VTS.token_file;
+        }
+    }
+}
+
+function loadConfig() {
+    invoke("get_config").then((conf) => updateView(conf));
+}

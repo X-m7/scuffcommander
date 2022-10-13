@@ -12,6 +12,7 @@ use scuffcommander::plugins::obs::{OBSConfig, OBSConnector};
 use scuffcommander::plugins::vts::{VTSConfig, VTSConnector};
 
 struct ActionConfigState(Mutex<ActionConfig>);
+struct AppConfigState(AppConfig);
 struct ConfigFolder(String);
 
 #[tauri::command]
@@ -21,12 +22,8 @@ async fn get_obs_scenes(
     let mut plugins = plugins_data.plugins.lock().await;
 
     if let Some(PluginInstance::OBS(obs)) = plugins.get_mut(&PluginType::OBS) {
-        let scenes = obs.get_scene_list().await;
-        if let Err(e) = scenes {
-            return Err(e);
-        }
+        let scenes = obs.get_scene_list().await?;
 
-        let scenes = scenes.unwrap();
         let mut scene_names = Vec::new();
         for scene in scenes {
             scene_names.push(scene.name);
@@ -68,6 +65,11 @@ async fn save_config(
     }
 }
 
+#[tauri::command]
+fn get_config(conf_state: tauri::State<'_, AppConfigState>) -> AppConfig {
+    conf_state.0.clone()
+}
+
 #[tokio::main]
 async fn main() {
     let args: Vec<String> = std::env::args().collect();
@@ -83,6 +85,7 @@ async fn main() {
     let conf = AppConfig::from_file(&conf_path);
 
     tauri::Builder::default()
+        .manage(AppConfigState(conf.clone()))
         .manage(PluginStates::init(conf.plugins).await)
         .manage(ActionConfigState(Mutex::new(ActionConfig::from_file(
             &actions_path,
@@ -92,7 +95,8 @@ async fn main() {
             get_obs_scenes,
             test_obs_connection,
             test_vts_connection,
-            save_config
+            save_config,
+            get_config
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

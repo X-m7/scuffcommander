@@ -34,7 +34,7 @@ impl VTSAction {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct VTSConfig {
     pub addr: String,
     pub token_file: String,

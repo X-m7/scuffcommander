@@ -66,7 +66,7 @@ impl PluginAction {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub enum PluginConfig {
     OBS(OBSConfig),
     VTS(VTSConfig),

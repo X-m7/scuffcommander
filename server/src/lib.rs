@@ -8,7 +8,7 @@ use std::fs::read_to_string;
 use plugins::{PluginAction, PluginConfig, PluginInstance, PluginQuery, PluginType};
 
 // See src/bin/confgen.rs on how to generate the config.json file
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct AppConfig {
     pub addr: String,
     pub port: u16,
