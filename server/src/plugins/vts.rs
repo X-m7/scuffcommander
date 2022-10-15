@@ -150,4 +150,45 @@ impl VTSConnector {
         self.change_expression_state(expr, !current_exprs[0].active)
             .await
     }
+
+    pub async fn get_expression_name_list(&mut self) -> Result<Vec<String>, String> {
+        let current_state = self
+            .client
+            .send(&vtubestudio::data::ExpressionStateRequest {
+                details: false,
+                expression_file: None,
+            })
+            .await;
+        if let Err(e) = current_state {
+            return Err(e.to_string());
+        }
+
+        let exprs = current_state.unwrap().expressions;
+        let mut out = Vec::new();
+
+        for expr in exprs {
+            out.push(expr.name);
+        }
+
+        Ok(out)
+    }
+
+    pub async fn get_model_name_list(&mut self) -> Result<Vec<String>, String> {
+        let current_state = self
+            .client
+            .send(&vtubestudio::data::AvailableModelsRequest {})
+            .await;
+        if let Err(e) = current_state {
+            return Err(e.to_string());
+        }
+
+        let models = current_state.unwrap().available_models;
+        let mut out = Vec::new();
+
+        for model in models {
+            out.push(model.model_name);
+        }
+
+        Ok(out)
+    }
 }

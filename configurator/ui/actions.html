@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="actions.js"></script>
+    <title>Main</title>
+  </head>
+  <body onload="loadActions()">
+    <h1>Actions Configuration</h1>
+    <p><a href="index.html">Back</a></p>
+    <form name="actionSelect">
+        <label for="action">Create a new action or select an existing one:</label>
+        <select name="action" oninput="chooseAction()">
+            <option value="none">Select an option</option>
+            <option value="new">Create a new action</option>
+        </select>
+    </form>
+    <form name="actionModify" hidden>
+        <label for="name">Action ID:</label>
+        <input type="text" name="input" placeholder="(only letters, numbers and hyphens)" />
+        <label for="type">Action type:</label>
+        <select name="type" oninput="chooseType()">
+            <option value="none">Select an option</option>
+            <option value="single">Single</option>
+            <option value="chain">Chain</option>
+            <option value="condition">Condition</option>
+        </select>
+    </form>
+    <form name="singleAction" hidden>
+        <label for="plugin">Plugin:</label>
+        <select name="plugin" oninput="choosePlugin()">
+            <option value="none">Select an option</option>
+            <option value="obs">OBS</option>
+            <option value="vts">VTube Studio</option>
+        </select>
+        <div id="obsTypeSelect" hidden>
+            <label for="typeObs">OBS action type:</label>
+            <select name="typeObs" oninput="obsChooseType()">
+                <option value="none">Select an option</option>
+                <option value="ProgramSceneChange">Program Scene Change</option>
+            </select>
+        </div>
+        <div id="vtsTypeSelect" hidden>
+            <label for="typeVts">VTube Studio action type:</label>
+            <select name="typeVts" oninput="vtsChooseType()">
+                <option value="none">Select an option</option>
+                <option value="ToggleExpression">Toggle Expression</option>
+                <option value="LoadModel">Load Model</option>
+            </select>
+        </div>
+        <div id="actionInputSelect" hidden>
+            <label for="inputSelect">Action parameter:</label>
+            <select name="inputSelect">
+                <option value="none">Select an option</option>
+            </select>
+        </div>
+    </form>
+  </body>
+</html>
