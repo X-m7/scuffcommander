@@ -1,6 +1,66 @@
 const { invoke } = window.__TAURI__.tauri;
 
+function getPluginParam(plugin) {
+    switch (plugin) {
+        case "none":
+            console.log("Invalid plugin type");
+            return null;
+        case "OBS":
+            return {
+                type: document.singleAction.typeObs.value,
+                param: document.singleAction.inputSelect.value
+            };
+        case "VTS":
+            return {
+                type: document.singleAction.typeVts.value,
+                param: document.singleAction.inputSelect.value
+            };
+    }
+}
+
+function addNewSingleAction() {
+    const id = document.actionModify.id.value;
+    const pluginType = document.singleAction.plugin.value;
+    const pluginData = getPluginParam(pluginType);
+    // once the action has been added refresh the list of actions
+    invoke("add_new_single_action", { id: id, pluginType: pluginType, pluginData: pluginData }).then(loadActions);
+}
+
+function addNewAction() {
+    const type = document.actionModify.type.value;
+    switch (type) {
+        case "none":
+            console.log("Invalid action type");
+            break;
+        case "single":
+            addNewSingleAction();
+            break;
+    }
+}
+
+function saveCurrentAction() {
+    switch (document.actionSelect.action.value) {
+        case "none":
+            console.log("Invalid action selected");
+            break;
+        case "new":
+            addNewAction();
+            break;
+    }
+}
+
 function updateActions(actions) {
+    document.actionSelect.action.options.length = 0;
+    let defaultOpt = document.createElement("option");
+    defaultOpt.value = "none";
+    defaultOpt.innerHTML = "Select an option"
+    document.actionSelect.action.appendChild(defaultOpt);
+
+    let defaultOpt2 = document.createElement("option");
+    defaultOpt2.value = "new";
+    defaultOpt2.innerHTML = "Create a new action"
+    document.actionSelect.action.appendChild(defaultOpt2);
+
     for (i in actions) {
         let opt = document.createElement("option");
         // prepend something so we can differentiate the real options from "none" and "new"
@@ -54,11 +114,12 @@ function choosePlugin() {
             document.getElementById("obsTypeSelect").setAttribute("hidden", true);
             document.getElementById("actionInputSelect").setAttribute("hidden", true);
             break;
-        case "obs":
+        case "OBS":
             document.getElementById("obsTypeSelect").removeAttribute("hidden");
             document.getElementById("vtsTypeSelect").setAttribute("hidden", true);
+            document.getElementById("actionInputSelect").removeAttribute("hidden");
             break;
-        case "vts":
+        case "VTS":
             document.getElementById("vtsTypeSelect").removeAttribute("hidden");
             document.getElementById("obsTypeSelect").setAttribute("hidden", true);
             document.getElementById("actionInputSelect").removeAttribute("hidden");

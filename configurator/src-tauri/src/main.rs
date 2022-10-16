@@ -5,8 +5,9 @@
 
 use async_std::fs::write;
 use async_std::sync::Mutex;
-use scuffcommander_core::plugins::{PluginInstance, PluginStates, PluginType};
-use scuffcommander_core::{ActionConfig, AppConfig};
+use scuffcommander_core::plugins::{PluginAction, PluginInstance, PluginStates, PluginType};
+use scuffcommander_core::{Action, ActionConfig, AppConfig};
+use serde_json::value::Value;
 
 use scuffcommander_core::plugins::obs::{OBSConfig, OBSConnector};
 use scuffcommander_core::plugins::vts::{VTSConfig, VTSConnector};
@@ -74,9 +75,9 @@ fn get_config(conf_state: tauri::State<'_, AppConfigState>) -> AppConfig {
 async fn get_actions(
     actions_state: tauri::State<'_, ActionConfigState>,
 ) -> Result<Vec<String>, ()> {
+    let mut actions_vec = Vec::new();
     let actions = &actions_state.0.lock().await.actions;
 
-    let mut actions_vec = Vec::new();
     for action in actions.keys() {
         actions_vec.push(action.clone());
     }
@@ -110,6 +111,27 @@ async fn get_vts_model_names(
     }
 }
 
+#[tauri::command]
+async fn add_new_single_action(
+    id: String,
+    plugin_type: PluginType,
+    plugin_data: Value,
+    actions_state: tauri::State<'_, ActionConfigState>,
+) -> Result<(), String> {
+    if id.is_empty() {
+        return Err("ID can't be empty".to_string());
+    }
+
+    let action = PluginAction::from_json(plugin_type, plugin_data)?;
+    let actions = &mut actions_state.0.lock().await.actions;
+    if actions.contains_key(&id) {
+        return Err("Action with given ID already exists".to_string());
+    }
+    actions.insert(id, Action::Single(action));
+
+    Ok(())
+}
+
 #[tokio::main]
 async fn main() {
     let args: Vec<String> = std::env::args().collect();
@@ -139,7 +161,8 @@ async fn main() {
             get_config,
             get_actions,
             get_vts_expression_names,
-            get_vts_model_names
+            get_vts_model_names,
+            add_new_single_action
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

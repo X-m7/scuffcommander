@@ -1,6 +1,7 @@
 use obws::responses::scenes::Scene;
 use obws::Client;
 use serde::{Deserialize, Serialize};
+use serde_json::value::Value;
 
 #[derive(Serialize, Deserialize)]
 pub enum OBSQuery {
@@ -28,6 +29,28 @@ impl OBSAction {
         match self {
             OBSAction::ProgramSceneChange(scene) => conn.change_current_program_scene(scene).await,
             OBSAction::CheckConnection => conn.get_obs_version().await.map(|_| ()),
+        }
+    }
+
+    pub fn from_json(data: Value) -> Result<OBSAction, String> {
+        if data.is_object() {
+            Ok(
+                match data["type"]
+                    .as_str()
+                    .ok_or_else(|| "OBS action type must be a string".to_string())?
+                {
+                    "ProgramSceneChange" => OBSAction::ProgramSceneChange(
+                        data["param"]
+                            .as_str()
+                            .ok_or_else(|| "OBS action parameter must be a string".to_string())?
+                            .to_string(),
+                    ),
+                    "CheckConnection" => OBSAction::CheckConnection,
+                    _ => return Err("Unsupported OBS action type".to_string()),
+                },
+            )
+        } else {
+            Err("Invalid data input for OBS action".to_string())
         }
     }
 }

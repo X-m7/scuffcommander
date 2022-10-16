@@ -1,5 +1,6 @@
 use async_std::fs::{read_to_string, write};
 use serde::{Deserialize, Serialize};
+use serde_json::value::Value;
 use vtubestudio::Client;
 
 #[derive(Serialize, Deserialize)]
@@ -30,6 +31,34 @@ impl VTSAction {
             VTSAction::ToggleExpression(expr) => conn.toggle_expression(expr).await,
             VTSAction::LoadModel(model) => conn.load_model(model).await,
             VTSAction::CheckConnection => conn.get_vts_version().await.map(|_| ()),
+        }
+    }
+
+    pub fn from_json(data: Value) -> Result<VTSAction, String> {
+        if data.is_object() {
+            Ok(
+                match data["type"]
+                    .as_str()
+                    .ok_or_else(|| "VTS action type must be a string".to_string())?
+                {
+                    "ToggleExpression" => VTSAction::ToggleExpression(
+                        data["param"]
+                            .as_str()
+                            .ok_or_else(|| "VTS action parameter must be a string".to_string())?
+                            .to_string(),
+                    ),
+                    "LoadModel" => VTSAction::LoadModel(
+                        data["param"]
+                            .as_str()
+                            .ok_or_else(|| "VTS action parameter must be a string".to_string())?
+                            .to_string(),
+                    ),
+                    "CheckConnection" => VTSAction::CheckConnection,
+                    _ => return Err("Unsupported VTS action type".to_string()),
+                },
+            )
+        } else {
+            Err("Invalid data input for OBS action".to_string())
         }
     }
 }

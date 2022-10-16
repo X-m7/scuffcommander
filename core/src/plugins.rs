@@ -4,12 +4,13 @@ pub mod vts;
 use async_std::sync::Mutex;
 use derive_more::Display;
 use serde::{Deserialize, Serialize};
+use serde_json::value::Value;
 use std::collections::HashMap;
 
 use obs::{OBSAction, OBSConfig, OBSConnector, OBSQuery};
 use vts::{VTSAction, VTSConfig, VTSConnector, VTSQuery};
 
-#[derive(Eq, Hash, PartialEq, Display)]
+#[derive(Eq, Hash, PartialEq, Display, Serialize, Deserialize)]
 pub enum PluginType {
     OBS,
     VTS,
@@ -63,6 +64,14 @@ impl PluginAction {
             PluginAction::OBS(_) => PluginType::OBS,
             PluginAction::VTS(_) => PluginType::VTS,
         }
+    }
+
+    // Helper method to make creating actions from frontend simpler
+    pub fn from_json(plugin_type: PluginType, data: Value) -> Result<PluginAction, String> {
+        Ok(match plugin_type {
+            PluginType::OBS => PluginAction::OBS(OBSAction::from_json(data)?),
+            PluginType::VTS => PluginAction::VTS(VTSAction::from_json(data)?),
+        })
     }
 }
 
