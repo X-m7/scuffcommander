@@ -67,6 +67,22 @@ async fn save_config(
 }
 
 #[tauri::command]
+async fn save_actions(
+    actions_state: tauri::State<'_, ActionConfigState>,
+    conf_state: tauri::State<'_, ConfigFolder>,
+) -> Result<(), String> {
+    match write(
+        format!("{}/actions.json", &conf_state.0),
+        serde_json::to_string_pretty(&*actions_state.0.lock().await).expect("Not ActionConfig?"),
+    )
+    .await
+    {
+        Ok(_) => Ok(()),
+        Err(e) => Err(e.to_string()),
+    }
+}
+
+#[tauri::command]
 fn get_config(conf_state: tauri::State<'_, AppConfigState>) -> AppConfig {
     conf_state.0.clone()
 }
@@ -152,7 +168,12 @@ async fn main() {
         .manage(ActionConfigState(Mutex::new(ActionConfig::from_file(
             "actions.json",
         ))))
-        .manage(ConfigFolder(args[1].clone()))
+        .manage(ConfigFolder(
+            std::env::current_dir()
+                .expect("Invalid current dir?")
+                .display()
+                .to_string(),
+        ))
         .invoke_handler(tauri::generate_handler![
             get_obs_scenes,
             test_obs_connection,
@@ -162,7 +183,8 @@ async fn main() {
             get_actions,
             get_vts_expression_names,
             get_vts_model_names,
-            add_new_single_action
+            add_new_single_action,
+            save_actions
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

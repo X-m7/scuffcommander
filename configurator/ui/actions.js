@@ -1,5 +1,13 @@
 const { invoke } = window.__TAURI__.tauri;
 
+function saveAll() {
+    invoke("save_actions").then(() => {
+        document.getElementById("saveAllOutput").innerHTML = "Actions saved";
+    }).catch((e) => {
+        document.getElementById("saveAllOutput").innerHTML = "Error occurred: " + e;
+    });
+}
+
 function getPluginParam(plugin) {
     switch (plugin) {
         case "none":
@@ -8,12 +16,14 @@ function getPluginParam(plugin) {
         case "OBS":
             return {
                 type: document.singleAction.typeObs.value,
-                param: document.singleAction.inputSelect.value
+                // substring because it had "x-" prepended to it
+                param: document.singleAction.inputSelect.value.substring(2)
             };
         case "VTS":
             return {
                 type: document.singleAction.typeVts.value,
-                param: document.singleAction.inputSelect.value
+                // substring because it had "x-" prepended to it
+                param: document.singleAction.inputSelect.value.substring(2)
             };
     }
 }
