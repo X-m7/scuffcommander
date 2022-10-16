@@ -119,16 +119,16 @@ async fn main() {
         return;
     };
 
-    let conf_path = format!("{}/config.json", args[1]);
-    let actions_path = format!("{}/actions.json", args[1]);
+    // cd to config directory so relative paths (for example for the VTS token file) goes there
+    std::env::set_current_dir(&args[1]).expect("Unable to open given config directory");
 
-    let conf = AppConfig::from_file(&conf_path);
+    let conf = AppConfig::from_file("config.json");
 
     tauri::Builder::default()
         .manage(AppConfigState(conf.clone()))
         .manage(PluginStates::init(conf.plugins).await)
         .manage(ActionConfigState(Mutex::new(ActionConfig::from_file(
-            &actions_path,
+            "actions.json",
         ))))
         .manage(ConfigFolder(args[1].clone()))
         .invoke_handler(tauri::generate_handler![

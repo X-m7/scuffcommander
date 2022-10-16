@@ -38,17 +38,18 @@ async fn main() -> std::io::Result<()> {
         return Ok(());
     };
 
-    let conf = AppConfig::from_file(&format!("{}/config.json", args[1]));
-    let state = web::Data::new(PluginStates::init(conf.plugins).await);
+    // cd to config directory so relative paths (for example for the VTS token file) goes there
+    std::env::set_current_dir(&args[1]).expect("Unable to open the given config directory");
 
-    let actions_path = format!("{}/actions.json", args[1]);
+    let conf = AppConfig::from_file("config.json");
+    let state = web::Data::new(PluginStates::init(conf.plugins).await);
 
     HttpServer::new(move || {
         App::new()
             .service(hello)
             .service(click)
             .app_data(state.clone())
-            .app_data(web::Data::new(ActionConfig::from_file(&actions_path)))
+            .app_data(web::Data::new(ActionConfig::from_file("actions.json")))
     })
     .bind((conf.addr, conf.port))?
     .run()
