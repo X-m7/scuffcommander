@@ -1,6 +1,6 @@
 use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
-use scuffcommander::plugins::PluginStates;
-use scuffcommander::{ActionConfig, AppConfig};
+use scuffcommander_core::plugins::PluginStates;
+use scuffcommander_core::{ActionConfig, AppConfig};
 
 #[get("/")]
 async fn hello() -> impl Responder {

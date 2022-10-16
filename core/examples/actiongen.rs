@@ -1,7 +1,7 @@
-use scuffcommander::plugins::obs::{OBSAction, OBSQuery};
-use scuffcommander::plugins::vts::{VTSAction, VTSQuery};
-use scuffcommander::plugins::{PluginAction, PluginQuery};
-use scuffcommander::{Action, ActionConfig, Condition};
+use scuffcommander_core::plugins::obs::{OBSAction, OBSQuery};
+use scuffcommander_core::plugins::vts::{VTSAction, VTSQuery};
+use scuffcommander_core::plugins::{PluginAction, PluginQuery};
+use scuffcommander_core::{Action, ActionConfig, Condition};
 use std::collections::HashMap;
 
 // Nested conditionals

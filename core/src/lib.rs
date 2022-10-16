@@ -7,7 +7,7 @@ use std::fs::read_to_string;
 
 use plugins::{PluginAction, PluginConfig, PluginInstance, PluginQuery, PluginType};
 
-// See src/bin/confgen.rs on how to generate the config.json file
+// See examples/confgen.rs on how to generate the config.json file
 #[derive(Serialize, Deserialize, Clone)]
 pub struct AppConfig {
     pub addr: String,
@@ -33,7 +33,7 @@ impl AppConfig {
     }
 }
 
-// See src/bin/actiongen.rs on how to generate the actions.json file
+// See examples/actiongen.rs on how to generate the actions.json file
 #[derive(Serialize, Deserialize)]
 pub struct ActionConfig {
     pub actions: HashMap<String, Action>,

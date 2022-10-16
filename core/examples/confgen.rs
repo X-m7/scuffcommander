@@ -1,7 +1,7 @@
-use scuffcommander::plugins::obs::OBSConfig;
-use scuffcommander::plugins::vts::VTSConfig;
-use scuffcommander::plugins::PluginConfig;
-use scuffcommander::AppConfig;
+use scuffcommander_core::plugins::obs::OBSConfig;
+use scuffcommander_core::plugins::vts::VTSConfig;
+use scuffcommander_core::plugins::PluginConfig;
+use scuffcommander_core::AppConfig;
 use std::io::stdin;
 
 fn input_str(statement: &str, default: &str) -> String {

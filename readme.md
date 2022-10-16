@@ -23,7 +23,7 @@ See the `example_conf` folder for example configuration files.
 
 ### Server
 1. Run `cargo run -- <conf>` in the `server` folder, where `<conf>` is the path to the folder with `actions.json` and `config.json`
-2. Open the `server/src/html/test.html` file in a browser
+2. Open the `server/html/test.html` file in a browser
 3. See if the buttons work
 
 ### Configurator

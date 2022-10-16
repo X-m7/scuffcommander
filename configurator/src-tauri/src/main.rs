@@ -5,11 +5,11 @@
 
 use async_std::fs::write;
 use async_std::sync::Mutex;
-use scuffcommander::plugins::{PluginInstance, PluginStates, PluginType};
-use scuffcommander::{ActionConfig, AppConfig};
+use scuffcommander_core::plugins::{PluginInstance, PluginStates, PluginType};
+use scuffcommander_core::{ActionConfig, AppConfig};
 
-use scuffcommander::plugins::obs::{OBSConfig, OBSConnector};
-use scuffcommander::plugins::vts::{VTSConfig, VTSConnector};
+use scuffcommander_core::plugins::obs::{OBSConfig, OBSConnector};
+use scuffcommander_core::plugins::vts::{VTSConfig, VTSConnector};
 
 struct ActionConfigState(Mutex<ActionConfig>);
 struct AppConfigState(AppConfig);
