@@ -1,60 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="actions.js"></script>
     <title>Main</title>
   </head>
   <body onload="loadActions()">
     <h1>Actions Configuration</h1>
-    <p><a href="index.html">Back</a></p>
+    <a href="index.html">Back</a>
     <form name="actionSelect">
-        <label for="action">Create a new action or select an existing one:</label>
-        <select name="action" oninput="chooseAction()">
+        <label>Create a new action or select an existing one: <select name="action" oninput="chooseAction()">
             <option value="none">Select an option</option>
             <option value="new">Create a new action</option>
-        </select>
+        </select></label>
     </form>
     <form name="actionModify" hidden>
-        <label for="name">Action ID:</label>
-        <input type="text" name="input" placeholder="(only letters, numbers and hyphens)" />
-        <label for="type">Action type:</label>
-        <select name="type" oninput="chooseType()">
+        <label>
+            Action ID: <input type="text" name="input" placeholder="(only letters, numbers and hyphens)">
+        </label>
+        <label>Action type: <select name="type" oninput="chooseType()">
             <option value="none">Select an option</option>
             <option value="single">Single</option>
             <option value="chain">Chain</option>
             <option value="condition">Condition</option>
-        </select>
+        </select></label>
     </form>
     <form name="singleAction" hidden>
-        <label for="plugin">Plugin:</label>
-        <select name="plugin" oninput="choosePlugin()">
+        <label>Plugin: <select id="plugin" name="plugin" oninput="choosePlugin()">
             <option value="none">Select an option</option>
             <option value="obs">OBS</option>
             <option value="vts">VTube Studio</option>
-        </select>
+        </select></label>
         <div id="obsTypeSelect" hidden>
-            <label for="typeObs">OBS action type:</label>
-            <select name="typeObs" oninput="obsChooseType()">
+            <label>OBS action type: <select name="typeObs" oninput="obsChooseType()">
                 <option value="none">Select an option</option>
                 <option value="ProgramSceneChange">Program Scene Change</option>
-            </select>
+            </select></label>
         </div>
         <div id="vtsTypeSelect" hidden>
-            <label for="typeVts">VTube Studio action type:</label>
-            <select name="typeVts" oninput="vtsChooseType()">
+            <label>VTube Studio action type: <select name="typeVts" oninput="vtsChooseType()">
                 <option value="none">Select an option</option>
                 <option value="ToggleExpression">Toggle Expression</option>
                 <option value="LoadModel">Load Model</option>
-            </select>
+            </select></label>
         </div>
         <div id="actionInputSelect" hidden>
-            <label for="inputSelect">Action parameter:</label>
-            <select name="inputSelect">
+            <label>Action parameter: <select name="inputSelect">
                 <option value="none">Select an option</option>
-            </select>
+            </select></label>
         </div>
     </form>
   </body>
