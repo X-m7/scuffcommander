@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Main</title>
     <script src="/conf.js"></script>
   </head>
@@ -14,29 +14,43 @@
     <p id="saveOutput"></p>
     <h2>Server Configuration</h2>
     <form name="serverForm">
-        <label>Server Name: <input type="text" name="addr" value="localhost"></label>
-        <br>
-        <label>Server Port: <input type="number" name="port" value="8080"></label>
+      <label>
+        Server Name: <input type="text" name="addr" value="localhost" />
+      </label>
+      <br />
+      <label>
+        Server Port: <input type="number" name="port" value="8080" />
+      </label>
     </form>
     <h2>OBS Configuration</h2>
     <form name="obsForm">
-        <label>WebSocket Server Address: <input type="text" name="addr" value="localhost"></label>
-        <br>
-        <label>WebSocket Server Port: <input type="number" name="port" value="4455"></label>
-        <br>
-        <label>WebSocket Server Password: <input type="password" name="pw"></label>
-        <br>
-        <button type="button" onclick="testObs()">Test parameters</button>
-        <p>Connection test result: <span id="obsCheck"></span></p>
+      <label>
+        WebSocket Server Address:
+        <input type="text" name="addr" value="localhost" />
+      </label>
+      <br />
+      <label>
+        WebSocket Server Port: <input type="number" name="port" value="4455" />
+      </label>
+      <br />
+      <label>
+        WebSocket Server Password: <input type="password" name="pw" />
+      </label>
+      <br />
+      <button type="button" onclick="testObs()">Test parameters</button>
+      <p>Connection test result: <span id="obsCheck"></span></p>
     </form>
     <h2>VTube Studio Configuration</h2>
     <form name="vtsForm">
-        <label>WebSocket Server Full Address: <input type="text" name="addr" value="ws://localhost:8001"></label>
-        <br>
-        <label>Token File Path: <input type="text" name="tokenFile"></label>
-        <br>
-        <button type="button" onclick="testVts()">Test parameters</button>
-        <p>Connection test result: <span id="vtsCheck"></span></p>
+      <label>
+        WebSocket Server Full Address:
+        <input type="text" name="addr" value="ws://localhost:8001" />
+      </label>
+      <br />
+      <label>Token File Path: <input type="text" name="tokenFile" /></label>
+      <br />
+      <button type="button" onclick="testVts()">Test parameters</button>
+      <p>Connection test result: <span id="vtsCheck"></span></p>
     </form>
   </body>
 </html>

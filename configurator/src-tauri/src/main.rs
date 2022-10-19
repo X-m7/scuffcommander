@@ -148,6 +148,19 @@ async fn add_new_single_action(
     Ok(())
 }
 
+#[tauri::command]
+async fn load_action_details(id: String, actions_state: tauri::State<'_, ActionConfigState>) -> Result<Action, String> {
+    let actions = &actions_state.0.lock().await.actions;
+
+    let action = actions.get(&id);
+
+    if action.is_none() {
+        return Err("Action with given ID not found".to_string());
+    }
+
+    Ok(action.unwrap().clone())
+}
+
 #[tokio::main]
 async fn main() {
     tauri::async_runtime::set(tokio::runtime::Handle::current());
@@ -186,6 +199,7 @@ async fn main() {
             get_vts_expression_names,
             get_vts_model_names,
             add_new_single_action,
+            load_action_details,
             save_actions
         ])
         .run(tauri::generate_context!())

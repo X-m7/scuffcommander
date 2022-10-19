@@ -3,7 +3,7 @@ use obws::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::value::Value;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub enum OBSQuery {
     CurrentProgramScene,
     Version,
@@ -18,7 +18,8 @@ impl OBSQuery {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
+#[serde(tag = "tag", content = "content")]
 pub enum OBSAction {
     ProgramSceneChange(String),
     CheckConnection,

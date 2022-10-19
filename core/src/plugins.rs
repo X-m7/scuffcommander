@@ -21,7 +21,7 @@ pub enum PluginInstance {
     VTS(VTSConnector),
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub enum PluginQuery {
     OBS(OBSQuery),
     VTS(VTSQuery),
@@ -44,7 +44,8 @@ impl PluginQuery {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
+#[serde(tag = "tag", content = "content")]
 pub enum PluginAction {
     OBS(OBSAction),
     VTS(VTSAction),

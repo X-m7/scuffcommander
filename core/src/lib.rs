@@ -55,7 +55,7 @@ impl ActionConfig {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Condition {
     pub query: PluginQuery,
     pub target: String,
@@ -82,7 +82,8 @@ impl Condition {
 }
 
 // need Box to allow recursion
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
+#[serde(tag = "tag", content = "content")]
 pub enum Action {
     Single(PluginAction),
     Chain(Vec<Action>),

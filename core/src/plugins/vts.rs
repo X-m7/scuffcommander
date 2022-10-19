@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::value::Value;
 use vtubestudio::Client;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub enum VTSQuery {
     ActiveModelId,
     Version,
@@ -18,7 +18,8 @@ impl VTSQuery {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
+#[serde(tag = "tag", content = "content")]
 pub enum VTSAction {
     ToggleExpression(String),
     LoadModel(String),
