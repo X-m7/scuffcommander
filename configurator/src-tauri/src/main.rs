@@ -150,6 +150,8 @@ async fn add_new_single_action(
 
 #[tokio::main]
 async fn main() {
+    tauri::async_runtime::set(tokio::runtime::Handle::current());
+
     let args: Vec<String> = std::env::args().collect();
 
     if args.len() == 1 {
