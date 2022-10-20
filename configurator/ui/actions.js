@@ -56,12 +56,17 @@ function addNewAction() {
 }
 
 function saveCurrentAction() {
-  switch (document.actionSelect.action.value) {
+  const id = document.actionSelect.action.value;
+  switch (id) {
     case "none":
       console.log("Invalid action selected");
       break;
     case "new":
       addNewAction();
+      break;
+    default:
+      // delete the existing action, then create a new one with the updated details
+      invoke("delete_action", { id: id.substring(2) }).then(addNewAction);
       break;
   }
 }
@@ -147,6 +152,7 @@ function showSingleAction(action) {
   }
 
   document.singleAction.plugin.value = action.tag;
+  choosePlugin();
   document.singleAction.removeAttribute("hidden");
 }
 

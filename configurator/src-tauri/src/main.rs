@@ -182,6 +182,19 @@ async fn add_new_single_action(
 }
 
 #[tauri::command]
+async fn delete_action(
+    id: String,
+    actions_state: tauri::State<'_, ActionConfigState>,
+) -> Result<(), String> {
+    let actions = &mut actions_state.0.lock().await.actions;
+    if actions.remove(&id).is_none() {
+        return Err("Action with given ID does not exist".to_string());
+    }
+
+    Ok(())
+}
+
+#[tauri::command]
 async fn load_action_details(
     id: String,
     actions_state: tauri::State<'_, ActionConfigState>,
@@ -238,7 +251,8 @@ async fn main() {
             get_vts_model_name_from_id,
             add_new_single_action,
             load_action_details,
-            save_actions
+            save_actions,
+            delete_action
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
