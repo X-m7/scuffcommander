@@ -68,10 +68,15 @@ impl PluginAction {
     }
 
     // Helper method to make creating actions from frontend simpler
-    pub fn from_json(plugin_type: PluginType, data: Value) -> Result<PluginAction, String> {
-        Ok(match plugin_type {
-            PluginType::OBS => PluginAction::OBS(OBSAction::from_json(data)?),
-            PluginType::VTS => PluginAction::VTS(VTSAction::from_json(data)?),
+    // PluginInstance is required to convert certain UI friendly inputs to the required format (for
+    // example VTS model name to model id)
+    pub async fn from_json(
+        plugin: &mut PluginInstance,
+        data: Value,
+    ) -> Result<PluginAction, String> {
+        Ok(match plugin {
+            PluginInstance::OBS(_) => PluginAction::OBS(OBSAction::from_json(data)?),
+            PluginInstance::VTS(conn) => PluginAction::VTS(VTSAction::from_json(data, conn).await?),
         })
     }
 }

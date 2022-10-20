@@ -35,25 +35,37 @@ impl VTSAction {
         }
     }
 
-    pub fn from_json(data: Value) -> Result<VTSAction, String> {
+    // Here the inputs for actions are the names (for example LoadModel will have the model name
+    // instead of ID), which will then be converted to the ID before storage
+    pub async fn from_json(data: Value, conn: &mut VTSConnector) -> Result<VTSAction, String> {
         if data.is_object() {
             Ok(
                 match data["type"]
                     .as_str()
                     .ok_or_else(|| "VTS action type must be a string".to_string())?
                 {
-                    "ToggleExpression" => VTSAction::ToggleExpression(
-                        data["param"]
-                            .as_str()
-                            .ok_or_else(|| "VTS action parameter must be a string".to_string())?
-                            .to_string(),
-                    ),
-                    "LoadModel" => VTSAction::LoadModel(
-                        data["param"]
-                            .as_str()
-                            .ok_or_else(|| "VTS action parameter must be a string".to_string())?
-                            .to_string(),
-                    ),
+                    "ToggleExpression" => {
+                        let param = conn
+                            .get_expression_id_from_name(
+                                data["param"]
+                                    .as_str()
+                                    .ok_or("VTS action parameter must be a string")?,
+                            )
+                            .await?;
+
+                        VTSAction::ToggleExpression(param)
+                    }
+                    "LoadModel" => {
+                        let param = conn
+                            .get_model_id_from_name(
+                                data["param"]
+                                    .as_str()
+                                    .ok_or("VTS action parameter must be a string")?,
+                            )
+                            .await?;
+
+                        VTSAction::LoadModel(param)
+                    }
                     "CheckConnection" => VTSAction::CheckConnection,
                     _ => return Err("Unsupported VTS action type".to_string()),
                 },
@@ -211,7 +223,7 @@ impl VTSConnector {
         Ok(out)
     }
 
-    pub async fn get_expression_id_from_name(&mut self, name: &str) -> Result<String, String> {
+    async fn get_expression_id_from_name(&mut self, name: &str) -> Result<String, String> {
         let exprs = self.get_expression_list().await?;
 
         for expr in exprs {
@@ -258,7 +270,7 @@ impl VTSConnector {
         Ok(out)
     }
 
-    pub async fn get_model_id_from_name(&mut self, name: &str) -> Result<String, String> {
+    async fn get_model_id_from_name(&mut self, name: &str) -> Result<String, String> {
         let models = self.get_model_list().await?;
 
         for model in models {
