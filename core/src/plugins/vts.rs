@@ -129,6 +129,7 @@ impl VTSConnector {
         }
     }
 
+    // Takes the model ID as the parameter
     pub async fn load_model(&mut self, model: &str) -> Result<(), String> {
         let resp = self
             .client
@@ -142,6 +143,8 @@ impl VTSConnector {
         }
     }
 
+    // Takes the expression ID/file name and whether to enable or disable the expression
+    // The toggle_expression method may be more useful
     pub async fn change_expression_state(
         &mut self,
         expr: &str,
@@ -160,6 +163,7 @@ impl VTSConnector {
         }
     }
 
+    // Takes the expression ID/file name
     pub async fn toggle_expression(&mut self, expr: &str) -> Result<(), String> {
         let current_state = self
             .client
@@ -181,7 +185,7 @@ impl VTSConnector {
             .await
     }
 
-    pub async fn get_expression_name_list(&mut self) -> Result<Vec<String>, String> {
+    async fn get_expression_list(&mut self) -> Result<Vec<vtubestudio::data::Expression>, String> {
         let current_state = self
             .client
             .send(&vtubestudio::data::ExpressionStateRequest {
@@ -193,7 +197,11 @@ impl VTSConnector {
             return Err(e.to_string());
         }
 
-        let exprs = current_state.unwrap().expressions;
+        Ok(current_state.unwrap().expressions)
+    }
+
+    pub async fn get_expression_name_list(&mut self) -> Result<Vec<String>, String> {
+        let exprs = self.get_expression_list().await?;
         let mut out = Vec::new();
 
         for expr in exprs {
@@ -203,7 +211,31 @@ impl VTSConnector {
         Ok(out)
     }
 
-    pub async fn get_model_name_list(&mut self) -> Result<Vec<String>, String> {
+    pub async fn get_expression_id_from_name(&mut self, name: &str) -> Result<String, String> {
+        let exprs = self.get_expression_list().await?;
+
+        for expr in exprs {
+            if name == expr.name {
+                return Ok(expr.file);
+            }
+        }
+
+        Err("Expression with given name not found for the current model".to_string())
+    }
+
+    pub async fn get_expression_name_from_id(&mut self, id: &str) -> Result<String, String> {
+        let exprs = self.get_expression_list().await?;
+
+        for expr in exprs {
+            if id == expr.file {
+                return Ok(expr.name);
+            }
+        }
+
+        Err("Expression with given ID not found for the current model".to_string())
+    }
+
+    async fn get_model_list(&mut self) -> Result<Vec<vtubestudio::data::Model>, String> {
         let current_state = self
             .client
             .send(&vtubestudio::data::AvailableModelsRequest {})
@@ -212,7 +244,11 @@ impl VTSConnector {
             return Err(e.to_string());
         }
 
-        let models = current_state.unwrap().available_models;
+        Ok(current_state.unwrap().available_models)
+    }
+
+    pub async fn get_model_name_list(&mut self) -> Result<Vec<String>, String> {
+        let models = self.get_model_list().await?;
         let mut out = Vec::new();
 
         for model in models {
@@ -220,5 +256,29 @@ impl VTSConnector {
         }
 
         Ok(out)
+    }
+
+    pub async fn get_model_id_from_name(&mut self, name: &str) -> Result<String, String> {
+        let models = self.get_model_list().await?;
+
+        for model in models {
+            if name == model.model_name {
+                return Ok(model.model_id);
+            }
+        }
+
+        Err("No model found with the given name".to_string())
+    }
+
+    pub async fn get_model_name_from_id(&mut self, id: &str) -> Result<String, String> {
+        let models = self.get_model_list().await?;
+
+        for model in models {
+            if id == model.model_id {
+                return Ok(model.model_name);
+            }
+        }
+
+        Err("No model found with the given ID".to_string())
     }
 }

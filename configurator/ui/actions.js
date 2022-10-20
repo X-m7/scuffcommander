@@ -91,11 +91,15 @@ function loadActions() {
   invoke("get_actions").then(updateActions);
 }
 
+function preselectActionInputSelect(newValue) {
+  document.singleAction.inputSelect.value = "x-" + newValue;
+}
+
 function showObsAction(action) {
   switch (action.tag) {
     case "ProgramSceneChange":
       document.getElementById("actionInputSelect").removeAttribute("hidden");
-      document.singleAction.inputSelect.value = "x-" + action.content;
+      preselectActionInputSelect(action.content);
       break;
     default:
       console.log("Unrecognised OBS action type");
@@ -108,9 +112,16 @@ function showObsAction(action) {
 function showVtsAction(action) {
   switch (action.tag) {
     case "ToggleExpression":
+      document.getElementById("actionInputSelect").removeAttribute("hidden");
+      invoke("get_vts_expression_name_from_id", { id: action.content }).then(
+        preselectActionInputSelect
+      );
+      break;
     case "LoadModel":
       document.getElementById("actionInputSelect").removeAttribute("hidden");
-      document.singleAction.inputSelect.value = "x-" + action.content;
+      invoke("get_vts_model_name_from_id", { id: action.content }).then(
+        preselectActionInputSelect
+      );
       break;
     default:
       console.log("Unrecognised VTS action type");
@@ -139,6 +150,7 @@ function showSingleAction(action) {
   document.singleAction.removeAttribute("hidden");
 }
 
+// Loading a selected action
 function showActionInUi(action) {
   switch (action.tag) {
     case "Single":
