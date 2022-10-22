@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>ScuffCommander</title>
+    <script>
+      const xhr = new XMLHttpRequest();
+      function action(id) {
+        xhr.open("GET", "http://localhost:8080/click/" + id);
+        xhr.send();
+      }
+    </script>
+  </head>
+  <body>
+    {{#each actions as |a|}}
+    <button type="button" onclick="action('{{a}}')">{{a}}</button>
+    {{/each}}
+  </body>
+</html>
