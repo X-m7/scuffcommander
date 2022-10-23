@@ -3,288 +3,10 @@
     windows_subsystem = "windows"
 )]
 
-use async_std::fs::write;
 use async_std::sync::Mutex;
-use scuffcommander_core::plugins::{PluginAction, PluginInstance, PluginStates, PluginType};
-use scuffcommander_core::{Action, ActionConfig, AppConfig};
-use serde_json::value::Value;
-
-use scuffcommander_core::plugins::obs::{OBSConfig, OBSConnector};
-use scuffcommander_core::plugins::vts::{VTSConfig, VTSConnector};
-
-struct ActionConfigState(Mutex<ActionConfig>);
-struct AppConfigState(AppConfig);
-struct ConfigFolder(String);
-struct TemporaryChain(Mutex<Vec<Action>>);
-
-#[tauri::command]
-async fn get_obs_scenes(
-    plugins_data: tauri::State<'_, PluginStates>,
-) -> Result<Vec<String>, String> {
-    let mut plugins = plugins_data.plugins.lock().await;
-
-    if let Some(PluginInstance::OBS(obs)) = plugins.get_mut(&PluginType::OBS) {
-        let scenes = obs.get_scene_list().await?;
-
-        let mut scene_names = Vec::new();
-        for scene in scenes {
-            scene_names.push(scene.name);
-        }
-        Ok(scene_names)
-    } else {
-        Err("OBS plugin not configured".to_string())
-    }
-}
-
-// Need Result as return due to Tauri bug 2533
-#[tauri::command]
-async fn test_obs_connection(conf: OBSConfig) -> Result<bool, ()> {
-    let mut conn = OBSConnector::new(conf).await;
-
-    Ok(conn.get_obs_version().await.is_ok())
-}
-
-#[tauri::command]
-async fn test_vts_connection(conf: VTSConfig) -> Result<bool, ()> {
-    let mut conn = VTSConnector::new(conf).await;
-
-    Ok(conn.get_vts_version().await.is_ok())
-}
-
-#[tauri::command]
-async fn save_config(
-    conf: AppConfig,
-    conf_state: tauri::State<'_, ConfigFolder>,
-) -> Result<(), String> {
-    match write(
-        format!("{}/config.json", &conf_state.0),
-        serde_json::to_string_pretty(&conf).expect("Not AppConfig?"),
-    )
-    .await
-    {
-        Ok(_) => Ok(()),
-        Err(e) => Err(e.to_string()),
-    }
-}
-
-#[tauri::command]
-async fn save_actions(
-    actions_state: tauri::State<'_, ActionConfigState>,
-    conf_state: tauri::State<'_, ConfigFolder>,
-) -> Result<(), String> {
-    match write(
-        format!("{}/actions.json", &conf_state.0),
-        serde_json::to_string_pretty(&*actions_state.0.lock().await).expect("Not ActionConfig?"),
-    )
-    .await
-    {
-        Ok(_) => Ok(()),
-        Err(e) => Err(e.to_string()),
-    }
-}
-
-#[tauri::command]
-fn get_config(conf_state: tauri::State<'_, AppConfigState>) -> AppConfig {
-    conf_state.0.clone()
-}
-
-#[tauri::command]
-async fn get_actions(
-    actions_state: tauri::State<'_, ActionConfigState>,
-) -> Result<Vec<String>, ()> {
-    let mut actions_vec = Vec::new();
-    let actions = &actions_state.0.lock().await.actions;
-
-    for action in actions.keys() {
-        actions_vec.push(action.clone());
-    }
-
-    Ok(actions_vec)
-}
-
-#[tauri::command]
-async fn get_vts_expression_names(
-    plugins_data: tauri::State<'_, PluginStates>,
-) -> Result<Vec<String>, String> {
-    let mut plugins = plugins_data.plugins.lock().await;
-
-    if let Some(PluginInstance::VTS(vts)) = plugins.get_mut(&PluginType::VTS) {
-        vts.get_expression_name_list().await
-    } else {
-        Err("VTS plugin not configured".to_string())
-    }
-}
-
-#[tauri::command]
-async fn get_vts_model_names(
-    plugins_data: tauri::State<'_, PluginStates>,
-) -> Result<Vec<String>, String> {
-    let mut plugins = plugins_data.plugins.lock().await;
-
-    if let Some(PluginInstance::VTS(vts)) = plugins.get_mut(&PluginType::VTS) {
-        vts.get_model_name_list().await
-    } else {
-        Err("VTS plugin not configured".to_string())
-    }
-}
-
-#[tauri::command]
-async fn get_vts_expression_name_from_id(
-    id: &str,
-    plugins_data: tauri::State<'_, PluginStates>,
-) -> Result<String, String> {
-    let mut plugins = plugins_data.plugins.lock().await;
-
-    if let Some(PluginInstance::VTS(vts)) = plugins.get_mut(&PluginType::VTS) {
-        vts.get_expression_name_from_id(id).await
-    } else {
-        Err("VTS plugin not configured".to_string())
-    }
-}
-
-#[tauri::command]
-async fn get_vts_model_name_from_id(
-    id: &str,
-    plugins_data: tauri::State<'_, PluginStates>,
-) -> Result<String, String> {
-    let mut plugins = plugins_data.plugins.lock().await;
-
-    if let Some(PluginInstance::VTS(vts)) = plugins.get_mut(&PluginType::VTS) {
-        vts.get_model_name_from_id(id).await
-    } else {
-        Err("VTS plugin not configured".to_string())
-    }
-}
-
-#[tauri::command]
-async fn add_new_single_action(
-    id: String,
-    plugin_type: PluginType,
-    plugin_data: Value,
-    actions_state: tauri::State<'_, ActionConfigState>,
-    plugins_state: tauri::State<'_, PluginStates>,
-) -> Result<(), String> {
-    if id.is_empty() {
-        return Err("ID can't be empty".to_string());
-    }
-
-    if let Some(plugin) = plugins_state.plugins.lock().await.get_mut(&plugin_type) {
-        let action = PluginAction::from_json(plugin, plugin_data).await?;
-        let actions = &mut actions_state.0.lock().await.actions;
-        if actions.contains_key(&id) {
-            return Err("Action with given ID already exists".to_string());
-        }
-        actions.insert(id, Action::Single(action));
-
-        Ok(())
-    } else {
-        Err("Selected plugin has not been configured".to_string())
-    }
-}
-
-#[tauri::command]
-async fn delete_action(
-    id: String,
-    actions_state: tauri::State<'_, ActionConfigState>,
-) -> Result<(), String> {
-    let actions = &mut actions_state.0.lock().await.actions;
-    if actions.remove(&id).is_none() {
-        return Err("Action with given ID does not exist".to_string());
-    }
-
-    Ok(())
-}
-
-#[tauri::command]
-async fn load_action_details(
-    id: String,
-    actions_state: tauri::State<'_, ActionConfigState>,
-) -> Result<Action, String> {
-    let actions = &actions_state.0.lock().await.actions;
-
-    let action = actions.get(&id);
-
-    if action.is_none() {
-        return Err("Action with given ID not found".to_string());
-    }
-
-    Ok(action.unwrap().clone())
-}
-
-#[tauri::command]
-async fn clear_temp_chain(temp_chain: tauri::State<'_, TemporaryChain>) -> Result<(), ()> {
-    temp_chain.0.lock().await.clear();
-
-    Ok(())
-}
-
-#[tauri::command]
-async fn store_temp_chain(
-    id: String,
-    actions_state: tauri::State<'_, ActionConfigState>,
-    temp_chain: tauri::State<'_, TemporaryChain>,
-) -> Result<(), String> {
-    let actions = &mut actions_state.0.lock().await.actions;
-    if actions.contains_key(&id) {
-        return Err("Action with given ID already exists".to_string());
-    }
-
-    actions.insert(id, Action::Chain(temp_chain.0.lock().await.clone()));
-
-    Ok(())
-}
-
-// Takes a chain action ID and copies it over to the temporary chain for modification
-#[tauri::command]
-async fn copy_action_to_temp_chain(
-    id: String,
-    actions_state: tauri::State<'_, ActionConfigState>,
-    temp_chain: tauri::State<'_, TemporaryChain>,
-) -> Result<(), String> {
-    let actions = &mut actions_state.0.lock().await.actions;
-    if !actions.contains_key(&id) {
-        return Err("Action with given ID does not exist".to_string());
-    }
-
-    let action = actions.get(&id).unwrap();
-
-    if let Action::Chain(chain) = action {
-        let _ = std::mem::replace(&mut *temp_chain.0.lock().await, chain.clone());
-        Ok(())
-    } else {
-        Err("Action with given ID is not a chain".to_string())
-    }
-}
-
-#[tauri::command]
-async fn add_new_single_action_to_temp_chain(
-    plugin_type: PluginType,
-    plugin_data: Value,
-    plugins_state: tauri::State<'_, PluginStates>,
-    temp_chain: tauri::State<'_, TemporaryChain>,
-) -> Result<(), String> {
-    if let Some(plugin) = plugins_state.plugins.lock().await.get_mut(&plugin_type) {
-        temp_chain.0.lock().await.push(Action::Single(
-            PluginAction::from_json(plugin, plugin_data).await?,
-        ));
-        Ok(())
-    } else {
-        Err("Selected plugin has not been configured".to_string())
-    }
-}
-
-#[tauri::command]
-async fn get_temp_chain_display(
-    temp_chain: tauri::State<'_, TemporaryChain>,
-) -> Result<Vec<String>, ()> {
-    let mut vec = Vec::new();
-
-    for action in &*temp_chain.0.lock().await {
-        vec.push(action.to_string());
-    }
-
-    Ok(vec)
-}
+use scuffcommander_configurator as app_mod;
+use scuffcommander_core::plugins::PluginStates;
+use scuffcommander_core::{ActionConfig, AppConfig};
 
 #[tokio::main]
 async fn main() {
@@ -303,38 +25,40 @@ async fn main() {
     let conf = AppConfig::from_file("config.json");
 
     tauri::Builder::default()
-        .manage(AppConfigState(conf.clone()))
+        .manage(app_mod::config::AppConfigState(conf.clone()))
         .manage(PluginStates::init(conf.plugins).await)
-        .manage(ActionConfigState(Mutex::new(ActionConfig::from_file(
-            "actions.json",
-        ))))
-        .manage(ConfigFolder(
+        .manage(app_mod::actions::ActionConfigState(Mutex::new(
+            ActionConfig::from_file("actions.json"),
+        )))
+        .manage(app_mod::config::ConfigFolder(
             std::env::current_dir()
                 .expect("Invalid current dir?")
                 .display()
                 .to_string(),
         ))
-        .manage(TemporaryChain(Mutex::new(Vec::new())))
+        .manage(app_mod::actions::chain::TemporaryChain(Mutex::new(
+            Vec::new(),
+        )))
         .invoke_handler(tauri::generate_handler![
-            get_obs_scenes,
-            test_obs_connection,
-            test_vts_connection,
-            save_config,
-            get_config,
-            get_actions,
-            get_vts_expression_names,
-            get_vts_model_names,
-            get_vts_expression_name_from_id,
-            get_vts_model_name_from_id,
-            add_new_single_action,
-            load_action_details,
-            save_actions,
-            delete_action,
-            clear_temp_chain,
-            store_temp_chain,
-            copy_action_to_temp_chain,
-            add_new_single_action_to_temp_chain,
-            get_temp_chain_display
+            app_mod::plugins::obs::get_obs_scenes,
+            app_mod::plugins::obs::test_obs_connection,
+            app_mod::plugins::vts::test_vts_connection,
+            app_mod::plugins::vts::get_vts_expression_names,
+            app_mod::plugins::vts::get_vts_model_names,
+            app_mod::plugins::vts::get_vts_expression_name_from_id,
+            app_mod::plugins::vts::get_vts_model_name_from_id,
+            app_mod::config::save_config,
+            app_mod::config::get_config,
+            app_mod::actions::get_actions,
+            app_mod::actions::add_new_single_action,
+            app_mod::actions::load_action_details,
+            app_mod::actions::save_actions,
+            app_mod::actions::delete_action,
+            app_mod::actions::chain::clear_temp_chain,
+            app_mod::actions::chain::store_temp_chain,
+            app_mod::actions::chain::copy_action_to_temp_chain,
+            app_mod::actions::chain::add_new_single_action_to_temp_chain,
+            app_mod::actions::chain::get_temp_chain_display
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
