@@ -1,6 +1,17 @@
 import * as modSingleAction from "./single-action.js";
+import * as modChainAction from "./chain-action.js";
 
 const { invoke } = window.__TAURI__.tauri;
+
+export function resetAllActionDetailInputs() {
+  document.chainAction.setAttribute("hidden", true);
+  document.singleAction.setAttribute("hidden", true);
+  modSingleAction.resetSingleActionInputs();
+}
+
+export function loadActions() {
+  invoke("get_actions").then(updateActions);
+}
 
 export function addNewAction() {
   const type = document.actionModify.type.value;
@@ -10,6 +21,11 @@ export function addNewAction() {
       break;
     case "single":
       modSingleAction.addNewSingleAction(loadActions);
+      break;
+    case "chain":
+      invoke("store_temp_chain", { id: document.actionModify.id.value }).then(
+        loadActions
+      );
       break;
   }
 }
@@ -36,12 +52,14 @@ export function updateActions(actions) {
 }
 
 // Loading a selected action
-export function showActionInUi(action) {
+export function showActionInUi(action, id) {
   switch (action.tag) {
     case "Single":
       modSingleAction.showSingleAction(action.content);
       break;
     case "Chain":
+      modChainAction.showChainAction(id);
+      break;
     case "Condition":
       console.log("Unimplemented");
       break;

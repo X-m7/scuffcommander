@@ -3,6 +3,7 @@ pub mod plugins;
 use async_recursion::async_recursion;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::fmt::{Display, Formatter};
 use std::fs::read_to_string;
 
 use plugins::{PluginAction, PluginConfig, PluginInstance, PluginQuery, PluginType};
@@ -61,6 +62,12 @@ pub struct Condition {
     pub target: String,
 }
 
+impl Display for Condition {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(f, "{} == {}", self.query, self.target)
+    }
+}
+
 impl Condition {
     pub async fn check(
         &self,
@@ -73,11 +80,7 @@ impl Condition {
             return Err(format!("Plugin {} not configured", plugin_type));
         }
 
-        let query = self.query.get(plugin.unwrap()).await;
-        match query {
-            Ok(q) => Ok(q == self.target),
-            Err(e) => Err(e),
-        }
+        Ok(self.query.get(plugin.unwrap()).await? == self.target)
     }
 }
 
@@ -88,6 +91,21 @@ pub enum Action {
     Single(PluginAction),
     Chain(Vec<Action>),
     If(Condition, Box<Action>, Option<Box<Action>>),
+}
+
+impl Display for Action {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        match self {
+            Action::Single(action) => write!(f, "{}", action),
+            Action::Chain(chain) => write!(f, "Chain (length: {})", chain.len()),
+            Action::If(cond, then, else_) => match else_ {
+                Some(else_action) => {
+                    write!(f, "If ({}) then ({}) else ({})", cond, then, else_action)
+                }
+                None => write!(f, "If ({}) then ({})", cond, then),
+            },
+        }
+    }
 }
 
 impl Action {
@@ -117,18 +135,14 @@ impl Action {
                 }
                 Ok(())
             }
-            Action::If(cond, then, else_) => match cond.check(plugins).await {
-                Ok(proceed) => {
-                    if proceed {
-                        then.run(plugins).await
-                    } else if let Some(else_action) = else_ {
-                        else_action.run(plugins).await
-                    } else {
-                        Ok(())
-                    }
+            Action::If(cond, then, else_) => {
+                if cond.check(plugins).await? {
+                    then.run(plugins).await?;
+                } else if let Some(else_action) = else_ {
+                    else_action.run(plugins).await?;
                 }
-                Err(e) => Err(e),
-            },
+                Ok(())
+            }
         }
     }
 }

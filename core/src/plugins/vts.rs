@@ -1,6 +1,7 @@
 use async_std::fs::{read_to_string, write};
 use serde::{Deserialize, Serialize};
 use serde_json::value::Value;
+use std::fmt::{Display, Formatter};
 use vtubestudio::Client;
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -18,12 +19,31 @@ impl VTSQuery {
     }
 }
 
+impl Display for VTSQuery {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        match self {
+            VTSQuery::ActiveModelId => write!(f, "Active Model ID"),
+            VTSQuery::Version => write!(f, "Version"),
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(tag = "tag", content = "content")]
 pub enum VTSAction {
     ToggleExpression(String),
     LoadModel(String),
     CheckConnection,
+}
+
+impl Display for VTSAction {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        match self {
+            VTSAction::ToggleExpression(expr) => write!(f, "Toggle Expression with ID: {}", expr),
+            VTSAction::LoadModel(model) => write!(f, "Load Model with ID: {}", model),
+            VTSAction::CheckConnection => write!(f, "Check Connection"),
+        }
+    }
 }
 
 impl VTSAction {

@@ -37,6 +37,16 @@
         </select>
       </label>
     </form>
+    <form name="chainAction" hidden>
+      Action type to add to chain:
+      <select name="type" oninput="chooseTypeChain()">
+        <option value="none">Select an option</option>
+        <option value="single">Single</option>
+        <option value="condition">Condition</option>
+      </select>
+      <button type="button" onclick="addToEndOfChain()">Add to end</button>
+      <ol id="chainActionList"></ol>
+    </form>
     <form name="singleAction" hidden>
       <label>
         Plugin:

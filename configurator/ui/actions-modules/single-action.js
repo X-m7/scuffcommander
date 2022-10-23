@@ -1,5 +1,15 @@
 const { invoke } = window.__TAURI__.tauri;
 
+export function resetSingleActionInputs() {
+  document.getElementById("obsTypeSelect").setAttribute("hidden", "true");
+  document.getElementById("vtsTypeSelect").setAttribute("hidden", "true");
+  document.getElementById("actionInputSelect").setAttribute("hidden", "true");
+  document.singleAction.plugin.value = "none";
+  document.singleAction.typeObs.value = "none";
+  document.singleAction.typeVts.value = "none";
+  document.singleAction.inputSelect.value = "none";
+}
+
 function getPluginParam(plugin) {
   switch (plugin) {
     case "none":
@@ -20,15 +30,23 @@ function getPluginParam(plugin) {
   }
 }
 
-export function addNewSingleAction(then = null) {
-  const id = document.actionModify.id.value;
+export function getSingleActionData() {
   const pluginType = document.singleAction.plugin.value;
   const pluginData = getPluginParam(pluginType);
+  return {
+    pluginType: pluginType,
+    pluginData: pluginData,
+  };
+}
+
+export function addNewSingleAction(then = null) {
+  const id = document.actionModify.id.value;
+  const data = getSingleActionData();
   // once the action has been added refresh the list of actions
   invoke("add_new_single_action", {
     id: id,
-    pluginType: pluginType,
-    pluginData: pluginData,
+    pluginType: data.pluginType,
+    pluginData: data.pluginData,
   }).then(then);
 }
 

@@ -6,6 +6,7 @@ use derive_more::Display;
 use serde::{Deserialize, Serialize};
 use serde_json::value::Value;
 use std::collections::HashMap;
+use std::fmt::{Display, Formatter};
 
 use obs::{OBSAction, OBSConfig, OBSConnector, OBSQuery};
 use vts::{VTSAction, VTSConfig, VTSConnector, VTSQuery};
@@ -25,6 +26,15 @@ pub enum PluginInstance {
 pub enum PluginQuery {
     OBS(OBSQuery),
     VTS(VTSQuery),
+}
+
+impl Display for PluginQuery {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        match self {
+            PluginQuery::OBS(q) => write!(f, "OBS-{}", q),
+            PluginQuery::VTS(q) => write!(f, "VTS-{}", q),
+        }
+    }
 }
 
 impl PluginQuery {
@@ -49,6 +59,15 @@ impl PluginQuery {
 pub enum PluginAction {
     OBS(OBSAction),
     VTS(VTSAction),
+}
+
+impl Display for PluginAction {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        match self {
+            PluginAction::OBS(a) => write!(f, "OBS-{}", a),
+            PluginAction::VTS(a) => write!(f, "VTS-{}", a),
+        }
+    }
 }
 
 impl PluginAction {

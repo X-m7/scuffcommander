@@ -1,4 +1,5 @@
 import * as modSingleAction from "./actions-modules/single-action.js";
+import * as modChainAction from "./actions-modules/chain-action.js";
 import * as modHelpers from "./actions-modules/helpers.js";
 
 const { invoke } = window.__TAURI__.tauri;
@@ -8,7 +9,7 @@ const { invoke } = window.__TAURI__.tauri;
  */
 
 window.loadActions = function () {
-  invoke("get_actions").then(modHelpers.updateActions);
+  modHelpers.loadActions();
 };
 
 window.saveAll = function () {
@@ -24,21 +25,22 @@ window.saveAll = function () {
 
 window.chooseAction = function () {
   const action = document.actionSelect.action.value;
+  modHelpers.resetAllActionDetailInputs();
   switch (action) {
     case "none":
-      document.actionModify.setAttribute("hidden", true);
-      document.singleAction.setAttribute("hidden", true);
       document.actionModify.type.value = "none";
       break;
     case "new":
       document.actionModify.removeAttribute("hidden");
+      document.actionModify.id.value = "";
+      document.actionModify.type.value = "none";
       break;
     default:
       const action_id = action.substring(2);
       document.actionModify.removeAttribute("hidden");
       document.actionModify.id.value = action_id;
-      invoke("load_action_details", { id: action_id }).then(
-        modHelpers.showActionInUi
+      invoke("load_action_details", { id: action_id }).then((action) =>
+        modHelpers.showActionInUi(action, action_id)
       );
       break;
   }
@@ -64,17 +66,31 @@ window.saveCurrentAction = function () {
 
 window.chooseType = function () {
   const type = document.actionModify.type.value;
+  modHelpers.resetAllActionDetailInputs();
   switch (type) {
     case "none":
-      document.singleAction.setAttribute("hidden", true);
       break;
     case "single":
+      modSingleAction.resetSingleActionInputs();
       document.singleAction.removeAttribute("hidden");
+      break;
+    case "chain":
+      modChainAction.resetChainInputs();
+      modChainAction.resetTempChain();
+      document.chainAction.removeAttribute("hidden");
       break;
     default:
       console.log("Unimplemented");
       break;
   }
+};
+
+window.chooseTypeChain = function () {
+  modChainAction.chooseTypeChain();
+};
+
+window.addToEndOfChain = function () {
+  modChainAction.addToEndOfChain();
 };
 
 window.choosePlugin = function () {
