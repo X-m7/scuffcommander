@@ -69,7 +69,7 @@ window.chooseTypeChain = function () {
 };
 
 window.addToEndOfChain = function () {
-  modChainAction.addToEndOfChain();
+  modChainAction.addToChain();
 };
 
 window.choosePlugin = function () {

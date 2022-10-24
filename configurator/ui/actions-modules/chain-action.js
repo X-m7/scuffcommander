@@ -17,7 +17,7 @@ export function chooseTypeChain() {
   }
 }
 
-export function addToEndOfChain() {
+export function addToChain(index = null) {
   const type = document.chainAction.type.value;
   switch (type) {
     case "none":
@@ -25,6 +25,7 @@ export function addToEndOfChain() {
       break;
     case "single":
       const data = modSingleAction.getSingleActionData();
+      data.index = index;
       invoke("add_new_single_action_to_temp_chain", data).then(
         refreshTempChain
       );
@@ -53,15 +54,33 @@ export function showChainAction(id) {
   resetChainInputs();
 }
 
+export function deleteChainItem(i) {
+  invoke("delete_entry_from_temp_chain", { index: i }).then(refreshTempChain);
+}
+
+function createButtonNode(text, onclick) {
+  const button = document.createElement("button");
+  button.textContent = text;
+  button.addEventListener("click", onclick);
+  button.setAttribute("type", "button");
+  return button;
+}
+
 function refreshTempChain() {
-  // TODO: add buttons for each action (add above, add below, delete, edit)
   invoke("get_temp_chain_display").then((actions) => {
     clearChainView();
     const uiList = document.getElementById("chainActionList");
-    actions.forEach((action) => {
-      let newElement = document.createElement("li");
-      newElement.textContent = action;
+    for (const i in actions) {
+      const newElement = document.createElement("li");
+      newElement.textContent = actions[i];
       uiList.appendChild(newElement);
-    });
+      const iInt = parseInt(i);
+      newElement.appendChild(
+        createButtonNode("Delete", () => deleteChainItem(iInt))
+      );
+      newElement.appendChild(
+        createButtonNode("Add new action above", () => addToChain(iInt))
+      );
+    }
   });
 }

@@ -51,21 +51,37 @@ pub async fn copy_action_to_temp_chain(
     }
 }
 
+// if index is given the behaviour is the same as the insert method of Vec
 #[tauri::command]
 pub async fn add_new_single_action_to_temp_chain(
     plugin_type: PluginType,
     plugin_data: Value,
+    index: Option<usize>,
     plugins_state: tauri::State<'_, PluginStates>,
     temp_chain: tauri::State<'_, TemporaryChain>,
 ) -> Result<(), String> {
     if let Some(plugin) = plugins_state.plugins.lock().await.get_mut(&plugin_type) {
-        temp_chain.0.lock().await.push(Action::Single(
-            PluginAction::from_json(plugin, plugin_data).await?,
-        ));
+        let action = Action::Single(PluginAction::from_json(plugin, plugin_data).await?);
+        let mut temp_chain = temp_chain.0.lock().await;
+        if let Some(i) = index {
+            temp_chain.insert(i, action);
+        } else {
+            temp_chain.push(action);
+        }
         Ok(())
     } else {
         Err("Selected plugin has not been configured".to_string())
     }
+}
+
+#[tauri::command]
+pub async fn delete_entry_from_temp_chain(
+    index: usize,
+    temp_chain: tauri::State<'_, TemporaryChain>,
+) -> Result<(), ()> {
+    temp_chain.0.lock().await.remove(index);
+
+    Ok(())
 }
 
 #[tauri::command]

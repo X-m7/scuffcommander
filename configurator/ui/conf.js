@@ -2,9 +2,9 @@ const { invoke } = window.__TAURI__.tauri;
 
 // format follows OBSConfig struct
 function getObsData() {
-  let addr = document.obsForm.addr.value;
-  let port = document.obsForm.port.value;
-  let pw = document.obsForm.pw.value;
+  const addr = document.obsForm.addr.value;
+  const port = document.obsForm.port.value;
+  const pw = document.obsForm.pw.value;
   return { addr: addr, port: parseInt(port), password: pw };
 }
 
@@ -20,8 +20,8 @@ function testObs() {
 
 // format follows VTSConfig struct
 function getVtsData() {
-  let addr = document.vtsForm.addr.value;
-  let file = document.vtsForm.tokenFile.value;
+  const addr = document.vtsForm.addr.value;
+  const file = document.vtsForm.tokenFile.value;
   return { addr: addr, token_file: file };
 }
 
@@ -37,8 +37,8 @@ function testVts() {
 
 // format follows AppConfig struct
 function getAppConfig() {
-  let addr = document.serverForm.addr.value;
-  let port = document.serverForm.port.value;
+  const addr = document.serverForm.addr.value;
+  const port = document.serverForm.port.value;
 
   return {
     addr: addr,

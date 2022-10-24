@@ -136,7 +136,7 @@ export function choosePlugin() {
 
 function resetActionInput() {
   document.singleAction.inputSelect.options.length = 0;
-  let defaultOpt = document.createElement("option");
+  const defaultOpt = document.createElement("option");
   defaultOpt.value = "none";
   defaultOpt.textContent = "Select an option";
   document.singleAction.inputSelect.appendChild(defaultOpt);
@@ -145,7 +145,7 @@ function resetActionInput() {
 function updateActionInputSelect(list) {
   resetActionInput();
   list.forEach((i) => {
-    let opt = document.createElement("option");
+    const opt = document.createElement("option");
     // prepend something so we can differentiate the real options from "none"
     opt.value = "x-" + i;
     opt.textContent = i;

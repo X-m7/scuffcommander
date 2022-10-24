@@ -77,18 +77,18 @@ export function addNewAction() {
 
 export function updateActions(actions) {
   document.actionSelect.action.options.length = 0;
-  let defaultOpt = document.createElement("option");
+  const defaultOpt = document.createElement("option");
   defaultOpt.value = "none";
   defaultOpt.textContent = "Select an option";
   document.actionSelect.action.appendChild(defaultOpt);
 
-  let defaultOpt2 = document.createElement("option");
+  const defaultOpt2 = document.createElement("option");
   defaultOpt2.value = "new";
   defaultOpt2.textContent = "Create a new action";
   document.actionSelect.action.appendChild(defaultOpt2);
 
   actions.forEach((action) => {
-    let opt = document.createElement("option");
+    const opt = document.createElement("option");
     // prepend something so we can differentiate the real options from "none" and "new"
     opt.value = "x-" + action;
     opt.textContent = action;

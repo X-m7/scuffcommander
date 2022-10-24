@@ -48,7 +48,9 @@
         <option value="condition">Condition</option>
       </select>
       <button type="button" onclick="addToEndOfChain()">Add to end</button>
-      <ol id="chainActionList"></ol>
+      <ol id="chainActionList">
+        <!-- this is populated via refreshTempChain in ./actions-modules/chain-action.js -->
+      </ol>
     </form>
     <form name="singleAction" hidden>
       <label>
