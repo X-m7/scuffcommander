@@ -3,10 +3,55 @@ import * as modChainAction from "./chain-action.js";
 
 const { invoke } = window.__TAURI__.tauri;
 
-export function resetAllActionDetailInputs() {
+function resetAllActionDetailInputs() {
   document.chainAction.setAttribute("hidden", true);
   document.singleAction.setAttribute("hidden", true);
   modSingleAction.resetSingleActionInputs();
+}
+
+export function chooseAction() {
+  const action = document.actionSelect.action.value;
+  resetAllActionDetailInputs();
+  switch (action) {
+    case "none":
+      document.actionModify.type.value = "none";
+      document.actionModify.setAttribute("hidden", true);
+      break;
+    case "new":
+      document.actionModify.removeAttribute("hidden");
+      document.actionModify.id.value = "";
+      document.actionModify.type.value = "none";
+      break;
+    default:
+      const action_id = action.substring(2);
+      document.actionModify.removeAttribute("hidden");
+      document.actionModify.id.value = action_id;
+      invoke("load_action_details", { id: action_id }).then((action) =>
+        showActionInUi(action, action_id)
+      );
+      break;
+  }
+}
+
+export function chooseType() {
+  const type = document.actionModify.type.value;
+  resetAllActionDetailInputs();
+  switch (type) {
+    case "none":
+      break;
+    case "single":
+      modSingleAction.resetSingleActionInputs();
+      document.singleAction.removeAttribute("hidden");
+      break;
+    case "chain":
+      modChainAction.resetChainInputs();
+      modChainAction.resetTempChain();
+      document.chainAction.removeAttribute("hidden");
+      break;
+    default:
+      console.log("Unimplemented");
+      break;
+  }
 }
 
 export function loadActions() {
@@ -52,7 +97,7 @@ export function updateActions(actions) {
 }
 
 // Loading a selected action
-export function showActionInUi(action, id) {
+function showActionInUi(action, id) {
   switch (action.tag) {
     case "Single":
       modSingleAction.showSingleAction(action.content);

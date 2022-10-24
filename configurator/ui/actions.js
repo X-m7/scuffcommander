@@ -24,26 +24,7 @@ window.saveAll = function () {
 };
 
 window.chooseAction = function () {
-  const action = document.actionSelect.action.value;
-  modHelpers.resetAllActionDetailInputs();
-  switch (action) {
-    case "none":
-      document.actionModify.type.value = "none";
-      break;
-    case "new":
-      document.actionModify.removeAttribute("hidden");
-      document.actionModify.id.value = "";
-      document.actionModify.type.value = "none";
-      break;
-    default:
-      const action_id = action.substring(2);
-      document.actionModify.removeAttribute("hidden");
-      document.actionModify.id.value = action_id;
-      invoke("load_action_details", { id: action_id }).then((action) =>
-        modHelpers.showActionInUi(action, action_id)
-      );
-      break;
-  }
+  modHelpers.chooseAction();
 };
 
 window.saveCurrentAction = function () {
@@ -65,24 +46,22 @@ window.saveCurrentAction = function () {
 };
 
 window.chooseType = function () {
-  const type = document.actionModify.type.value;
-  modHelpers.resetAllActionDetailInputs();
-  switch (type) {
-    case "none":
-      break;
-    case "single":
-      modSingleAction.resetSingleActionInputs();
-      document.singleAction.removeAttribute("hidden");
-      break;
-    case "chain":
-      modChainAction.resetChainInputs();
-      modChainAction.resetTempChain();
-      document.chainAction.removeAttribute("hidden");
-      break;
-    default:
-      console.log("Unimplemented");
-      break;
+  modHelpers.chooseType();
+};
+
+window.deleteCurrentAction = function () {
+  const id = document.actionSelect.action.value;
+  if (id === "new" || id === "none") {
+    console.log("invalid action selected");
+    return;
   }
+
+  invoke("delete_action", { id: id.substring(2) }).then(() => {
+    document.actionSelect.action.value = "none";
+    document.actionModify.id.value = "";
+    modHelpers.loadActions();
+    modHelpers.chooseAction();
+  });
 };
 
 window.chooseTypeChain = function () {
