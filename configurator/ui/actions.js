@@ -1,5 +1,6 @@
 import * as modSingleAction from "./actions-modules/single-action.js";
 import * as modChainAction from "./actions-modules/chain-action.js";
+import * as modConditionAction from "./actions-modules/condition-action.js";
 import * as modHelpers from "./actions-modules/helpers.js";
 
 const { invoke } = window.__TAURI__.tauri;
@@ -82,4 +83,16 @@ window.obsChooseType = function () {
 
 window.vtsChooseType = function () {
   modSingleAction.vtsChooseType();
+};
+
+window.queryChoosePlugin = function () {
+  modConditionAction.queryChoosePlugin();
+};
+
+window.obsQueryChooseType = function () {
+  modConditionAction.obsQueryChooseType();
+};
+
+window.vtsQueryChooseType = function () {
+  modConditionAction.vtsQueryChooseType();
 };

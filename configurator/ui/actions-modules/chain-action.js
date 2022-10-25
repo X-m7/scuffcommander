@@ -11,7 +11,8 @@ export function chooseTypeChain() {
     case "single":
       document.singleAction.removeAttribute("hidden");
       break;
-    default:
+    case "condition":
+      // TODO: make this work
       console.log("Unimplemented");
       break;
   }
@@ -31,6 +32,7 @@ export function addToChain(index = null) {
       );
       break;
     case "condition":
+      // TODO: make this work
       console.log("Unimplemented");
   }
 }

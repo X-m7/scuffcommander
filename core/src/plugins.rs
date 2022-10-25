@@ -1,6 +1,7 @@
 pub mod obs;
 pub mod vts;
 
+use super::Condition;
 use async_std::sync::Mutex;
 use derive_more::Display;
 use serde::{Deserialize, Serialize};
@@ -135,5 +136,45 @@ impl PluginStates {
         PluginStates {
             plugins: Mutex::new(plugins),
         }
+    }
+}
+
+impl Condition {
+    // Helper method to make creating conditions from frontend simpler
+    // PluginInstance is required to convert certain UI friendly inputs to the required format (for
+    // example VTS model name to model id)
+    pub async fn from_json(
+        plugin: &mut PluginInstance,
+        data: serde_json::Value,
+    ) -> Result<Condition, String> {
+        if !data.is_object() {
+            return Err("Invalid data input for condition".to_string());
+        }
+
+        let plugin_specific_type = &data["type"];
+        let target = &data["param"];
+
+        if plugin_specific_type.is_null() || target.is_null() {
+            return Err("Invalid data input for condition".to_string());
+        }
+
+        let plugin_specific_type = plugin_specific_type.as_str().unwrap();
+        let target = target.as_str().unwrap();
+
+        let (query, target) = match plugin {
+            PluginInstance::OBS(_) => {
+                let (obs_query, target) = OBSQuery::from_strings(plugin_specific_type, target)?;
+
+                (PluginQuery::OBS(obs_query), target)
+            }
+            PluginInstance::VTS(conn) => {
+                let (vts_query, target) =
+                    VTSQuery::from_strings(plugin_specific_type, target, conn).await?;
+
+                (PluginQuery::VTS(vts_query), target)
+            }
+        };
+
+        Ok(Condition { query, target })
     }
 }

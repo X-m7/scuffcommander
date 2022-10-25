@@ -59,7 +59,8 @@ async fn main() {
             app_mod::actions::chain::copy_action_to_temp_chain,
             app_mod::actions::chain::add_new_single_action_to_temp_chain,
             app_mod::actions::chain::delete_entry_from_temp_chain,
-            app_mod::actions::chain::get_temp_chain_display
+            app_mod::actions::chain::get_temp_chain_display,
+            app_mod::actions::condition::add_new_condition_action,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

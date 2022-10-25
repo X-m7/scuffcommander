@@ -1,3 +1,5 @@
+import * as modHelpers from "./helpers.js";
+
 const { invoke } = window.__TAURI__.tauri;
 
 export function resetSingleActionInputs() {
@@ -134,40 +136,25 @@ export function choosePlugin() {
   }
 }
 
-function resetActionInput() {
-  document.singleAction.inputSelect.options.length = 0;
-  const defaultOpt = document.createElement("option");
-  defaultOpt.value = "none";
-  defaultOpt.textContent = "Select an option";
-  document.singleAction.inputSelect.appendChild(defaultOpt);
-}
-
-function updateActionInputSelect(list) {
-  resetActionInput();
-  list.forEach((i) => {
-    const opt = document.createElement("option");
-    // prepend something so we can differentiate the real options from "none"
-    opt.value = "x-" + i;
-    opt.textContent = i;
-    document.singleAction.inputSelect.appendChild(opt);
-  });
-}
-
 // `then` is a function to be run after this has finished fully
 // otherwise the input field(s) can end up being reset
 export function obsChooseType(then = null) {
   const type = document.singleAction.typeObs.value;
   switch (type) {
     case "none":
-      if (!(afterUpdateFn instanceof Function)) {
-        resetActionInput();
+      if (!(then instanceof Function)) {
+        modHelpers.resetSelectInput(document.singleAction.inputSelect);
         document
           .getElementById("actionInputSelect")
           .setAttribute("hidden", true);
       }
       break;
     case "ProgramSceneChange":
-      invoke("get_obs_scenes").then(updateActionInputSelect).then(then);
+      invoke("get_obs_scenes")
+        .then((list) =>
+          modHelpers.updateSelectInput(list, document.singleAction.inputSelect)
+        )
+        .then(then);
       document.getElementById("actionInputSelect").removeAttribute("hidden");
       break;
   }
@@ -180,7 +167,7 @@ export function vtsChooseType(then = null) {
   switch (type) {
     case "none":
       if (!(then instanceof Function)) {
-        resetActionInput();
+        modHelpers.resetSelectInput(document.singleAction.inputSelect);
         document
           .getElementById("actionInputSelect")
           .setAttribute("hidden", true);
@@ -188,12 +175,18 @@ export function vtsChooseType(then = null) {
       break;
     case "ToggleExpression":
       invoke("get_vts_expression_names")
-        .then(updateActionInputSelect)
+        .then((list) =>
+          modHelpers.updateSelectInput(list, document.singleAction.inputSelect)
+        )
         .then(then);
       document.getElementById("actionInputSelect").removeAttribute("hidden");
       break;
     case "LoadModel":
-      invoke("get_vts_model_names").then(updateActionInputSelect).then(then);
+      invoke("get_vts_model_names")
+        .then((list) =>
+          modHelpers.updateSelectInput(list, document.singleAction.inputSelect)
+        )
+        .then(then);
       document.getElementById("actionInputSelect").removeAttribute("hidden");
       break;
   }

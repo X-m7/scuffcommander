@@ -17,6 +17,24 @@ impl VTSQuery {
             VTSQuery::Version => conn.get_vts_version().await,
         }
     }
+
+    // Helper method to convert the target string from a UI friendly format to that expected by the
+    // run method (for example converting from a model name to id)
+    pub async fn from_strings(
+        query_type: &str,
+        target: &str,
+        conn: &mut VTSConnector,
+    ) -> Result<(VTSQuery, String), String> {
+        let query: VTSQuery =
+            serde_json::from_str(&format!("\"{}\"", query_type)).map_err(|e| e.to_string())?;
+
+        let target = match query {
+            VTSQuery::ActiveModelId => conn.get_model_id_from_name(target).await?,
+            VTSQuery::Version => target.to_string(),
+        };
+
+        Ok((query, target))
+    }
 }
 
 impl Display for VTSQuery {
@@ -58,41 +76,41 @@ impl VTSAction {
     // Here the inputs for actions are the names (for example LoadModel will have the model name
     // instead of ID), which will then be converted to the ID before storage
     pub async fn from_json(data: Value, conn: &mut VTSConnector) -> Result<VTSAction, String> {
-        if data.is_object() {
-            Ok(
-                match data["type"]
-                    .as_str()
-                    .ok_or_else(|| "VTS action type must be a string".to_string())?
-                {
-                    "ToggleExpression" => {
-                        let param = conn
-                            .get_expression_id_from_name(
-                                data["param"]
-                                    .as_str()
-                                    .ok_or("VTS action parameter must be a string")?,
-                            )
-                            .await?;
-
-                        VTSAction::ToggleExpression(param)
-                    }
-                    "LoadModel" => {
-                        let param = conn
-                            .get_model_id_from_name(
-                                data["param"]
-                                    .as_str()
-                                    .ok_or("VTS action parameter must be a string")?,
-                            )
-                            .await?;
-
-                        VTSAction::LoadModel(param)
-                    }
-                    "CheckConnection" => VTSAction::CheckConnection,
-                    _ => return Err("Unsupported VTS action type".to_string()),
-                },
-            )
-        } else {
-            Err("Invalid data input for OBS action".to_string())
+        if !data.is_object() {
+            return Err("Invalid data input for OBS action".to_string());
         }
+
+        let output = match data["type"]
+            .as_str()
+            .ok_or_else(|| "VTS action type must be a string".to_string())?
+        {
+            "ToggleExpression" => {
+                let param = conn
+                    .get_expression_id_from_name(
+                        data["param"]
+                            .as_str()
+                            .ok_or("VTS action parameter must be a string")?,
+                    )
+                    .await?;
+
+                VTSAction::ToggleExpression(param)
+            }
+            "LoadModel" => {
+                let param = conn
+                    .get_model_id_from_name(
+                        data["param"]
+                            .as_str()
+                            .ok_or("VTS action parameter must be a string")?,
+                    )
+                    .await?;
+
+                VTSAction::LoadModel(param)
+            }
+            "CheckConnection" => VTSAction::CheckConnection,
+            _ => return Err("Unsupported VTS action type".to_string()),
+        };
+
+        Ok(output)
     }
 }
 

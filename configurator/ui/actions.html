@@ -41,16 +41,68 @@
       </label>
     </form>
     <form name="chainAction" hidden>
-      Action type to add to chain:
-      <select name="type" oninput="chooseTypeChain()">
-        <option value="none">Select an option</option>
-        <option value="single">Single</option>
-        <option value="condition">Condition</option>
-      </select>
+      <label>
+        Action type to add to chain:
+        <select name="type" oninput="chooseTypeChain()">
+          <option value="none">Select an option</option>
+          <option value="single">Single</option>
+          <option value="condition">Condition</option>
+        </select>
+      </label>
       <button type="button" onclick="addToEndOfChain()">Add to end</button>
       <ol id="chainActionList">
         <!-- this is populated via refreshTempChain in ./actions-modules/chain-action.js -->
       </ol>
+    </form>
+    <form name="conditionAction" hidden>
+      <label>
+        Plugin:
+        <select name="plugin" oninput="queryChoosePlugin()">
+          <option value="none">Select an option</option>
+          <option value="OBS">OBS</option>
+          <option value="VTS">VTS</option>
+        </select>
+      </label>
+      <div id="conditionQueryObs" hidden>
+        <label>
+          OBS query type:
+          <select name="typeObs" oninput="obsQueryChooseType()">
+            <option value="none">Select an option</option>
+            <option value="CurrentProgramScene">Current Program Scene</option>
+          </select>
+        </label>
+      </div>
+      <div id="conditionQueryVts" hidden>
+        <label>
+          VTube Studio query type:
+          <select name="typeVts" oninput="vtsQueryChooseType()">
+            <option value="none">Select an option</option>
+            <option value="ActiveModelId">Active Model</option>
+          </select>
+        </label>
+      </div>
+      <div id="queryInputSelect" hidden>
+        <label>
+          Query parameter:
+          <select name="inputSelect">
+            <option value="none">Select an option</option>
+          </select>
+        </label>
+      </div>
+      <br />
+      <label>
+        Action to execute if the above query is true:
+        <select name="thenAction">
+          <option value="none">Select an existing action to copy</option>
+        </select>
+      </label>
+      <br />
+      <label>
+        Action to execute otherwise:
+        <select name="elseAction">
+          <option value="none">Do nothing</option>
+        </select>
+      </label>
     </form>
     <form name="singleAction" hidden>
       <label>
@@ -86,8 +138,8 @@
         </label>
       </div>
       <div id="actionInputSelect" hidden>
-        <label
-          >Action parameter:
+        <label>
+          Action parameter:
           <select name="inputSelect">
             <option value="none">Select an option</option>
           </select>

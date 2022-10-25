@@ -56,6 +56,8 @@ impl ActionConfig {
     }
 }
 
+// There is also a from_json function for this, but the implementation is in the plugins module due
+// to needing access to plugin specifics
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Condition {
     pub query: PluginQuery,
