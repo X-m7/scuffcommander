@@ -1,5 +1,6 @@
 import * as modSingleAction from "./single-action.js";
 import * as modConditionAction from "./condition-action.js";
+import * as modPlugins from "./plugins/plugins.js";
 
 const { invoke } = window.__TAURI__.tauri;
 
@@ -15,6 +16,10 @@ export function chooseTypeChain() {
       break;
     case "condition":
       document.conditionAction.removeAttribute("hidden");
+      invoke("get_actions").then(modConditionAction.updateThenElseSelect);
+      break;
+    default:
+      console.log("Unsupported action type");
       break;
   }
 }
@@ -51,7 +56,7 @@ export function resetTempChain() {
 }
 
 export function resetChainInputs() {
-  modSingleAction.resetSingleActionInputs();
+  modPlugins.singleActionResetInputs();
   document.chainAction.type.value = "none";
 }
 

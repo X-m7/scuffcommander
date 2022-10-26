@@ -1,6 +1,7 @@
 import * as modSingleAction from "./single-action.js";
 import * as modChainAction from "./chain-action.js";
 import * as modConditionAction from "./condition-action.js";
+import * as modPlugins from "./plugins/plugins.js";
 
 const { invoke } = window.__TAURI__.tauri;
 
@@ -8,7 +9,7 @@ function resetAllActionDetailInputs() {
   document.chainAction.setAttribute("hidden", true);
   document.singleAction.setAttribute("hidden", true);
   document.conditionAction.setAttribute("hidden", true);
-  modSingleAction.resetSingleActionInputs();
+  modPlugins.singleActionResetInputs();
   modChainAction.resetChainInputs();
   modConditionAction.resetConditionInputs();
 }

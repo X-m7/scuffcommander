@@ -2,6 +2,9 @@ import * as modSingleAction from "./actions-modules/single-action.js";
 import * as modChainAction from "./actions-modules/chain-action.js";
 import * as modConditionAction from "./actions-modules/condition-action.js";
 import * as modHelpers from "./actions-modules/helpers.js";
+import * as modPlugins from "./actions-modules/plugins/plugins.js";
+import * as modObs from "./actions-modules/plugins/obs.js";
+import * as modVts from "./actions-modules/plugins/vts.js";
 
 const { invoke } = window.__TAURI__.tauri;
 
@@ -74,25 +77,25 @@ window.addToEndOfChain = function () {
 };
 
 window.choosePlugin = function () {
-  modSingleAction.choosePlugin();
+  modPlugins.singleActionChoosePlugin();
 };
 
 window.obsChooseType = function () {
-  modSingleAction.obsChooseType();
+  modObs.obsSingleActionChooseType();
 };
 
 window.vtsChooseType = function () {
-  modSingleAction.vtsChooseType();
+  modVts.vtsSingleActionChooseType();
 };
 
 window.queryChoosePlugin = function () {
-  modConditionAction.queryChoosePlugin();
+  modPlugins.queryChoosePlugin();
 };
 
 window.obsQueryChooseType = function () {
-  modConditionAction.obsQueryChooseType();
+  modObs.obsQueryChooseType();
 };
 
 window.vtsQueryChooseType = function () {
-  modConditionAction.vtsQueryChooseType();
+  modVts.vtsQueryChooseType();
 };
