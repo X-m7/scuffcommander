@@ -47,6 +47,7 @@ async fn main() {
             app_mod::plugins::vts::get_vts_model_names,
             app_mod::plugins::vts::get_vts_expression_name_from_id,
             app_mod::plugins::vts::get_vts_model_name_from_id,
+            app_mod::plugins::vts::get_vts_current_model_pos,
             app_mod::config::save_config,
             app_mod::config::get_config,
             app_mod::actions::get_actions,

@@ -1,4 +1,4 @@
-use scuffcommander_core::plugins::vts::{VTSConfig, VTSConnector};
+use scuffcommander_core::plugins::vts::{VTSConfig, VTSConnector, VTSMoveModelInput};
 use scuffcommander_core::plugins::{PluginInstance, PluginStates, PluginType};
 
 #[tauri::command]
@@ -57,6 +57,27 @@ pub async fn get_vts_model_name_from_id(
 
     if let Some(PluginInstance::VTS(vts)) = plugins.get_mut(&PluginType::VTS) {
         vts.get_model_name_from_id(id).await
+    } else {
+        Err("VTS plugin not configured".to_string())
+    }
+}
+
+#[tauri::command]
+pub async fn get_vts_current_model_pos(
+    plugins_data: tauri::State<'_, PluginStates>,
+) -> Result<VTSMoveModelInput, String> {
+    let mut plugins = plugins_data.plugins.lock().await;
+
+    if let Some(PluginInstance::VTS(vts)) = plugins.get_mut(&PluginType::VTS) {
+        let (x, y, rotation, size) = vts.get_current_model_position().await?;
+
+        Ok(VTSMoveModelInput {
+            x,
+            y,
+            rotation,
+            size,
+            time_sec: 0.0,
+        })
     } else {
         Err("VTS plugin not configured".to_string())
     }

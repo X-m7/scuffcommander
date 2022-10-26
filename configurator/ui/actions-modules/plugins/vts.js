@@ -6,6 +6,59 @@ const { invoke } = window.__TAURI__.tauri;
  * Single action relevant things
  */
 
+export function vtsResetInputs() {
+  document.getElementById("vtsTypeSelect").setAttribute("hidden", "true");
+  document
+    .getElementById("vtsModelPositionInput")
+    .setAttribute("hidden", "true");
+  document.singleAction.typeVts.value = "none";
+  document.singleAction.vtsPosX.value = "";
+  document.singleAction.vtsPosY.value = "";
+  document.singleAction.vtsPosRotation.value = "";
+  document.singleAction.vtsPosSize.value = "";
+  document.singleAction.vtsPosAnimDuration.value = "";
+}
+
+export function vtsGetSingleActionParams() {
+  const type = document.singleAction.typeVts.value;
+  let param = null;
+
+  switch (type) {
+    case "ToggleExpression":
+    case "LoadModel":
+      // substring because it had "x-" prepended to it
+      param = document.singleAction.inputSelect.value.substring(2);
+      break;
+    case "MoveModel":
+      // follows the structure of VTSMoveModelInput
+      param = {
+        x: parseFloat(document.singleAction.vtsPosX.value),
+        y: parseFloat(document.singleAction.vtsPosY.value),
+        rotation: parseFloat(document.singleAction.vtsPosRotation.value),
+        size: parseFloat(document.singleAction.vtsPosSize.value),
+        time_sec: parseFloat(document.singleAction.vtsPosAnimDuration.value),
+      };
+      break;
+    default:
+      console.log("Unsupported plugin");
+      return null;
+  }
+
+  return {
+    type: type,
+    param: param,
+  };
+}
+
+// requires VTSMoveModelInput as the input
+function prefillMoveModelAction(action) {
+  document.singleAction.vtsPosX.value = action.x;
+  document.singleAction.vtsPosY.value = action.y;
+  document.singleAction.vtsPosRotation.value = action.rotation;
+  document.singleAction.vtsPosSize.value = action.size;
+  document.singleAction.vtsPosAnimDuration.value = action.time_sec;
+}
+
 export function vtsShowSingleAction(action) {
   switch (action.tag) {
     case "ToggleExpression":
@@ -24,6 +77,9 @@ export function vtsShowSingleAction(action) {
         modHelpers.preselectSelectInput(act, document.singleAction.inputSelect)
       );
       break;
+    case "MoveModel":
+      prefillMoveModelAction(action.content);
+      break;
     default:
       console.log("Unrecognised VTS action type");
       return;
@@ -35,14 +91,14 @@ export function vtsShowSingleAction(action) {
 // `then` is a function to be run after this has finished fully
 // otherwise the input field(s) can end up being reset
 export function vtsSingleActionChooseType(then = null) {
+  document.getElementById("actionInputSelect").setAttribute("hidden", true);
+  document.getElementById("vtsModelPositionInput").setAttribute("hidden", true);
+
   const type = document.singleAction.typeVts.value;
   switch (type) {
     case "none":
       if (!(then instanceof Function)) {
         modHelpers.resetSelectInput(document.singleAction.inputSelect);
-        document
-          .getElementById("actionInputSelect")
-          .setAttribute("hidden", true);
       }
       break;
     case "ToggleExpression":
@@ -61,7 +117,20 @@ export function vtsSingleActionChooseType(then = null) {
         .then(then);
       document.getElementById("actionInputSelect").removeAttribute("hidden");
       break;
+    case "MoveModel":
+      document
+        .getElementById("vtsModelPositionInput")
+        .removeAttribute("hidden");
+      then();
+      break;
+    default:
+      console.log("Unsupported action");
+      break;
   }
+}
+
+export function vtsGetCurrentModelPos() {
+  invoke("get_vts_current_model_pos").then(prefillMoveModelAction);
 }
 
 /*

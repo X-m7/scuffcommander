@@ -6,6 +6,11 @@ import * as modHelpers from "../helpers.js";
  * Single action relevant things
  */
 
+export function obsResetInputs() {
+  document.getElementById("obsTypeSelect").setAttribute("hidden", "true");
+  document.singleAction.typeObs.value = "none";
+}
+
 export function obsShowSingleAction(action) {
   switch (action.tag) {
     case "ProgramSceneChange":

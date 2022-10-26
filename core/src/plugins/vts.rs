@@ -47,10 +47,20 @@ impl Display for VTSQuery {
 }
 
 #[derive(Serialize, Deserialize, Clone)]
+pub struct VTSMoveModelInput {
+    pub x: f64,
+    pub y: f64,
+    pub rotation: f64,
+    pub size: f64,
+    pub time_sec: f64,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
 #[serde(tag = "tag", content = "content")]
 pub enum VTSAction {
     ToggleExpression(String),
     LoadModel(String),
+    MoveModel(VTSMoveModelInput),
     CheckConnection,
 }
 
@@ -59,6 +69,17 @@ impl Display for VTSAction {
         match self {
             VTSAction::ToggleExpression(expr) => write!(f, "Toggle Expression with ID: {}", expr),
             VTSAction::LoadModel(model) => write!(f, "Load Model with ID: {}", model),
+            VTSAction::MoveModel(VTSMoveModelInput {
+                x,
+                y,
+                rotation,
+                size,
+                time_sec,
+            }) => write!(
+                f,
+                "Move Model to coordinates ({}, {}), with rotation {} and size {} for {} seconds",
+                x, y, rotation, size, time_sec
+            ),
             VTSAction::CheckConnection => write!(f, "Check Connection"),
         }
     }
@@ -69,18 +90,20 @@ impl VTSAction {
         match self {
             VTSAction::ToggleExpression(expr) => conn.toggle_expression(expr).await,
             VTSAction::LoadModel(model) => conn.load_model(model).await,
+            VTSAction::MoveModel(info) => conn.move_model(info).await,
             VTSAction::CheckConnection => conn.get_vts_version().await.map(|_| ()),
         }
     }
 
     // Here the inputs for actions are the names (for example LoadModel will have the model name
     // instead of ID), which will then be converted to the ID before storage
-    pub async fn from_json(data: Value, conn: &mut VTSConnector) -> Result<VTSAction, String> {
+    pub async fn from_json(mut data: Value, conn: &mut VTSConnector) -> Result<VTSAction, String> {
         if !data.is_object() {
             return Err("Invalid data input for OBS action".to_string());
         }
 
         let output = match data["type"]
+            .take()
             .as_str()
             .ok_or_else(|| "VTS action type must be a string".to_string())?
         {
@@ -105,6 +128,12 @@ impl VTSAction {
                     .await?;
 
                 VTSAction::LoadModel(param)
+            }
+            "MoveModel" => {
+                let info: VTSMoveModelInput = serde_json::value::from_value(data["param"].take())
+                    .map_err(|e| e.to_string())?;
+
+                VTSAction::MoveModel(info)
             }
             "CheckConnection" => VTSAction::CheckConnection,
             _ => return Err("Unsupported VTS action type".to_string()),
@@ -168,15 +197,19 @@ impl VTSConnector {
         }
     }
 
-    pub async fn get_current_model_id(&mut self) -> Result<String, String> {
+    async fn get_current_model_info(
+        &mut self,
+    ) -> Result<vtubestudio::data::CurrentModelResponse, String> {
         let resp = self
             .client
             .send(&vtubestudio::data::CurrentModelRequest {})
             .await;
-        match resp {
-            Ok(v) => Ok(v.model_id),
-            Err(e) => Err(e.to_string()),
-        }
+
+        resp.map_err(|e| e.to_string())
+    }
+
+    pub async fn get_current_model_id(&mut self) -> Result<String, String> {
+        Ok(self.get_current_model_info().await?.model_id)
     }
 
     // Takes the model ID as the parameter
@@ -185,6 +218,31 @@ impl VTSConnector {
             .client
             .send(&vtubestudio::data::ModelLoadRequest {
                 model_id: model.to_string(),
+            })
+            .await;
+        match resp {
+            Ok(_) => Ok(()),
+            Err(e) => Err(e.to_string()),
+        }
+    }
+
+    // Returns x, y, rotation, size
+    pub async fn get_current_model_position(&mut self) -> Result<(f64, f64, f64, f64), String> {
+        let pos = self.get_current_model_info().await?.model_position;
+
+        Ok((pos.position_x, pos.position_y, pos.rotation, pos.size))
+    }
+
+    pub async fn move_model(&mut self, info: &VTSMoveModelInput) -> Result<(), String> {
+        let resp = self
+            .client
+            .send(&vtubestudio::data::MoveModelRequest {
+                time_in_seconds: info.time_sec,
+                values_are_relative_to_model: false,
+                position_x: Some(info.x),
+                position_y: Some(info.y),
+                rotation: Some(info.rotation),
+                size: Some(info.size),
             })
             .await;
         match resp {

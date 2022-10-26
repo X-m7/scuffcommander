@@ -99,3 +99,7 @@ window.obsQueryChooseType = function () {
 window.vtsQueryChooseType = function () {
   modVts.vtsQueryChooseType();
 };
+
+window.vtsGetCurrentModelPos = function () {
+  modVts.vtsGetCurrentModelPos();
+};

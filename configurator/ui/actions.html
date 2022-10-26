@@ -137,6 +137,7 @@
             <option value="none">Select an option</option>
             <option value="ToggleExpression">Toggle Expression</option>
             <option value="LoadModel">Load Model</option>
+            <option value="MoveModel">Move Model</option>
           </select>
         </label>
       </div>
@@ -147,6 +148,34 @@
             <option value="none">Select an option</option>
           </select>
         </label>
+      </div>
+      <div id="vtsModelPositionInput" hidden>
+        <label>
+          X: <input type="text" name="vtsPosX" placeholder="(-1 to 1)" />
+        </label>
+        <label>
+          Y: <input type="text" name="vtsPosY" placeholder="(-1 to 1)" />
+        </label>
+        <label>
+          Rotation (degrees):
+          <input
+            type="text"
+            name="vtsPosRotation"
+            placeholder="(-360 to 360)"
+          />
+        </label>
+        <label>
+          Size:
+          <input type="text" name="vtsPosSize" placeholder="(-100 to 100)" />
+        </label>
+        <label>
+          Animation time (s):
+          <input type="text" name="vtsPosAnimDuration" placeholder="(0 to 2)" />
+        </label>
+        <br />
+        <button type="button" onclick="vtsGetCurrentModelPos()">
+          Get current model position
+        </button>
       </div>
     </form>
   </body>

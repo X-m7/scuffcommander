@@ -8,12 +8,10 @@ const { invoke } = window.__TAURI__.tauri;
  */
 
 export function singleActionResetInputs() {
-  document.getElementById("obsTypeSelect").setAttribute("hidden", "true");
-  document.getElementById("vtsTypeSelect").setAttribute("hidden", "true");
+  modObs.obsResetInputs();
+  modVts.vtsResetInputs();
   document.getElementById("actionInputSelect").setAttribute("hidden", "true");
   document.singleAction.plugin.value = "none";
-  document.singleAction.typeObs.value = "none";
-  document.singleAction.typeVts.value = "none";
   document.singleAction.inputSelect.value = "none";
 }
 
@@ -29,11 +27,7 @@ export function singleActionGetPluginParam(plugin) {
         param: document.singleAction.inputSelect.value.substring(2),
       };
     case "VTS":
-      return {
-        type: document.singleAction.typeVts.value,
-        // substring because it had "x-" prepended to it
-        param: document.singleAction.inputSelect.value.substring(2),
-      };
+      return modVts.vtsGetSingleActionParams();
   }
 }
 
@@ -41,7 +35,6 @@ export function singleActionShowHelper(action) {
   switch (action.tag) {
     case "OBS":
       document.singleAction.typeObs.value = action.content.tag;
-      // TODO: fix location of below cmds
       modObs.obsSingleActionChooseType(() =>
         modObs.obsShowSingleAction(action.content)
       );
@@ -76,7 +69,6 @@ export function singleActionChoosePlugin() {
     case "VTS":
       document.getElementById("vtsTypeSelect").removeAttribute("hidden");
       document.getElementById("obsTypeSelect").setAttribute("hidden", true);
-      document.getElementById("actionInputSelect").removeAttribute("hidden");
       break;
     default:
       console.log("Unimplemented");
