@@ -1,4 +1,5 @@
 import * as modSingleAction from "./single-action.js";
+import * as modConditionAction from "./condition-action.js";
 
 const { invoke } = window.__TAURI__.tauri;
 
@@ -7,17 +8,18 @@ export function chooseTypeChain() {
   switch (type) {
     case "none":
       document.singleAction.setAttribute("hidden", true);
+      document.conditionAction.setAttribute("hidden", true);
       break;
     case "single":
       document.singleAction.removeAttribute("hidden");
       break;
     case "condition":
-      // TODO: make this work
-      console.log("Unimplemented");
+      document.conditionAction.removeAttribute("hidden");
       break;
   }
 }
 
+// if no index is given the new action will be added to the end
 export function addToChain(index = null) {
   const type = document.chainAction.type.value;
   switch (type) {
@@ -32,8 +34,11 @@ export function addToChain(index = null) {
       );
       break;
     case "condition":
-      // TODO: make this work
-      console.log("Unimplemented");
+      const data2 = modConditionAction.getConditionData();
+      invoke("add_new_condition_action_to_temp_chain", {
+        actionData: data2,
+        index: index,
+      }).then(refreshTempChain);
   }
 }
 

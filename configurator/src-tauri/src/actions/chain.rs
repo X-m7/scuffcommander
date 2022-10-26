@@ -74,6 +74,29 @@ pub async fn add_new_single_action_to_temp_chain(
     }
 }
 
+// if index is given the behaviour is the same as the insert method of Vec
+#[tauri::command]
+pub async fn add_new_condition_action_to_temp_chain(
+    action_data: super::condition::ConditionActionData,
+    index: Option<usize>,
+    actions_state: tauri::State<'_, ActionConfigState>,
+    plugins_state: tauri::State<'_, PluginStates>,
+    temp_chain: tauri::State<'_, TemporaryChain>,
+) -> Result<(), String> {
+    let action =
+        super::condition::get_condition_action_from_ui(action_data, &actions_state, &plugins_state)
+            .await?;
+
+    let mut temp_chain = temp_chain.0.lock().await;
+    if let Some(i) = index {
+        temp_chain.insert(i, action);
+    } else {
+        temp_chain.push(action);
+    }
+
+    Ok(())
+}
+
 #[tauri::command]
 pub async fn delete_entry_from_temp_chain(
     index: usize,

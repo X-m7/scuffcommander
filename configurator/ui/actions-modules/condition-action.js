@@ -12,6 +12,8 @@ export function resetConditionInputs() {
   document.conditionAction.inputSelect.value = "none";
   document.conditionAction.thenAction.value = "none";
   document.conditionAction.elseAction.value = "none";
+  document.getElementById("conditionCurrentThen").textContent = "None";
+  document.getElementById("conditionCurrentElse").textContent = "None";
 }
 
 function getPluginParam(plugin) {
@@ -34,6 +36,7 @@ function getPluginParam(plugin) {
   }
 }
 
+// output follows layout of ConditionActionData struct in the actions::condition module of backend
 export function getConditionData() {
   const pluginType = document.conditionAction.plugin.value;
   const pluginData = getPluginParam(pluginType);
@@ -51,10 +54,10 @@ export function getConditionData() {
   }
 
   return {
-    pluginType: pluginType,
-    pluginData: pluginData,
-    thenAction: thenAction.substring(2),
-    elseAction: elseAction,
+    plugin_type: pluginType,
+    plugin_data: pluginData,
+    then_action: thenAction.substring(2),
+    else_action: elseAction,
   };
 }
 
@@ -62,7 +65,7 @@ export function addNewConditionAction(then = null) {
   const data = getConditionData();
   data.id = document.actionModify.id.value;
   // once the action has been added refresh the list of actions
-  invoke("add_new_condition_action", data).then(then);
+  invoke("add_new_condition_action", { actionData: data }).then(then);
 }
 
 export function updateThenElseSelect(
