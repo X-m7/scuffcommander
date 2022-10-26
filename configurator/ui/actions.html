@@ -60,7 +60,7 @@
         <select name="plugin" oninput="queryChoosePlugin()">
           <option value="none">Select an option</option>
           <option value="OBS">OBS</option>
-          <option value="VTS">VTS</option>
+          <option value="VTS">VTube Studio</option>
         </select>
       </label>
       <div id="conditionQueryObs" hidden>
@@ -112,10 +112,20 @@
         Plugin:
         <select name="plugin" oninput="choosePlugin()">
           <option value="none">Select an option</option>
+          <option value="General">General</option>
           <option value="OBS">OBS</option>
           <option value="VTS">VTube Studio</option>
         </select>
       </label>
+      <div id="generalTypeSelect" hidden>
+        <label>
+          General action type:
+          <select name="typeGeneral" oninput="generalChooseType()">
+            <option value="none">Select an option</option>
+            <option value="Delay">Delay</option>
+          </select>
+        </label>
+      </div>
       <div id="obsTypeSelect" hidden>
         <label>
           OBS action type:
@@ -147,6 +157,12 @@
           <select name="inputSelect">
             <option value="none">Select an option</option>
           </select>
+        </label>
+      </div>
+      <div id="actionInputText" hidden>
+        <label>
+          Action parameter:
+          <input type="text" name="inputText" />
         </label>
       </div>
       <div id="vtsModelPositionInput" hidden>

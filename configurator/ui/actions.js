@@ -5,6 +5,7 @@ import * as modHelpers from "./actions-modules/helpers.js";
 import * as modPlugins from "./actions-modules/plugins/plugins.js";
 import * as modObs from "./actions-modules/plugins/obs.js";
 import * as modVts from "./actions-modules/plugins/vts.js";
+import * as modGeneral from "./actions-modules/plugins/general.js";
 
 const { invoke } = window.__TAURI__.tauri;
 
@@ -90,6 +91,10 @@ window.vtsChooseType = function () {
 
 window.queryChoosePlugin = function () {
   modPlugins.queryChoosePlugin();
+};
+
+window.generalChooseType = function () {
+  modGeneral.generalSingleActionChooseType();
 };
 
 window.obsQueryChooseType = function () {

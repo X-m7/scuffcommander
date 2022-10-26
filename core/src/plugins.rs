@@ -1,3 +1,4 @@
+pub mod general;
 pub mod obs;
 pub mod vts;
 
@@ -9,6 +10,7 @@ use serde_json::value::Value;
 use std::collections::HashMap;
 use std::fmt::{Display, Formatter};
 
+use general::GeneralAction;
 use obs::{OBSAction, OBSConfig, OBSConnector, OBSQuery};
 use vts::{VTSAction, VTSConfig, VTSConnector, VTSQuery};
 
@@ -16,11 +18,13 @@ use vts::{VTSAction, VTSConfig, VTSConnector, VTSQuery};
 pub enum PluginType {
     OBS,
     VTS,
+    General,
 }
 
 pub enum PluginInstance {
     OBS(OBSConnector),
     VTS(VTSConnector),
+    General,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -61,6 +65,7 @@ impl PluginQuery {
 pub enum PluginAction {
     OBS(OBSAction),
     VTS(VTSAction),
+    General(GeneralAction),
 }
 
 impl Display for PluginAction {
@@ -68,6 +73,7 @@ impl Display for PluginAction {
         match self {
             PluginAction::OBS(a) => write!(f, "OBS-{}", a),
             PluginAction::VTS(a) => write!(f, "VTS-{}", a),
+            PluginAction::General(a) => write!(f, "General-{}", a),
         }
     }
 }
@@ -77,6 +83,10 @@ impl PluginAction {
         match (self, plugin) {
             (PluginAction::OBS(action), PluginInstance::OBS(conn)) => action.run(conn).await,
             (PluginAction::VTS(action), PluginInstance::VTS(conn)) => action.run(conn).await,
+            (PluginAction::General(action), PluginInstance::General) => {
+                action.run().await;
+                Ok(())
+            }
             _ => Err("Mismatched action and plugin instance".to_string()),
         }
     }
@@ -85,6 +95,7 @@ impl PluginAction {
         match self {
             PluginAction::OBS(_) => PluginType::OBS,
             PluginAction::VTS(_) => PluginType::VTS,
+            PluginAction::General(_) => PluginType::General,
         }
     }
 
@@ -98,6 +109,7 @@ impl PluginAction {
         Ok(match plugin {
             PluginInstance::OBS(_) => PluginAction::OBS(OBSAction::from_json(data)?),
             PluginInstance::VTS(conn) => PluginAction::VTS(VTSAction::from_json(data, conn).await?),
+            PluginInstance::General => PluginAction::General(GeneralAction::from_json(data)?),
         })
     }
 }
@@ -106,6 +118,13 @@ impl PluginAction {
 pub enum PluginConfig {
     OBS(OBSConfig),
     VTS(VTSConfig),
+    General,
+}
+
+impl PluginConfig {
+    pub fn get_default_vec() -> Vec<PluginConfig> {
+        vec![PluginConfig::General]
+    }
 }
 
 // Need mutex here because there can only be one of these
@@ -130,6 +149,9 @@ impl PluginStates {
                         PluginType::VTS,
                         PluginInstance::VTS(VTSConnector::new(c).await),
                     );
+                }
+                PluginConfig::General => {
+                    plugins.insert(PluginType::General, PluginInstance::General);
                 }
             };
         }
@@ -173,6 +195,9 @@ impl Condition {
                     VTSQuery::from_strings(plugin_specific_type, target, conn).await?;
 
                 (PluginQuery::VTS(vts_query), target)
+            }
+            PluginInstance::General => {
+                return Err("No query types implemented for this plugin".to_string())
             }
         };
 

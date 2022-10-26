@@ -49,6 +49,9 @@ export function obsSingleActionChooseType(then = null) {
         .then(then);
       document.getElementById("actionInputSelect").removeAttribute("hidden");
       break;
+    default:
+      console.log("Unsupported OBS action type");
+      break;
   }
 }
 

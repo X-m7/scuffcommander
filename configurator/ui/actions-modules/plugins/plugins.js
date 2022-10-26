@@ -1,5 +1,6 @@
 import * as modObs from "./obs.js";
 import * as modVts from "./vts.js";
+import * as modGeneral from "./general.js";
 
 const { invoke } = window.__TAURI__.tauri;
 
@@ -7,19 +8,23 @@ const { invoke } = window.__TAURI__.tauri;
  * Single action relevant things
  */
 
-export function singleActionResetInputs() {
+function resetPluginInputs() {
   modObs.obsResetInputs();
   modVts.vtsResetInputs();
+  modGeneral.generalResetInputs();
   document.getElementById("actionInputSelect").setAttribute("hidden", "true");
-  document.singleAction.plugin.value = "none";
+  document.getElementById("actionInputText").setAttribute("hidden", "true");
   document.singleAction.inputSelect.value = "none";
+  document.singleAction.inputText.value = "";
+}
+
+export function singleActionResetInputs() {
+  resetPluginInputs();
+  document.singleAction.plugin.value = "none";
 }
 
 export function singleActionGetPluginParam(plugin) {
   switch (plugin) {
-    case "none":
-      console.log("Invalid plugin type");
-      return null;
     case "OBS":
       return {
         type: document.singleAction.typeObs.value,
@@ -28,6 +33,12 @@ export function singleActionGetPluginParam(plugin) {
       };
     case "VTS":
       return modVts.vtsGetSingleActionParams();
+    case "General":
+      return modGeneral.generalGetSingleActionParams();
+    case "none":
+    default:
+      console.log("Invalid plugin type");
+      return null;
   }
 }
 
@@ -45,6 +56,11 @@ export function singleActionShowHelper(action) {
         modVts.vtsShowSingleAction(action.content)
       );
       break;
+    case "General":
+      document.singleAction.typeGeneral.value = action.content.tag;
+      modGeneral.generalSingleActionChooseType(() =>
+        modGeneral.generalShowSingleAction(action.content)
+      );
     default:
       console.log("Unrecognised plugin type");
       return;
@@ -53,23 +69,34 @@ export function singleActionShowHelper(action) {
   document.singleAction.plugin.value = action.tag;
 }
 
+function hideTypeSelect() {
+  document.getElementById("vtsTypeSelect").setAttribute("hidden", true);
+  document.getElementById("obsTypeSelect").setAttribute("hidden", true);
+  document.getElementById("generalTypeSelect").setAttribute("hidden", true);
+}
+
 export function singleActionChoosePlugin() {
+  resetPluginInputs();
+
   const plugin = document.singleAction.plugin.value;
   switch (plugin) {
     case "none":
-      document.getElementById("vtsTypeSelect").setAttribute("hidden", true);
-      document.getElementById("obsTypeSelect").setAttribute("hidden", true);
       document.getElementById("actionInputSelect").setAttribute("hidden", true);
+      document.getElementById("actionInputText").setAttribute("hidden", true);
       break;
     case "OBS":
       document.getElementById("obsTypeSelect").removeAttribute("hidden");
-      document.getElementById("vtsTypeSelect").setAttribute("hidden", true);
       document.getElementById("actionInputSelect").removeAttribute("hidden");
+      document.getElementById("actionInputText").setAttribute("hidden", true);
       break;
     case "VTS":
       document.getElementById("vtsTypeSelect").removeAttribute("hidden");
-      document.getElementById("obsTypeSelect").setAttribute("hidden", true);
+      document.getElementById("actionInputText").setAttribute("hidden", true);
       break;
+    case "General":
+      document.getElementById("actionInputSelect").setAttribute("hidden", true);
+      document.getElementById("generalTypeSelect").removeAttribute("hidden");
+      document.getElementById("actionInputText").removeAttribute("hidden");
     default:
       console.log("Unimplemented");
       break;

@@ -40,7 +40,7 @@ export function vtsGetSingleActionParams() {
       };
       break;
     default:
-      console.log("Unsupported plugin");
+      console.log("Unsupported VTS action type");
       return null;
   }
 
@@ -121,7 +121,9 @@ export function vtsSingleActionChooseType(then = null) {
       document
         .getElementById("vtsModelPositionInput")
         .removeAttribute("hidden");
-      then();
+      if (then instanceof Function) {
+        then();
+      }
       break;
     default:
       console.log("Unsupported action");

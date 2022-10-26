@@ -25,10 +25,11 @@ impl AppConfig {
         .unwrap_or_else(|e| {
             println!("Unable to parse config: {}", e);
             println!("Using defaults");
+
             AppConfig {
                 addr: "localhost".to_string(),
                 port: 8080,
-                plugins: Vec::new(),
+                plugins: PluginConfig::get_default_vec(),
             }
         })
     }

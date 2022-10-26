@@ -59,7 +59,7 @@ fn main() {
         .parse::<u16>()
         .expect("Invalid port number");
 
-    let plugins = vec![obs_setup(), vts_setup()];
+    let plugins = vec![obs_setup(), vts_setup(), PluginConfig::General];
 
     let conf = AppConfig {
         addr,
