@@ -93,3 +93,8 @@ pub async fn load_action_details(
 
     Ok(action.unwrap().clone())
 }
+
+#[tauri::command]
+pub fn convert_action_to_string(action: Action) -> String {
+    format!("{}", action)
+}

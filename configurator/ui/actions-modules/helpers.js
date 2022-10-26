@@ -50,9 +50,12 @@ export function chooseType() {
       modChainAction.resetTempChain();
       document.chainAction.removeAttribute("hidden");
       break;
-    case "condition":
+    case "if":
       document.conditionAction.removeAttribute("hidden");
       invoke("get_actions").then(modConditionAction.updateThenElseSelect);
+      break;
+    default:
+      console.log("Unsupported action type");
       break;
   }
 }
@@ -76,8 +79,11 @@ export function addNewAction() {
         loadActions
       );
       break;
-    case "condition":
+    case "if":
       modConditionAction.addNewConditionAction(loadActions);
+      break;
+    default:
+      console.log("Unsupported action type");
       break;
   }
 }
@@ -103,8 +109,8 @@ function showActionInUi(action, id) {
     case "Chain":
       modChainAction.showChainAction(id);
       break;
-    case "Condition":
-      // TODO: load current condition, show current actions as text
+    case "If":
+      modConditionAction.showConditionAction(action.content);
       break;
     default:
       console.log("Unrecognised action type");
@@ -114,26 +120,30 @@ function showActionInUi(action, id) {
   document.actionModify.type.value = action.tag.toLowerCase();
 }
 
+export function createSelectOption(val, text) {
+  const defaultOpt = document.createElement("option");
+  defaultOpt.value = val;
+  defaultOpt.textContent = text;
+  return defaultOpt;
+}
+
 export function resetSelectInput(
   selectElement,
   defaultContent = "Select an option"
 ) {
   selectElement.options.length = 0;
-  const defaultOpt = document.createElement("option");
-  defaultOpt.value = "none";
-  defaultOpt.textContent = defaultContent;
-  selectElement.appendChild(defaultOpt);
+  selectElement.appendChild(createSelectOption("none", defaultContent));
 }
 
 export function updateSelectInput(list, selectElement, resetBeforehand = true) {
   if (resetBeforehand) {
     resetSelectInput(selectElement);
   }
-  list.forEach((i) => {
-    const opt = document.createElement("option");
-    // prepend something so we can differentiate the real options from "none"
-    opt.value = "x-" + i;
-    opt.textContent = i;
-    selectElement.appendChild(opt);
-  });
+  for (const i of list) {
+    selectElement.appendChild(createSelectOption("x-" + i, i));
+  }
+}
+
+export function preselectSelectInput(newValue, selectElement) {
+  selectElement.value = "x-" + newValue;
 }

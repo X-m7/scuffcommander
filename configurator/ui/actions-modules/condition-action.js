@@ -65,20 +65,44 @@ export function addNewConditionAction(then = null) {
   invoke("add_new_condition_action", data).then(then);
 }
 
-export function updateThenElseSelect(actions) {
+export function updateThenElseSelect(
+  actions,
+  currentActionThen = null,
+  currentActionElse = null
+) {
   modHelpers.resetSelectInput(
     document.conditionAction.thenAction,
     "Select an existing action to copy"
   );
+  modHelpers.resetSelectInput(
+    document.conditionAction.elseAction,
+    "Do nothing"
+  );
+
+  if (currentActionThen !== null) {
+    invoke("convert_action_to_string", { action: currentActionThen }).then(
+      (str) => {
+        document.getElementById("conditionCurrentThen").textContent = str;
+      }
+    );
+  } else {
+    document.getElementById("conditionCurrentThen").textContent = "None";
+  }
+
+  if (currentActionElse !== null) {
+    invoke("convert_action_to_string", { action: currentActionElse }).then(
+      (str) => {
+        document.getElementById("conditionCurrentElse").textContent = str;
+      }
+    );
+  } else {
+    document.getElementById("conditionCurrentElse").textContent = "None";
+  }
+
   modHelpers.updateSelectInput(
     actions,
     document.conditionAction.thenAction,
     false
-  );
-
-  modHelpers.resetSelectInput(
-    document.conditionAction.elseAction,
-    "Do nothing"
   );
   modHelpers.updateSelectInput(
     actions,
@@ -104,6 +128,76 @@ export function queryChoosePlugin() {
       document.getElementById("conditionQueryVts").removeAttribute("hidden");
       break;
   }
+}
+
+// input is Condition struct
+function obsShowCondition(cond) {
+  switch (cond.query.content) {
+    case "CurrentProgramScene":
+      document.getElementById("queryInputSelect").removeAttribute("hidden");
+      modHelpers.preselectSelectInput(
+        cond.target,
+        document.conditionAction.inputSelect
+      );
+      break;
+    default:
+      console.log("Unrecognised OBS query type");
+      return;
+  }
+
+  document.getElementById("obsTypeSelect").removeAttribute("hidden");
+}
+
+// input is Condition struct
+function vtsShowCondition(cond) {
+  switch (cond.query.content) {
+    case "ActiveModelId":
+      document.getElementById("queryInputSelect").removeAttribute("hidden");
+      invoke("get_vts_model_name_from_id", { id: cond.target }).then((act) =>
+        modHelpers.preselectSelectInput(
+          act,
+          document.conditionAction.inputSelect
+        )
+      );
+      break;
+    default:
+      console.log("Unrecognised VTS query type");
+      return;
+  }
+
+  document.getElementById("vtsTypeSelect").removeAttribute("hidden");
+}
+
+// input is { query, target } (Condition struct)
+function showCondition(cond) {
+  document.conditionAction.plugin.value = cond.query.tag;
+
+  switch (cond.query.tag) {
+    case "OBS":
+      // flow: set OBS/VTS field above, then set OBS query type (current scene, etc),
+      // then populate the input for the selected query type (ex: available scenes to select),
+      // finally preselect/prefill the query param/target input (the current selected scene)
+      document.conditionAction.typeObs.value = cond.query.content;
+      obsQueryChooseType(() => obsShowCondition(cond));
+      break;
+    case "VTS":
+      document.conditionAction.typeVts.value = cond.query.content;
+      vtsQueryChooseType(() => vtsShowCondition(cond));
+      break;
+    default:
+      console.log("Unsupported plugin");
+      break;
+  }
+}
+
+export function showConditionAction(action) {
+  showCondition(action[0]);
+  invoke("get_actions").then((allActions) =>
+    updateThenElseSelect(allActions, action[1], action[2])
+  );
+
+  queryChoosePlugin();
+  document.conditionAction.removeAttribute("hidden");
 }
 
 // `then` is a function to be run after this has finished fully

@@ -54,6 +54,7 @@ async fn main() {
             app_mod::actions::load_action_details,
             app_mod::actions::save_actions,
             app_mod::actions::delete_action,
+            app_mod::actions::convert_action_to_string,
             app_mod::actions::chain::clear_temp_chain,
             app_mod::actions::chain::store_temp_chain,
             app_mod::actions::chain::copy_action_to_temp_chain,

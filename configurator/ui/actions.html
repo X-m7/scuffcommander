@@ -36,7 +36,7 @@
           <option value="none">Select an option</option>
           <option value="single">Single</option>
           <option value="chain">Chain</option>
-          <option value="condition">Condition</option>
+          <option value="if">Condition</option>
         </select>
       </label>
     </form>
@@ -89,7 +89,10 @@
           </select>
         </label>
       </div>
-      <br />
+      <div>
+        <p>Current then action: <span id="conditionCurrentThen"></span></p>
+        <p>Current else action: <span id="conditionCurrentElse"></span></p>
+      </div>
       <label>
         Action to execute if the above query is true:
         <select name="thenAction">

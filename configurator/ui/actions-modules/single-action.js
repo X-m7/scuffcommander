@@ -52,15 +52,14 @@ export function addNewSingleAction(then = null) {
   }).then(then);
 }
 
-function preselectActionInputSelect(newValue) {
-  document.singleAction.inputSelect.value = "x-" + newValue;
-}
-
 function showObsAction(action) {
   switch (action.tag) {
     case "ProgramSceneChange":
       document.getElementById("actionInputSelect").removeAttribute("hidden");
-      preselectActionInputSelect(action.content);
+      modHelpers.preselectSelectInput(
+        action.content,
+        document.singleAction.inputSelect
+      );
       break;
     default:
       console.log("Unrecognised OBS action type");
@@ -75,13 +74,17 @@ function showVtsAction(action) {
     case "ToggleExpression":
       document.getElementById("actionInputSelect").removeAttribute("hidden");
       invoke("get_vts_expression_name_from_id", { id: action.content }).then(
-        preselectActionInputSelect
+        (act) =>
+          modHelpers.preselectSelectInput(
+            act,
+            document.singleAction.inputSelect
+          )
       );
       break;
     case "LoadModel":
       document.getElementById("actionInputSelect").removeAttribute("hidden");
-      invoke("get_vts_model_name_from_id", { id: action.content }).then(
-        preselectActionInputSelect
+      invoke("get_vts_model_name_from_id", { id: action.content }).then((act) =>
+        modHelpers.preselectSelectInput(act, document.singleAction.inputSelect)
       );
       break;
     default:

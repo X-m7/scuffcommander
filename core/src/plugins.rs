@@ -24,6 +24,7 @@ pub enum PluginInstance {
 }
 
 #[derive(Serialize, Deserialize, Clone)]
+#[serde(tag = "tag", content = "content")]
 pub enum PluginQuery {
     OBS(OBSQuery),
     VTS(VTSQuery),
