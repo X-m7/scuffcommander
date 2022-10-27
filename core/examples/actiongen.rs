@@ -35,7 +35,7 @@ fn obs_toggle(actions: &mut ActionConfig) {
     let else1 = Action::If(query2, Box::new(then2), None);
 
     actions.actions.insert(
-        "6".to_string(),
+        "Scene Toggle".to_string(),
         Action::If(query1, Box::new(then1), Some(Box::new(else1))),
     );
 }
@@ -72,7 +72,7 @@ fn vts_toggle_model(actions: &mut ActionConfig) {
     let else1 = Action::If(query2, Box::new(then2), None);
 
     actions.actions.insert(
-        "8".to_string(),
+        "Model Toggle".to_string(),
         Action::If(query1, Box::new(then1), Some(Box::new(else1))),
     );
 }
@@ -111,7 +111,7 @@ fn vts_model_dependent_expression_toggle(actions: &mut ActionConfig) {
 
     actions
         .actions
-        .insert("7".to_string(), Action::Chain(chain));
+        .insert("Model Dep Expr Toggle".to_string(), Action::Chain(chain));
 }
 
 fn main() {
@@ -121,25 +121,25 @@ fn main() {
 
     // Single action per button
     actions.actions.insert(
-        "1".to_string(),
+        "Waiting Scene".to_string(),
         Action::Single(PluginAction::OBS(OBSAction::ProgramSceneChange(
             "Waiting".to_string(),
         ))),
     );
     actions.actions.insert(
-        "2".to_string(),
+        "Desktop+VTS Scene".to_string(),
         Action::Single(PluginAction::OBS(OBSAction::ProgramSceneChange(
             "Desktop + VTS".to_string(),
         ))),
     );
     actions.actions.insert(
-        "3".to_string(),
+        "Qt Expr Toggle".to_string(),
         Action::Single(PluginAction::VTS(VTSAction::ToggleExpression(
             "Qt.exp3.json".to_string(),
         ))),
     );
     actions.actions.insert(
-        "4".to_string(),
+        "expressiong Toggle".to_string(),
         Action::Single(PluginAction::VTS(VTSAction::ToggleExpression(
             "expressiong.exp3.json".to_string(),
         ))),
@@ -156,7 +156,7 @@ fn main() {
     ];
     actions
         .actions
-        .insert("5".to_string(), Action::Chain(chain));
+        .insert("Dual Expr Toggle".to_string(), Action::Chain(chain));
 
     obs_toggle(&mut actions);
     vts_model_dependent_expression_toggle(&mut actions);

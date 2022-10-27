@@ -57,6 +57,90 @@ impl ActionConfig {
     }
 }
 
+// See examples/uiconfgen.rs on how to generate the ui.json file
+#[derive(Serialize, Deserialize)]
+pub struct UIConfig {
+    pub style: UIStyle,
+    pub pages: HashMap<String, UIPage>,
+}
+
+impl UIConfig {
+    pub fn from_file(path: &str) -> UIConfig {
+        serde_json::from_str(&read_to_string(path).unwrap_or_else(|e| {
+            println!("{}", e);
+            String::new()
+        }))
+        .unwrap_or_else(|e| {
+            println!("Unable to parse UI config: {}", e);
+            println!("Using defaults");
+
+            let mut pages = HashMap::new();
+            pages.insert(
+                "home".to_string(),
+                UIPage {
+                    buttons: Vec::new(),
+                },
+            );
+
+            UIConfig {
+                pages,
+                style: UIStyle {
+                    default_button_style: ButtonStyle {
+                        width: "3cm".to_string(),
+                        height: "3cm".to_string(),
+                        bg_color: "darkgrey".to_string(),
+                        fg_color: "white".to_string(),
+                    },
+                    bg_color: "white".to_string(),
+                    fg_color: "black".to_string(),
+                },
+            }
+        })
+    }
+}
+
+// color is a valid CSS colour
+#[derive(Serialize, Deserialize)]
+pub struct UIStyle {
+    pub default_button_style: ButtonStyle,
+    pub bg_color: String,
+    pub fg_color: String,
+}
+
+// button width and height are CSS size strings ("1em", "2cm", "3in", "4px", etc)
+#[derive(Serialize, Deserialize)]
+pub struct ButtonStyle {
+    pub width: String,
+    pub height: String,
+    pub bg_color: String,
+    pub fg_color: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct UIPage {
+    pub buttons: Vec<UIButton>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum UIButton {
+    ExecuteAction(ButtonData),
+    OpenPage(ButtonData),
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ButtonData {
+    pub target_id: String,
+    pub style_override: Option<ButtonStyle>,
+    pub img: Option<Base64Image>,
+}
+
+// Format is the MIME type (for example PNG is "image/png")
+#[derive(Serialize, Deserialize)]
+pub struct Base64Image {
+    pub format: String,
+    pub data: String,
+}
+
 // There is also a from_json function for this, but the implementation is in the plugins module due
 // to needing access to plugin specifics
 #[derive(Serialize, Deserialize, Clone)]

@@ -2,7 +2,7 @@ use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
 use handlebars::Handlebars;
 
 use scuffcommander_core::plugins::PluginStates;
-use scuffcommander_core::{ActionConfig, AppConfig};
+use scuffcommander_core::{ActionConfig, AppConfig, UIConfig};
 
 #[get("/")]
 async fn hello() -> impl Responder {
@@ -11,22 +11,21 @@ async fn hello() -> impl Responder {
         .finish()
 }
 
-// Currently only supports putting all the actions into 1 page
-// Also only takes the action IDs as the button names directly with no sorting (will use different
-// struct with an array for display purposes)
 #[get("/page/{page_id}")]
 async fn page(
     page_id: web::Path<String>,
     hb: web::Data<Handlebars<'_>>,
-    actions_data: web::Data<ActionConfig>,
+    ui_data: web::Data<UIConfig>,
 ) -> impl Responder {
     let id = page_id.into_inner();
 
-    if id != "home" {
+    if !ui_data.pages.contains_key(&id) {
         return HttpResponse::NotFound().body("Page not found");
     }
 
-    let data = serde_json::json!( { "actions": Vec::from_iter(actions_data.actions.keys()) } );
+    let page = ui_data.pages.get(&id).unwrap();
+
+    let data = serde_json::json!( { "buttons": page.buttons, "style": ui_data.style } );
     let body = hb.render("page", &data).expect("Template render failed");
 
     HttpResponse::Ok().body(body)
@@ -86,6 +85,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(state.clone())
             .app_data(handlebars_ref.clone())
             .app_data(web::Data::new(ActionConfig::from_file("actions.json")))
+            .app_data(web::Data::new(UIConfig::from_file("ui.json")))
     })
     .bind((conf.addr, conf.port))?
     .run()

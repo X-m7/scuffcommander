@@ -1,41 +1,6 @@
 {
   "actions": {
-    "5": {
-      "tag": "Chain",
-      "content": [
-        {
-          "tag": "Single",
-          "content": {
-            "tag": "VTS",
-            "content": {
-              "tag": "ToggleExpression",
-              "content": "Qt.exp3.json"
-            }
-          }
-        },
-        {
-          "tag": "Single",
-          "content": {
-            "tag": "VTS",
-            "content": {
-              "tag": "ToggleExpression",
-              "content": "expressiong.exp3.json"
-            }
-          }
-        }
-      ]
-    },
-    "1": {
-      "tag": "Single",
-      "content": {
-        "tag": "OBS",
-        "content": {
-          "tag": "ProgramSceneChange",
-          "content": "Waiting"
-        }
-      }
-    },
-    "2": {
+    "Desktop+VTS Scene": {
       "tag": "Single",
       "content": {
         "tag": "OBS",
@@ -45,23 +10,33 @@
         }
       }
     },
-    "8": {
+    "Qt Expr Toggle": {
+      "tag": "Single",
+      "content": {
+        "tag": "VTS",
+        "content": {
+          "tag": "ToggleExpression",
+          "content": "Qt.exp3.json"
+        }
+      }
+    },
+    "Scene Toggle": {
       "tag": "If",
       "content": [
         {
           "query": {
-            "tag": "VTS",
-            "content": "ActiveModelId"
+            "tag": "OBS",
+            "content": "CurrentProgramScene"
           },
-          "target": "d87b771d2902473bbaa0226d03ef4754"
+          "target": "Desktop + VTS"
         },
         {
           "tag": "Single",
           "content": {
-            "tag": "VTS",
+            "tag": "OBS",
             "content": {
-              "tag": "LoadModel",
-              "content": "ca883c1edcac4739904f17ac2e92c768"
+              "tag": "ProgramSceneChange",
+              "content": "Waiting"
             }
           }
         },
@@ -70,18 +45,18 @@
           "content": [
             {
               "query": {
-                "tag": "VTS",
-                "content": "ActiveModelId"
+                "tag": "OBS",
+                "content": "CurrentProgramScene"
               },
-              "target": "ca883c1edcac4739904f17ac2e92c768"
+              "target": "Waiting"
             },
             {
               "tag": "Single",
               "content": {
-                "tag": "VTS",
+                "tag": "OBS",
                 "content": {
-                  "tag": "LoadModel",
-                  "content": "d87b771d2902473bbaa0226d03ef4754"
+                  "tag": "ProgramSceneChange",
+                  "content": "Desktop + VTS"
                 }
               }
             },
@@ -90,7 +65,7 @@
         }
       ]
     },
-    "7": {
+    "Model Dep Expr Toggle": {
       "tag": "Chain",
       "content": [
         {
@@ -141,43 +116,23 @@
         }
       ]
     },
-    "3": {
-      "tag": "Single",
-      "content": {
-        "tag": "VTS",
-        "content": {
-          "tag": "ToggleExpression",
-          "content": "Qt.exp3.json"
-        }
-      }
-    },
-    "4": {
-      "tag": "Single",
-      "content": {
-        "tag": "VTS",
-        "content": {
-          "tag": "ToggleExpression",
-          "content": "expressiong.exp3.json"
-        }
-      }
-    },
-    "6": {
+    "Model Toggle": {
       "tag": "If",
       "content": [
         {
           "query": {
-            "tag": "OBS",
-            "content": "CurrentProgramScene"
+            "tag": "VTS",
+            "content": "ActiveModelId"
           },
-          "target": "Desktop + VTS"
+          "target": "d87b771d2902473bbaa0226d03ef4754"
         },
         {
           "tag": "Single",
           "content": {
-            "tag": "OBS",
+            "tag": "VTS",
             "content": {
-              "tag": "ProgramSceneChange",
-              "content": "Waiting"
+              "tag": "LoadModel",
+              "content": "ca883c1edcac4739904f17ac2e92c768"
             }
           }
         },
@@ -186,18 +141,18 @@
           "content": [
             {
               "query": {
-                "tag": "OBS",
-                "content": "CurrentProgramScene"
+                "tag": "VTS",
+                "content": "ActiveModelId"
               },
-              "target": "Waiting"
+              "target": "ca883c1edcac4739904f17ac2e92c768"
             },
             {
               "tag": "Single",
               "content": {
-                "tag": "OBS",
+                "tag": "VTS",
                 "content": {
-                  "tag": "ProgramSceneChange",
-                  "content": "Desktop + VTS"
+                  "tag": "LoadModel",
+                  "content": "d87b771d2902473bbaa0226d03ef4754"
                 }
               }
             },
@@ -205,6 +160,51 @@
           ]
         }
       ]
+    },
+    "Waiting Scene": {
+      "tag": "Single",
+      "content": {
+        "tag": "OBS",
+        "content": {
+          "tag": "ProgramSceneChange",
+          "content": "Waiting"
+        }
+      }
+    },
+    "Dual Expr Toggle": {
+      "tag": "Chain",
+      "content": [
+        {
+          "tag": "Single",
+          "content": {
+            "tag": "VTS",
+            "content": {
+              "tag": "ToggleExpression",
+              "content": "Qt.exp3.json"
+            }
+          }
+        },
+        {
+          "tag": "Single",
+          "content": {
+            "tag": "VTS",
+            "content": {
+              "tag": "ToggleExpression",
+              "content": "expressiong.exp3.json"
+            }
+          }
+        }
+      ]
+    },
+    "expressiong Toggle": {
+      "tag": "Single",
+      "content": {
+        "tag": "VTS",
+        "content": {
+          "tag": "ToggleExpression",
+          "content": "expressiong.exp3.json"
+        }
+      }
     }
   }
 }

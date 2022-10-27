@@ -4,17 +4,60 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ScuffCommander</title>
+    <style type="text/css">
+      button {
+        background-color: {{style.default_button_style.bg_color}};
+        color: {{style.default_button_style.fg_color}};
+        width: {{style.default_button_style.width}};
+        height: {{style.default_button_style.height}};
+        vertical-align: top;
+      }
+
+      img {
+        width: 90%;
+        height: 90%;
+        padding: 5%;
+        margin: auto;
+        vertical-align: center;
+      }
+
+      body {
+        background-color: {{style.bg_color}};
+        color: {{style.fg_color}};
+      }
+    </style>
     <script>
       const xhr = new XMLHttpRequest();
       function action(id) {
         xhr.open("GET", document.location.origin + "/click/" + id);
         xhr.send();
       }
+      function page(id) {
+        document.location = document.location.origin + "/page/" + id;
+      }
     </script>
   </head>
   <body>
-    {{#each actions as |a|}}
-    <button type="button" onclick="action('{{a}}')">{{a}}</button>
+    {{#each buttons as |b|}} {{#with b.ExecuteAction}}
+    <button
+      type="button"
+      style="{{#with style_override}} color:{{fg_color}}; background_color:{{bg_color}}; width:{{width}}; height:{{height}}; {{/with}}"
+      onclick="action('{{target_id}}')"
+    >
+      {{#if img}}
+      <img src="data:{{img.format}};base64,{{img.data}}" alt="{{target_id}}" />
+      {{else}} {{target_id}} {{/if}} {{/with}}
+    </button>
+    {{#with b.OpenPage}}
+    <button
+      type="button"
+      style="{{#with style_override}} color:{{fg_color}}; background_color:{{bg_color}}; width:{{width}}; height:{{height}}; {{/with}}"
+      onclick="page('{{target_id}}')"
+    >
+      {{#if img}}
+      <img src="data:{{img.format}};base64,{{img.data}}" alt="{{target_id}}" />
+      {{else}} {{target_id}} {{/if}} {{/with}}
+    </button>
     {{/each}}
   </body>
 </html>
