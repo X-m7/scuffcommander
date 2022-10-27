@@ -50,6 +50,7 @@ function getAppConfig() {
       {
         VTS: getVtsData(),
       },
+      "General",
     ],
   };
 }
