@@ -1,8 +1,8 @@
-pub struct ConfigFolder(pub String);
-pub struct AppConfigState(pub AppConfig);
-
 use async_std::fs::write;
 use scuffcommander_core::AppConfig;
+
+pub struct ConfigFolder(pub String);
+pub struct AppConfigState(pub AppConfig);
 
 #[tauri::command]
 pub async fn save_config(

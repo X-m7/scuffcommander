@@ -6,7 +6,7 @@
 use async_std::sync::Mutex;
 use scuffcommander_configurator as app_mod;
 use scuffcommander_core::plugins::PluginStates;
-use scuffcommander_core::{ActionConfig, AppConfig};
+use scuffcommander_core::{ActionConfig, AppConfig, UIConfig};
 
 #[tokio::main]
 async fn main() {
@@ -30,6 +30,9 @@ async fn main() {
         .manage(app_mod::actions::ActionConfigState(Mutex::new(
             ActionConfig::from_file("actions.json"),
         )))
+        .manage(app_mod::UIConfigState(Mutex::new(UIConfig::from_file(
+            "ui.json",
+        ))))
         .manage(app_mod::config::ConfigFolder(
             std::env::current_dir()
                 .expect("Invalid current dir?")
@@ -50,6 +53,9 @@ async fn main() {
             app_mod::plugins::vts::get_vts_current_model_pos,
             app_mod::config::save_config,
             app_mod::config::get_config,
+            app_mod::pages::get_page_names,
+            app_mod::pages::get_page_buttons_info,
+            app_mod::pages::delete_button_from_page,
             app_mod::actions::get_actions,
             app_mod::actions::add_new_single_action,
             app_mod::actions::load_action_details,
