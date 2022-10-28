@@ -1,5 +1,5 @@
 use crate::actions::ActionConfigState;
-use crate::UIConfigState;
+use crate::config::UIConfigState;
 use scuffcommander_core::{UIButton, UIButtonType};
 use std::collections::HashSet;
 

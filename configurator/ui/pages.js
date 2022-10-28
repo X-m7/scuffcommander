@@ -261,6 +261,12 @@ window.saveButton = function () {
   // TODO: if selected page is "new" and page ID field is empty warn user
 };
 
+window.saveUiConfig = function () {
+  invoke("save_ui_config").then(
+    () => (document.getElementById("saveOutput").textContent = "Pages saved")
+  );
+};
+
 window.updateActionOrPageSelect = function () {
   updateActionOrPageSelect();
 };

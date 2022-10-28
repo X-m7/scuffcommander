@@ -30,9 +30,9 @@ async fn main() {
         .manage(app_mod::actions::ActionConfigState(Mutex::new(
             ActionConfig::from_file("actions.json"),
         )))
-        .manage(app_mod::UIConfigState(Mutex::new(UIConfig::from_file(
-            "ui.json",
-        ))))
+        .manage(app_mod::config::UIConfigState(Mutex::new(
+            UIConfig::from_file("ui.json"),
+        )))
         .manage(app_mod::config::ConfigFolder(
             std::env::current_dir()
                 .expect("Invalid current dir?")
@@ -53,6 +53,7 @@ async fn main() {
             app_mod::plugins::vts::get_vts_current_model_pos,
             app_mod::config::save_config,
             app_mod::config::get_config,
+            app_mod::config::save_ui_config,
             app_mod::pages::get_page_names,
             app_mod::pages::get_page_buttons_info,
             app_mod::pages::delete_button_from_page,

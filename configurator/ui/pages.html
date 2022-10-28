@@ -10,6 +10,7 @@
   </head>
   <body onload="loadPages()">
     <h1>Pages Configuration</h1>
+    <p id="saveOutput"></p>
     <form name="pageSelect">
       <label>
         Create a new page or select an existing one:
@@ -18,6 +19,7 @@
           <option value="new">Create a new page</option>
         </select>
       </label>
+      <button type="button" onclick="saveUiConfig()">Save Pages</button>
     </form>
     <form name="pageDetails" hidden>
       <label>
