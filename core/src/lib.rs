@@ -88,11 +88,11 @@ impl UIConfig {
                     default_button_style: ButtonStyle {
                         width: "3cm".to_string(),
                         height: "3cm".to_string(),
-                        bg_color: "darkgrey".to_string(),
-                        fg_color: "white".to_string(),
+                        bg_color: "#656565".to_string(),
+                        fg_color: "#FFFFFF".to_string(),
                     },
-                    bg_color: "white".to_string(),
-                    fg_color: "black".to_string(),
+                    bg_color: "#FFFFFF".to_string(),
+                    fg_color: "#000000".to_string(),
                 },
             }
         })
@@ -100,6 +100,8 @@ impl UIConfig {
 }
 
 // color is a valid CSS colour
+// (although the safest format is #XXXXXX, otherwise the configurator at present will not display
+// it correctly)
 #[derive(Serialize, Deserialize)]
 pub struct UIStyle {
     pub default_button_style: ButtonStyle,
@@ -108,7 +110,7 @@ pub struct UIStyle {
 }
 
 // button width and height are CSS size strings ("1em", "2cm", "3in", "4px", etc)
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct ButtonStyle {
     pub width: String,
     pub height: String,
@@ -132,6 +134,12 @@ pub struct UIPage {
 }
 
 #[derive(Serialize, Deserialize)]
+pub enum UIButtonType {
+    ExecuteAction,
+    OpenPage,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
 pub enum UIButton {
     ExecuteAction(ButtonData),
     OpenPage(ButtonData),
@@ -148,7 +156,7 @@ impl Display for UIButton {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct ButtonData {
     pub target_id: String,
     pub style_override: Option<ButtonStyle>,
@@ -174,7 +182,7 @@ impl Display for ButtonData {
 }
 
 // Format is the MIME type (for example PNG is "image/png")
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Base64Image {
     pub format: String,
     pub data: String,

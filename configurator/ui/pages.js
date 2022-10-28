@@ -26,6 +26,10 @@ function updateSelectInput(list, selectElement, resetBeforehand = true) {
   }
 }
 
+function preselectSelectInput(newValue, selectElement) {
+  selectElement.value = "x-" + newValue;
+}
+
 // this one was specific to chain actions
 function createButtonNode(text, onclick) {
   const button = document.createElement("button");
@@ -49,27 +53,122 @@ function refreshPageSelect(pages) {
 
 function resetAllPageDetailInputs() {
   document.pageDetails.setAttribute("hidden", true);
-  document.buttonDetails.setAttribute("hidden", true);
   document.getElementById("imageInfo").setAttribute("hidden", true);
-  document.styleDetails.setAttribute("hidden", true);
+  document.getElementById("imageLocationDisplay").setAttribute("hidden", true);
 
   document.pageDetails.id.value = "";
   document.getElementById("buttonsInPage").replaceChildren();
+
+  document.buttonDetails.setAttribute("hidden", true);
+  resetButtonDetailInputs();
+  resetButtonStyleInputs();
+}
+
+function resetButtonStyleInputs() {
+  document.buttonStyleDetails.setAttribute("hidden", true);
+
+  document.buttonStyleDetails.width.value = 3;
+  document.buttonStyleDetails.height.value = 3;
+  document.buttonStyleDetails.bgColor.value = "#FFFFFF";
+  document.buttonStyleDetails.fgColor.value = "#000000";
+}
+
+function resetButtonDetailInputs() {
+  document.getElementById("newButtonText").setAttribute("hidden", true);
+  document.getElementById("editButtonText").setAttribute("hidden", true);
+
+  document.getElementById("editButtonId").textContent = "";
   document.buttonDetails.type.value = "none";
   document.buttonDetails.id.value = "none";
   document.buttonDetails.enableStyleOverride.checked = false;
   document.buttonDetails.enableImage.checked = false;
   document.getElementById("imageLocation").textContent = "";
-  document.styleDetails.width.value = 3;
-  document.styleDetails.height.value = 3;
-  document.styleDetails.bgColor.value = "#FFFFFF";
-  document.styleDetails.fgColor.value = "#000000";
 }
 
 function deleteButtonFromPage(id, pos) {
   invoke("delete_button_from_page", { id: id, index: pos }).then(() =>
     loadPage(id)
   );
+}
+
+function moveButtonUpInPage(id, pos) {
+  invoke("move_button_up_in_page", { id: id, index: pos }).then(() =>
+    loadPage(id)
+  );
+}
+
+function moveButtonDownInPage(id, pos) {
+  invoke("move_button_down_in_page", { id: id, index: pos }).then(() =>
+    loadPage(id)
+  );
+}
+
+// Takes the index of the element to modify (as number not string)
+function showPageDetailsForm(editIndex = null) {
+  document.pageDetails.removeAttribute("hidden");
+  document.buttonDetails.removeAttribute("hidden");
+
+  resetButtonDetailInputs();
+
+  if (editIndex === null) {
+    document.getElementById("newButtonText").removeAttribute("hidden");
+    resetButtonStyleInputs();
+  } else {
+    document.getElementById("editButtonId").textContent = editIndex + 1;
+    document.getElementById("editButtonText").removeAttribute("hidden");
+  }
+}
+
+// takes ButtonStyle struct as input
+function loadButtonStyleData(data) {
+  document.buttonStyleDetails.width.value = parseFloat(data.width);
+  document.buttonStyleDetails.height.value = parseFloat(data.height);
+  document.buttonStyleDetails.bgColor.value = data.bg_color;
+  document.buttonStyleDetails.fgColor.value = data.fg_color;
+
+  document.buttonStyleDetails.removeAttribute("hidden");
+}
+
+function loadButtonData(id, pos) {
+  showPageDetailsForm(pos);
+  // command returns UIButton enum
+  invoke("get_page_button_data", { id: id, index: pos }).then((button) => {
+    let data = null;
+    if (button.ExecuteAction) {
+      data = button.ExecuteAction;
+      document.buttonDetails.type.value = "ExecuteAction";
+    } else if (button.OpenPage) {
+      data = button.OpenPage;
+      document.buttonDetails.type.value = "OpenPage";
+    } else {
+      console.log("Unsupported button type");
+      return;
+    }
+
+    updateActionOrPageSelect(() => {
+      const sel = document.buttonDetails.id;
+      // add back the currently selected option, then preselect it
+      sel.appendChild(
+        createSelectOption("x-" + data.target_id, data.target_id)
+      );
+      preselectSelectInput(data.target_id, sel);
+    });
+
+    if (data.style_override !== null) {
+      document.buttonDetails.enableStyleOverride.checked = true;
+      loadButtonStyleData(data.style_override);
+    } else {
+      document.buttonDetails.enableStyleOverride.checked = false;
+      resetButtonStyleInputs();
+    }
+
+    if (data.img != null) {
+      document.buttonDetails.enableImage.checked = true;
+      document.getElementById("imageInfo").removeAttribute("hidden");
+    } else {
+      document.buttonDetails.enableImage.checked = false;
+    }
+  });
 }
 
 function loadPage(id) {
@@ -85,18 +184,85 @@ function loadPage(id) {
       list.appendChild(newElement);
 
       const iInt = parseInt(i);
+
+      newElement.appendChild(
+        createButtonNode("Edit", () => loadButtonData(id, iInt))
+      );
+
+      // can't move top button any higher
+      if (iInt > 0) {
+        newElement.appendChild(
+          createButtonNode("Move up", () => moveButtonUpInPage(id, iInt))
+        );
+      }
+
+      // can't move bottom button any lower
+      if (iInt < buttons.length - 1) {
+        newElement.appendChild(
+          createButtonNode("Move down", () => moveButtonDownInPage(id, iInt))
+        );
+      }
+
       newElement.appendChild(
         createButtonNode("Delete", () => deleteButtonFromPage(id, iInt))
       );
-      // TODO: other buttons (edit, move up, move down)
     }
 
-    document.pageDetails.removeAttribute("hidden");
+    showPageDetailsForm();
   });
 }
 
+function getCurrentPageId() {
+  const selected = document.pageSelect.page.value;
+
+  if (selected === "none") {
+    return;
+  } else if (selected === "new") {
+    return null;
+  } else {
+    return selected.substring(2);
+  }
+}
+
+// `then` is a function to execute once the selector has been updated
+function updateActionOrPageSelect(then = null) {
+  const type = document.buttonDetails.type.value;
+  switch (type) {
+    case "none":
+      break;
+    case "ExecuteAction":
+    case "OpenPage":
+      invoke("get_page_or_action_name_list", {
+        pageId: getCurrentPageId(),
+        outputType: type,
+      })
+        .then((list) => updateSelectInput(list, document.buttonDetails.id))
+        .then(then);
+      break;
+    default:
+      console.log("Unsupported button type");
+      break;
+  }
+}
+
+/*
+ * Functions used directly by the HTML (onload, onclick, oninput)
+ */
+
+window.switchToNewButtonMode = function () {
+  showPageDetailsForm();
+};
+
 window.loadPages = function () {
   invoke("get_page_names").then(refreshPageSelect);
+};
+
+window.saveButton = function () {
+  // TODO: if selected page is "new" and page ID field is empty warn user
+};
+
+window.updateActionOrPageSelect = function () {
+  updateActionOrPageSelect();
 };
 
 window.selectPage = function () {
@@ -107,6 +273,7 @@ window.selectPage = function () {
       return;
     case "new":
       resetAllPageDetailInputs();
+      showPageDetailsForm();
       break;
     default:
       loadPage(page.substring(2));

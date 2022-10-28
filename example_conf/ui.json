@@ -3,11 +3,11 @@
     "default_button_style": {
       "width": "2.5cm",
       "height": "2.5cm",
-      "bg_color": "darkslategrey",
-      "fg_color": "white"
+      "bg_color": "#2F4F4F",
+      "fg_color": "#F0FFFF"
     },
-    "bg_color": "black",
-    "fg_color": "white"
+    "bg_color": "#000000",
+    "fg_color": "#FFFFFF"
   },
   "pages": {
     "home": {
@@ -42,8 +42,8 @@
             "style_override": {
               "width": "3cm",
               "height": "2.5cm",
-              "bg_color": "midnightblue",
-              "fg_color": "white"
+              "bg_color": "#191970",
+              "fg_color": "#FFFFFF"
             },
             "img": null
           }
@@ -54,8 +54,8 @@
             "style_override": {
               "width": "3cm",
               "height": "2.5cm",
-              "bg_color": "midnightblue",
-              "fg_color": "white"
+              "bg_color": "#191970",
+              "fg_color": "#FFFFFF"
             },
             "img": null
           }
@@ -84,8 +84,8 @@
             "style_override": {
               "width": "2in",
               "height": "2in",
-              "bg_color": "midnightblue",
-              "fg_color": "white"
+              "bg_color": "#191970",
+              "fg_color": "#FFFFFF"
             },
             "img": null
           }
@@ -96,8 +96,8 @@
             "style_override": {
               "width": "2in",
               "height": "2in",
-              "bg_color": "midnightblue",
-              "fg_color": "white"
+              "bg_color": "#191970",
+              "fg_color": "#FFFFFF"
             },
             "img": null
           }

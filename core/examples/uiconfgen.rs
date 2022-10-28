@@ -216,11 +216,11 @@ fn style() -> UIStyle {
         default_button_style: ButtonStyle {
             width: "2.5cm".to_string(),
             height: "2.5cm".to_string(),
-            bg_color: "darkslategrey".to_string(),
-            fg_color: "white".to_string(),
+            bg_color: "#2F4F4F".to_string(),
+            fg_color: "#F0FFFF".to_string(),
         },
-        bg_color: "black".to_string(),
-        fg_color: "white".to_string(),
+        bg_color: "#000000".to_string(),
+        fg_color: "#FFFFFF".to_string(),
     }
 }
 
@@ -251,8 +251,8 @@ fn page_home() -> UIPage {
         style_override: Some(ButtonStyle {
             width: "3cm".to_string(),
             height: "2.5cm".to_string(),
-            bg_color: "midnightblue".to_string(),
-            fg_color: "white".to_string(),
+            bg_color: "#191970".to_string(),
+            fg_color: "#FFFFFF".to_string(),
         }),
         img: None,
     });
@@ -262,8 +262,8 @@ fn page_home() -> UIPage {
         style_override: Some(ButtonStyle {
             width: "3cm".to_string(),
             height: "2.5cm".to_string(),
-            bg_color: "midnightblue".to_string(),
-            fg_color: "white".to_string(),
+            bg_color: "#191970".to_string(),
+            fg_color: "#FFFFFF".to_string(),
         }),
         img: None,
     });
@@ -291,8 +291,8 @@ fn page_2() -> UIPage {
         style_override: Some(ButtonStyle {
             width: "2in".to_string(),
             height: "2in".to_string(),
-            bg_color: "midnightblue".to_string(),
-            fg_color: "white".to_string(),
+            bg_color: "#191970".to_string(),
+            fg_color: "#FFFFFF".to_string(),
         }),
         img: None,
     });
@@ -302,8 +302,8 @@ fn page_2() -> UIPage {
         style_override: Some(ButtonStyle {
             width: "2in".to_string(),
             height: "2in".to_string(),
-            bg_color: "midnightblue".to_string(),
-            fg_color: "white".to_string(),
+            bg_color: "#191970".to_string(),
+            fg_color: "#FFFFFF".to_string(),
         }),
         img: None,
     });

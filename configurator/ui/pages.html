@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
     <script type="module" src="pages.js"></script>
     <title>Main</title>
   </head>
@@ -28,43 +29,64 @@
       </ol>
     </form>
     <form name="buttonDetails" hidden>
+      <p>
+        Currently
+        <span id="newButtonText" hidden>creating a new button</span>
+        <span id="editButtonText" hidden>
+          editing the button at position
+          <span id="editButtonId"></span>
+          <button type="button" onclick="switchToNewButtonMode()">
+            Create a new button instead
+          </button>
+        </span>
+        <button type="button" onclick="saveButton()">Save button</button>
+      </p>
       <label>
         Type of button:
-        <select name="type">
+        <select name="type" oninput="updateActionOrPageSelect()">
           <option value="none">Select an option</option>
           <option value="ExecuteAction">Execute an action</option>
           <option value="OpenPage">Open another page</option>
         </select>
       </label>
+      <br />
       <label>
         ID of action/page to activate:
         <select name="id">
           <option value="none">Select an option</option>
         </select>
       </label>
+      <br />
       <label>
         Enable style override:
         <input type="checkbox" name="enableStyleOverride" />
       </label>
+      <br />
       <label>
         Show image instead of action/page ID:
         <input type="checkbox" name="enableImage" />
       </label>
+      <br />
       <div id="imageInfo" hidden>
-        <p>Image location: <span id="imageLocation"></span></p>
+        <p id="imageLocationDisplay" hidden>
+          Image location: <span id="imageLocation"></span>
+        </p>
         <button type="button">Select image file</button>
       </div>
     </form>
-    <form name="styleDetails" hidden>
+    <form name="buttonStyleDetails" hidden>
       <label>
         Button width (cm): <input type="number" step="any" name="width" />
       </label>
+      <br />
       <label>
         Button height (cm): <input type="number" step="any" name="height" />
       </label>
+      <br />
       <label>
         Button background color: <input type="color" name="bgColor" />
       </label>
+      <br />
       <label>
         Button text/foreground color: <input type="color" name="fgColor" />
       </label>
