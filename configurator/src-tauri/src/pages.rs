@@ -53,6 +53,20 @@ pub async fn delete_button_from_page(
     Ok(())
 }
 
+#[tauri::command]
+pub async fn delete_page(
+    id: String,
+    ui_state: tauri::State<'_, UIConfigState>,
+) -> Result<(), String> {
+    let pages = &mut ui_state.0.lock().await.pages;
+
+    if pages.remove(&id).is_none() {
+        return Err("Page with given ID not found".to_string());
+    }
+
+    Ok(())
+}
+
 async fn move_button_to_index(
     id: String,
     index_initial: usize,

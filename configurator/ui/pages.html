@@ -10,7 +10,7 @@
   </head>
   <body onload="loadPages()">
     <h1>Pages Configuration</h1>
-    <p id="saveOutput"></p>
+    <p id="msgOutput"></p>
     <form name="pageSelect">
       <label>
         Create a new page or select an existing one:
@@ -26,6 +26,9 @@
         Page ID: <input type="text" name="id" placeholder="No /, ? or #" />
       </label>
       <button type="button">Update page name</button>
+      <button type="button" onclick="deletePage()">
+        Delete currently selected page
+      </button>
       <ol id="buttonsInPage">
         <!-- This list is populated by JS, will have button info and edit options -->
       </ol>

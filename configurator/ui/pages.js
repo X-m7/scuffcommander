@@ -215,9 +215,7 @@ function loadPage(id) {
 function getCurrentPageId() {
   const selected = document.pageSelect.page.value;
 
-  if (selected === "none") {
-    return;
-  } else if (selected === "new") {
+  if (selected === "none" || selected == "new") {
     return null;
   } else {
     return selected.substring(2);
@@ -245,6 +243,10 @@ function updateActionOrPageSelect(then = null) {
   }
 }
 
+function loadPages() {
+  invoke("get_page_names").then(refreshPageSelect);
+}
+
 /*
  * Functions used directly by the HTML (onload, onclick, oninput)
  */
@@ -254,7 +256,7 @@ window.switchToNewButtonMode = function () {
 };
 
 window.loadPages = function () {
-  invoke("get_page_names").then(refreshPageSelect);
+  loadPages();
 };
 
 window.saveButton = function () {
@@ -263,8 +265,18 @@ window.saveButton = function () {
 
 window.saveUiConfig = function () {
   invoke("save_ui_config").then(
-    () => (document.getElementById("saveOutput").textContent = "Pages saved")
+    () => (document.getElementById("msgOutput").textContent = "Pages saved")
   );
+};
+
+window.deletePage = function () {
+  const id = getCurrentPageId();
+  invoke("delete_page", { id: id }).then(() => {
+    document.getElementById("msgOutput").textContent = `Page ${id} deleted`;
+    document.pageSelect.page.value = "none";
+    loadPages();
+    selectPage();
+  });
 };
 
 window.updateActionOrPageSelect = function () {
@@ -273,12 +285,12 @@ window.updateActionOrPageSelect = function () {
 
 window.selectPage = function () {
   const page = document.pageSelect.page.value;
+  resetAllPageDetailInputs();
   switch (page) {
     case "none":
       document.pageDetails.setAttribute("hidden", true);
       return;
     case "new":
-      resetAllPageDetailInputs();
       showPageDetailsForm();
       break;
     default:
