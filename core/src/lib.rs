@@ -102,7 +102,7 @@ impl UIConfig {
 // color is a valid CSS colour
 // (although the safest format is #XXXXXX, otherwise the configurator at present will not display
 // it correctly)
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct UIStyle {
     pub default_button_style: ButtonStyle,
     pub bg_color: String,

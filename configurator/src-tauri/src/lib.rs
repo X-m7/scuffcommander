@@ -2,6 +2,7 @@ pub mod actions;
 pub mod config;
 pub mod pages;
 pub mod plugins;
+pub mod style;
 
 // needed to make a module here since commands can't be defined at the root directly
 pub mod general {
