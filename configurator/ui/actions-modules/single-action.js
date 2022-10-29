@@ -24,7 +24,11 @@ export function addNewSingleAction(then = null) {
 }
 
 export function showSingleAction(action) {
+  // this hides/unhides things based on the plugin
+  modPlugins.singleActionChoosePlugin(action.tag);
+
+  // show helper actually loads the action details
   modPlugins.singleActionShowHelper(action);
-  modPlugins.singleActionChoosePlugin();
+
   document.singleAction.removeAttribute("hidden");
 }

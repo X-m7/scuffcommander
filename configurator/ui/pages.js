@@ -27,7 +27,7 @@ function resetButtonDetailInputs() {
 
   document.getElementById("editButtonId").textContent = "";
   document.buttonDetails.type.value = "none";
-  document.buttonDetails.id.value = "none";
+  modCommon.resetSelectInput(document.buttonDetails.id);
   document.buttonDetails.enableStyleOverride.checked = false;
   document.buttonDetails.enableImage.checked = false;
 

@@ -27,6 +27,7 @@ export function vtsGetSingleActionParams() {
   switch (type) {
     case "ToggleExpression":
     case "LoadModel":
+    case "TriggerHotkey":
       // substring because it had "x-" prepended to it
       param = document.singleAction.inputSelect.value.substring(2);
       break;
@@ -69,6 +70,13 @@ export function vtsShowSingleAction(action) {
           modCommon.preselectSelectInput(act, document.singleAction.inputSelect)
       );
       break;
+    case "TriggerHotkey":
+      document.getElementById("actionInputSelect").removeAttribute("hidden");
+      invoke("get_vts_hotkey_name_from_id", { id: action.content }).then(
+        (act) =>
+          modCommon.preselectSelectInput(act, document.singleAction.inputSelect)
+      );
+      break;
     case "LoadModel":
       document.getElementById("actionInputSelect").removeAttribute("hidden");
       invoke("get_vts_model_name_from_id", { id: action.content }).then((act) =>
@@ -101,6 +109,14 @@ export function vtsSingleActionChooseType(then = null) {
       break;
     case "ToggleExpression":
       invoke("get_vts_expression_names")
+        .then((list) =>
+          modCommon.updateSelectInput(list, document.singleAction.inputSelect)
+        )
+        .then(then);
+      document.getElementById("actionInputSelect").removeAttribute("hidden");
+      break;
+    case "TriggerHotkey":
+      invoke("get_vts_hotkey_names")
         .then((list) =>
           modCommon.updateSelectInput(list, document.singleAction.inputSelect)
         )

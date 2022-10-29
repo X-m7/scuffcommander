@@ -75,10 +75,13 @@ function hideTypeSelect() {
   document.getElementById("generalTypeSelect").setAttribute("hidden", true);
 }
 
-export function singleActionChoosePlugin() {
+export function singleActionChoosePlugin(plugin = null) {
   resetPluginInputs();
 
-  const plugin = document.singleAction.plugin.value;
+  if (plugin === null) {
+    plugin = document.singleAction.plugin.value;
+  }
+
   switch (plugin) {
     case "none":
       document.getElementById("actionInputSelect").setAttribute("hidden", true);

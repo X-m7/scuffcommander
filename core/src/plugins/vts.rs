@@ -61,6 +61,7 @@ pub enum VTSAction {
     ToggleExpression(String),
     LoadModel(String),
     MoveModel(VTSMoveModelInput),
+    TriggerHotkey(String),
     CheckConnection,
 }
 
@@ -80,6 +81,7 @@ impl Display for VTSAction {
                 "Move Model to coordinates ({}, {}), with rotation {} and size {} for {} seconds",
                 x, y, rotation, size, time_sec
             ),
+            VTSAction::TriggerHotkey(hotkey) => write!(f, "Trigger hotkey with ID: {}", hotkey),
             VTSAction::CheckConnection => write!(f, "Check Connection"),
         }
     }
@@ -91,6 +93,7 @@ impl VTSAction {
             VTSAction::ToggleExpression(expr) => conn.toggle_expression(expr).await,
             VTSAction::LoadModel(model) => conn.load_model(model).await,
             VTSAction::MoveModel(info) => conn.move_model(info).await,
+            VTSAction::TriggerHotkey(hotkey) => conn.trigger_hotkey(hotkey).await,
             VTSAction::CheckConnection => conn.get_vts_version().await.map(|_| ()),
         }
     }
@@ -134,6 +137,17 @@ impl VTSAction {
                     .map_err(|e| e.to_string())?;
 
                 VTSAction::MoveModel(info)
+            }
+            "TriggerHotkey" => {
+                let param = conn
+                    .get_hotkey_id_from_name(
+                        data["param"]
+                            .as_str()
+                            .ok_or("VTS action parameter must be a string")?,
+                    )
+                    .await?;
+
+                VTSAction::TriggerHotkey(param)
             }
             "CheckConnection" => VTSAction::CheckConnection,
             _ => return Err("Unsupported VTS action type".to_string()),
@@ -388,5 +402,62 @@ impl VTSConnector {
         }
 
         Err("No model found with the given ID".to_string())
+    }
+
+    async fn get_hotkey_list(&mut self) -> Result<Vec<vtubestudio::data::Hotkey>, String> {
+        let resp = self
+            .client
+            .send(&vtubestudio::data::HotkeysInCurrentModelRequest {
+                model_id: None,
+                live2d_item_file_name: None,
+            })
+            .await;
+        match resp {
+            Ok(r) => Ok(r.available_hotkeys),
+            Err(e) => Err(e.to_string()),
+        }
+    }
+
+    async fn get_hotkey_id_from_name(&mut self, name: &str) -> Result<String, String> {
+        for hotkey in self.get_hotkey_list().await? {
+            if name == hotkey.name {
+                return Ok(hotkey.hotkey_id);
+            }
+        }
+
+        Err("Hotkey with given name not found in current model".to_string())
+    }
+
+    pub async fn get_hotkey_name_from_id(&mut self, id: &str) -> Result<String, String> {
+        for hotkey in self.get_hotkey_list().await? {
+            if id == hotkey.hotkey_id {
+                return Ok(hotkey.name);
+            }
+        }
+
+        Err("Hotkey with given ID not found in current model".to_string())
+    }
+
+    pub async fn get_hotkey_name_list(&mut self) -> Result<Vec<String>, String> {
+        let mut out = Vec::new();
+        for hotkey in self.get_hotkey_list().await? {
+            out.push(hotkey.name);
+        }
+
+        Ok(out)
+    }
+
+    pub async fn trigger_hotkey(&mut self, id: &str) -> Result<(), String> {
+        let resp = self
+            .client
+            .send(&vtubestudio::data::HotkeyTriggerRequest {
+                hotkey_id: id.to_string(),
+                item_instance_id: None,
+            })
+            .await;
+        match resp {
+            Ok(_) => Ok(()),
+            Err(e) => Err(e.to_string()),
+        }
     }
 }
