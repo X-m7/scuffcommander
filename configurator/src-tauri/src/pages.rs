@@ -247,10 +247,23 @@ pub async fn edit_button_in_page(
         return Err("Button index out of bounds".to_string());
     }
 
-    // Get the original image data if desired
+    // Get the original image data if desired, otherwise convert the file referenced by the path in
+    // img.data to Base64
     if let Some(img) = &data.get_data().img {
         if img.format == "keeporiginal" {
             data.get_mut_data().img = buttons[index].get_mut_data().img.take();
+        } else {
+            let path = std::path::Path::new(&img.data);
+            let ext = path
+                .extension()
+                .ok_or_else(|| "Can't get file extension".to_string())?
+                .to_str()
+                .ok_or_else(|| "File extension is not valid Unicode".to_string())?;
+            let raw_img_data = async_std::fs::read(path).await.map_err(|e| e.to_string())?;
+            data.get_mut_data().img = Some(scuffcommander_core::Base64Image {
+                format: format!("image/{}", ext),
+                data: base64::encode(raw_img_data),
+            });
         }
     }
 

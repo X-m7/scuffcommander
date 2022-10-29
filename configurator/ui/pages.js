@@ -93,20 +93,25 @@ function resetAllPageDetailInputs() {
 
   document.buttonDetails.setAttribute("hidden", true);
   resetButtonDetailInputs();
-  resetButtonStyleInputs();
 }
 
 function resetButtonDetailInputs() {
   document.getElementById("newButtonText").setAttribute("hidden", true);
   document.getElementById("editButtonText").setAttribute("hidden", true);
-  document.getElementById("imageInfo").setAttribute("hidden", true);
-  document.getElementById("imageLocationDisplay").setAttribute("hidden", true);
 
   document.getElementById("editButtonId").textContent = "";
   document.buttonDetails.type.value = "none";
   document.buttonDetails.id.value = "none";
   document.buttonDetails.enableStyleOverride.checked = false;
   document.buttonDetails.enableImage.checked = false;
+
+  resetButtonStyleInputs();
+  resetButtonImageInput();
+}
+
+function resetButtonImageInput() {
+  document.getElementById("imageInfo").setAttribute("hidden", true);
+  document.getElementById("imageLocationDisplay").setAttribute("hidden", true);
   document.getElementById("imageLocation").textContent = "";
 }
 
@@ -180,8 +185,10 @@ function loadButtonData(id, pos) {
     if (data.img != null) {
       document.buttonDetails.enableImage.checked = true;
       document.getElementById("imageInfo").removeAttribute("hidden");
+      document.getElementById("imageLocation").textContent = "keeporiginal";
     } else {
       document.buttonDetails.enableImage.checked = false;
+      resetButtonImageInput();
     }
   });
 }
@@ -276,9 +283,23 @@ function getUiButtonStruct() {
     out[type].style_override = null;
   }
 
-  // TODO: get img (see checkbox and imageLocation)
-  // TODO: respond to checkbox change of show image
-  out[type].img = null;
+  if (document.buttonDetails.enableImage.checked) {
+    const img = {};
+    const imgLocation = document.getElementById("imageLocation").textContent;
+
+    if (imgLocation === "keeporiginal") {
+      img.format = "keeporiginal";
+      img.data = "";
+    } else {
+      // Rust side will get the file extension and convert to base64
+      img.format = "";
+      img.data = imgLocation;
+    }
+
+    out[type].img = img;
+  } else {
+    out[type].img = null;
+  }
 
   return out;
 }
@@ -360,6 +381,13 @@ window.updateActionOrPageSelect = function () {
   updateActionOrPageSelect();
 };
 
+window.pickImageFile = function () {
+  invoke("pick_image_file").then((img) => {
+    document.getElementById("imageLocation").textContent = img;
+    document.getElementById("imageLocationDisplay").removeAttribute("hidden");
+  });
+};
+
 window.renamePage = function () {
   const selectedPage = document.pageSelect.page.value;
   const newPageId = document.pageDetails.id.value;
@@ -387,6 +415,13 @@ window.showHideButtonStyleInputs = function () {
   resetButtonStyleInputs();
   if (document.buttonDetails.enableStyleOverride.checked) {
     document.buttonStyleDetails.removeAttribute("hidden");
+  }
+};
+
+window.showHideButtonImageInput = function () {
+  resetButtonImageInput();
+  if (document.buttonDetails.enableImage.checked) {
+    document.getElementById("imageInfo").removeAttribute("hidden");
   }
 };
 

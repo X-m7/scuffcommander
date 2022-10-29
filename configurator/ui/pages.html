@@ -74,14 +74,24 @@
       <br />
       <label>
         Show image instead of action/page ID:
-        <input type="checkbox" name="enableImage" />
+        <input
+          type="checkbox"
+          name="enableImage"
+          oninput="showHideButtonImageInput()"
+        />
       </label>
       <br />
       <div id="imageInfo" hidden>
+        <p>
+          Warning: Make sure that the selected image is not overly large in
+          size.
+        </p>
         <p id="imageLocationDisplay" hidden>
           Image location: <span id="imageLocation"></span>
         </p>
-        <button type="button">Select image file</button>
+        <button type="button" onclick="pickImageFile()">
+          Select image file
+        </button>
       </div>
     </form>
     <form name="buttonStyleDetails" hidden>

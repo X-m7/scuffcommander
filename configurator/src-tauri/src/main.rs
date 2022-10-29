@@ -65,6 +65,7 @@ async fn main() {
             app_mod::pages::get_page_button_data,
             app_mod::pages::get_page_or_action_name_list,
             app_mod::pages::rename_page,
+            app_mod::general::pick_image_file,
             app_mod::actions::get_actions,
             app_mod::actions::add_new_single_action,
             app_mod::actions::load_action_details,
