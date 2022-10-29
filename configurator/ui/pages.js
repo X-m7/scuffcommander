@@ -40,6 +40,40 @@ function createButtonNode(text, onclick) {
 }
 
 /*
+ * Common button style functions (useful for the global style later)
+ */
+
+function resetButtonStyleInputs() {
+  document.buttonStyleDetails.setAttribute("hidden", true);
+
+  document.buttonStyleDetails.width.value = 3;
+  document.buttonStyleDetails.height.value = 3;
+  document.buttonStyleDetails.bgColor.value = "#FFFFFF";
+  document.buttonStyleDetails.fgColor.value = "#000000";
+}
+
+// takes ButtonStyle struct as input
+function loadButtonStyleData(data) {
+  // parseFloat strips the units out (so "2cm" => 2 for example)
+  document.buttonStyleDetails.width.value = parseFloat(data.width);
+  document.buttonStyleDetails.height.value = parseFloat(data.height);
+  document.buttonStyleDetails.bgColor.value = data.bg_color;
+  document.buttonStyleDetails.fgColor.value = data.fg_color;
+
+  document.buttonStyleDetails.removeAttribute("hidden");
+}
+
+function getButtonStyleStruct() {
+  const out = {};
+  out.width = document.buttonStyleDetails.width.value + "cm";
+  out.height = document.buttonStyleDetails.height.value + "cm";
+  out.bg_color = document.buttonStyleDetails.bgColor.value;
+  out.fg_color = document.buttonStyleDetails.fgColor.value;
+
+  return out;
+}
+
+/*
  * End common helper functions
  */
 
@@ -62,15 +96,6 @@ function resetAllPageDetailInputs() {
   document.buttonDetails.setAttribute("hidden", true);
   resetButtonDetailInputs();
   resetButtonStyleInputs();
-}
-
-function resetButtonStyleInputs() {
-  document.buttonStyleDetails.setAttribute("hidden", true);
-
-  document.buttonStyleDetails.width.value = 3;
-  document.buttonStyleDetails.height.value = 3;
-  document.buttonStyleDetails.bgColor.value = "#FFFFFF";
-  document.buttonStyleDetails.fgColor.value = "#000000";
 }
 
 function resetButtonDetailInputs() {
@@ -117,16 +142,6 @@ function showPageDetailsForm(editIndex = null) {
     document.getElementById("editButtonId").textContent = editIndex + 1;
     document.getElementById("editButtonText").removeAttribute("hidden");
   }
-}
-
-// takes ButtonStyle struct as input
-function loadButtonStyleData(data) {
-  document.buttonStyleDetails.width.value = parseFloat(data.width);
-  document.buttonStyleDetails.height.value = parseFloat(data.height);
-  document.buttonStyleDetails.bgColor.value = data.bg_color;
-  document.buttonStyleDetails.fgColor.value = data.fg_color;
-
-  document.buttonStyleDetails.removeAttribute("hidden");
 }
 
 function loadButtonData(id, pos) {
@@ -215,7 +230,7 @@ function loadPage(id) {
 function getCurrentPageId() {
   const selected = document.pageSelect.page.value;
 
-  if (selected === "none" || selected == "new") {
+  if (selected === "none" || selected === "new") {
     return null;
   } else {
     return selected.substring(2);
@@ -234,7 +249,9 @@ function updateActionOrPageSelect(then = null) {
         pageId: getCurrentPageId(),
         outputType: type,
       })
-        .then((list) => updateSelectInput(list, document.buttonDetails.id))
+        .then((list) => {
+          updateSelectInput(list, document.buttonDetails.id);
+        })
         .then(then);
       break;
     default:
@@ -245,6 +262,30 @@ function updateActionOrPageSelect(then = null) {
 
 function loadPages() {
   invoke("get_page_names").then(refreshPageSelect);
+}
+
+function getUiButtonStruct() {
+  const out = {};
+  const type = document.buttonDetails.type.value;
+  out[type] = {};
+  out[type].target_id = document.buttonDetails.id.value.substring(2);
+
+  if (document.buttonDetails.enableStyleOverride.checked) {
+    out[type].style_override = getButtonStyleStruct();
+  } else {
+    out[type].style_override = null;
+  }
+
+  // TODO: get img (see checkbox and imageLocation)
+  // TODO: respond to checkbox change of show image
+  // TODO: rename page support
+  out[type].img = null;
+
+  return out;
+}
+
+function showMsg(msg) {
+  document.getElementById("msgOutput").textContent = msg;
 }
 
 /*
@@ -260,19 +301,56 @@ window.loadPages = function () {
 };
 
 window.saveButton = function () {
-  // TODO: if selected page is "new" and page ID field is empty warn user
+  const selectedPage = document.pageSelect.page.value;
+  const newPageId = document.pageDetails.id.value;
+  let pageId = null;
+  if (selectedPage === "new") {
+    if (newPageId.length === 0) {
+      showMsg(
+        "Before adding a button to a new page the page ID needs to be specified first"
+      );
+      return;
+    }
+    pageId = newPageId;
+  } else {
+    pageId = selectedPage.substring(2);
+  }
+
+  if (
+    document.getElementById("editButtonText").getAttribute("hidden") !== "true"
+  ) {
+    invoke("edit_button_in_page", {
+      id: pageId,
+      index: parseInt(document.getElementById("editButtonId").textContent) - 1,
+      data: getUiButtonStruct(),
+    }).then(() => {
+      showMsg(`Button edit saved to page "${pageId}"`);
+      selectPage();
+    });
+  } else {
+    invoke("add_new_button_to_page", {
+      id: pageId,
+      data: getUiButtonStruct(),
+    }).then((newPage) => {
+      if (newPage) {
+        showMsg(`New page "${pageId}" created`);
+        loadPages();
+      } else {
+        showMsg(`New button added to page "${pageId}"`);
+      }
+      selectPage();
+    });
+  }
 };
 
 window.saveUiConfig = function () {
-  invoke("save_ui_config").then(
-    () => (document.getElementById("msgOutput").textContent = "Pages saved")
-  );
+  invoke("save_ui_config").then(() => showMsg("Pages saved"));
 };
 
 window.deletePage = function () {
   const id = getCurrentPageId();
   invoke("delete_page", { id: id }).then(() => {
-    document.getElementById("msgOutput").textContent = `Page ${id} deleted`;
+    showMsg(`Page "${id}" deleted`);
     document.pageSelect.page.value = "none";
     loadPages();
     selectPage();
@@ -281,6 +359,13 @@ window.deletePage = function () {
 
 window.updateActionOrPageSelect = function () {
   updateActionOrPageSelect();
+};
+
+window.showHideButtonStyleInputs = function () {
+  resetButtonStyleInputs();
+  if (document.buttonDetails.enableStyleOverride.checked) {
+    document.buttonStyleDetails.removeAttribute("hidden");
+  }
 };
 
 window.selectPage = function () {

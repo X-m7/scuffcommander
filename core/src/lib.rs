@@ -145,6 +145,22 @@ pub enum UIButton {
     OpenPage(ButtonData),
 }
 
+impl UIButton {
+    pub fn get_data(&self) -> &ButtonData {
+        match self {
+            UIButton::ExecuteAction(data) => data,
+            UIButton::OpenPage(data) => data,
+        }
+    }
+
+    pub fn get_mut_data(&mut self) -> &mut ButtonData {
+        match self {
+            UIButton::ExecuteAction(data) => data,
+            UIButton::OpenPage(data) => data,
+        }
+    }
+}
+
 impl Display for UIButton {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
         let (data, button_type_str) = match self {

@@ -327,6 +327,12 @@ fn main() {
 
     pages.insert("home".to_string(), page_home());
     pages.insert("Complex Actions".to_string(), page_2());
+    pages.insert(
+        "Blank".to_string(),
+        UIPage {
+            buttons: Vec::new(),
+        },
+    );
 
     println!(
         "{}",

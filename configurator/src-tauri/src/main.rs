@@ -58,6 +58,8 @@ async fn main() {
             app_mod::pages::get_page_buttons_info,
             app_mod::pages::delete_button_from_page,
             app_mod::pages::delete_page,
+            app_mod::pages::edit_button_in_page,
+            app_mod::pages::add_new_button_to_page,
             app_mod::pages::move_button_up_in_page,
             app_mod::pages::move_button_down_in_page,
             app_mod::pages::get_page_button_data,

@@ -1,6 +1,6 @@
 use crate::actions::ActionConfigState;
 use crate::config::UIConfigState;
-use scuffcommander_core::{UIButton, UIButtonType};
+use scuffcommander_core::{UIButton, UIButtonType, UIPage};
 use std::collections::HashSet;
 
 #[tauri::command]
@@ -225,5 +225,62 @@ pub async fn get_page_or_action_name_list(
             get_action_name_list_filtered(page_id, ui_state, actions_state).await
         }
         UIButtonType::OpenPage => get_page_name_list_filtered(page_id, ui_state).await,
+    }
+}
+
+#[tauri::command]
+pub async fn edit_button_in_page(
+    id: String,
+    index: usize,
+    mut data: UIButton,
+    ui_state: tauri::State<'_, UIConfigState>,
+) -> Result<(), String> {
+    let pages = &mut ui_state.0.lock().await.pages;
+
+    if !pages.contains_key(&id) {
+        return Err("Page with the given ID does not exist".to_string());
+    }
+
+    let buttons = &mut pages.get_mut(&id).unwrap().buttons;
+
+    if index >= buttons.len() {
+        return Err("Button index out of bounds".to_string());
+    }
+
+    // Get the original image data if desired
+    if let Some(img) = &data.get_data().img {
+        if img.format == "keeporiginal" {
+            data.get_mut_data().img = buttons[index].get_mut_data().img.take();
+        }
+    }
+
+    buttons[index] = data;
+
+    Ok(())
+}
+
+// Returns true if a new page has also been created, false otherwise
+#[tauri::command]
+pub async fn add_new_button_to_page(
+    id: String,
+    data: UIButton,
+    ui_state: tauri::State<'_, UIConfigState>,
+) -> Result<bool, String> {
+    if id.is_empty() {
+        return Err("ID can't be empty".to_string());
+    }
+
+    let pages = &mut ui_state.0.lock().await.pages;
+
+    if let std::collections::hash_map::Entry::Vacant(e) = pages.entry(id.clone()) {
+        e.insert(UIPage {
+            buttons: vec![data],
+        });
+
+        Ok(true)
+    } else {
+        pages.get_mut(&id).unwrap().buttons.push(data);
+
+        Ok(false)
     }
 }
