@@ -1,4 +1,5 @@
 import * as modHelpers from "../helpers.js";
+import * as modCommon from "../../common.js";
 
 const { invoke } = window.__TAURI__.tauri;
 
@@ -65,16 +66,13 @@ export function vtsShowSingleAction(action) {
       document.getElementById("actionInputSelect").removeAttribute("hidden");
       invoke("get_vts_expression_name_from_id", { id: action.content }).then(
         (act) =>
-          modHelpers.preselectSelectInput(
-            act,
-            document.singleAction.inputSelect
-          )
+          modCommon.preselectSelectInput(act, document.singleAction.inputSelect)
       );
       break;
     case "LoadModel":
       document.getElementById("actionInputSelect").removeAttribute("hidden");
       invoke("get_vts_model_name_from_id", { id: action.content }).then((act) =>
-        modHelpers.preselectSelectInput(act, document.singleAction.inputSelect)
+        modCommon.preselectSelectInput(act, document.singleAction.inputSelect)
       );
       break;
     case "MoveModel":
@@ -98,13 +96,13 @@ export function vtsSingleActionChooseType(then = null) {
   switch (type) {
     case "none":
       if (!(then instanceof Function)) {
-        modHelpers.resetSelectInput(document.singleAction.inputSelect);
+        modCommon.resetSelectInput(document.singleAction.inputSelect);
       }
       break;
     case "ToggleExpression":
       invoke("get_vts_expression_names")
         .then((list) =>
-          modHelpers.updateSelectInput(list, document.singleAction.inputSelect)
+          modCommon.updateSelectInput(list, document.singleAction.inputSelect)
         )
         .then(then);
       document.getElementById("actionInputSelect").removeAttribute("hidden");
@@ -112,7 +110,7 @@ export function vtsSingleActionChooseType(then = null) {
     case "LoadModel":
       invoke("get_vts_model_names")
         .then((list) =>
-          modHelpers.updateSelectInput(list, document.singleAction.inputSelect)
+          modCommon.updateSelectInput(list, document.singleAction.inputSelect)
         )
         .then(then);
       document.getElementById("actionInputSelect").removeAttribute("hidden");
@@ -145,7 +143,7 @@ export function vtsShowCondition(cond) {
     case "ActiveModelId":
       document.getElementById("queryInputSelect").removeAttribute("hidden");
       invoke("get_vts_model_name_from_id", { id: cond.target }).then((act) =>
-        modHelpers.preselectSelectInput(
+        modCommon.preselectSelectInput(
           act,
           document.conditionAction.inputSelect
         )
@@ -166,7 +164,7 @@ export function vtsQueryChooseType(then = null) {
   switch (type) {
     case "none":
       if (!(then instanceof Function)) {
-        modHelpers.resetSelectInput(document.conditionAction.inputSelect);
+        modCommon.resetSelectInput(document.conditionAction.inputSelect);
         document
           .getElementById("queryInputSelect")
           .setAttribute("hidden", true);
@@ -175,7 +173,7 @@ export function vtsQueryChooseType(then = null) {
     case "ActiveModelId":
       invoke("get_vts_model_names")
         .then((list) =>
-          modHelpers.updateSelectInput(
+          modCommon.updateSelectInput(
             list,
             document.conditionAction.inputSelect
           )

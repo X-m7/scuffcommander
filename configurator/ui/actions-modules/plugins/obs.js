@@ -1,6 +1,7 @@
 const { invoke } = window.__TAURI__.tauri;
 
 import * as modHelpers from "../helpers.js";
+import * as modCommon from "../../common.js";
 
 /*
  * Single action relevant things
@@ -15,7 +16,7 @@ export function obsShowSingleAction(action) {
   switch (action.tag) {
     case "ProgramSceneChange":
       document.getElementById("actionInputSelect").removeAttribute("hidden");
-      modHelpers.preselectSelectInput(
+      modCommon.preselectSelectInput(
         action.content,
         document.singleAction.inputSelect
       );
@@ -35,7 +36,7 @@ export function obsSingleActionChooseType(then = null) {
   switch (type) {
     case "none":
       if (!(then instanceof Function)) {
-        modHelpers.resetSelectInput(document.singleAction.inputSelect);
+        modCommon.resetSelectInput(document.singleAction.inputSelect);
         document
           .getElementById("actionInputSelect")
           .setAttribute("hidden", true);
@@ -44,7 +45,7 @@ export function obsSingleActionChooseType(then = null) {
     case "ProgramSceneChange":
       invoke("get_obs_scenes")
         .then((list) =>
-          modHelpers.updateSelectInput(list, document.singleAction.inputSelect)
+          modCommon.updateSelectInput(list, document.singleAction.inputSelect)
         )
         .then(then);
       document.getElementById("actionInputSelect").removeAttribute("hidden");
@@ -64,7 +65,7 @@ export function obsShowCondition(cond) {
   switch (cond.query.content) {
     case "CurrentProgramScene":
       document.getElementById("queryInputSelect").removeAttribute("hidden");
-      modHelpers.preselectSelectInput(
+      modCommon.preselectSelectInput(
         cond.target,
         document.conditionAction.inputSelect
       );
@@ -84,7 +85,7 @@ export function obsQueryChooseType(then = null) {
   switch (type) {
     case "none":
       if (!(then instanceof Function)) {
-        modHelpers.resetSelectInput(document.conditionAction.inputSelect);
+        modCommon.resetSelectInput(document.conditionAction.inputSelect);
         document
           .getElementById("queryInputSelect")
           .setAttribute("hidden", true);
@@ -93,7 +94,7 @@ export function obsQueryChooseType(then = null) {
     case "CurrentProgramScene":
       invoke("get_obs_scenes")
         .then((list) =>
-          modHelpers.updateSelectInput(
+          modCommon.updateSelectInput(
             list,
             document.conditionAction.inputSelect
           )

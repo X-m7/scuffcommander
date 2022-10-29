@@ -2,6 +2,7 @@ import * as modSingleAction from "./single-action.js";
 import * as modChainAction from "./chain-action.js";
 import * as modConditionAction from "./condition-action.js";
 import * as modPlugins from "./plugins/plugins.js";
+import * as modCommon from "../common.js";
 
 const { invoke } = window.__TAURI__.tauri;
 
@@ -90,7 +91,7 @@ export function addNewAction() {
 }
 
 export function updateActions(actions) {
-  resetSelectInput(document.actionSelect.action);
+  modCommon.resetSelectInput(document.actionSelect.action);
 
   const defaultOpt2 = document.createElement("option");
   defaultOpt2.value = "new";
@@ -98,7 +99,7 @@ export function updateActions(actions) {
   document.actionSelect.action.appendChild(defaultOpt2);
 
   // false for 3rd param since we also need a second predefined option
-  updateSelectInput(actions, document.actionSelect.action, false);
+  modCommon.updateSelectInput(actions, document.actionSelect.action, false);
 }
 
 // Loading a selected action
@@ -119,32 +120,4 @@ function showActionInUi(action, id) {
   }
 
   document.actionModify.type.value = action.tag.toLowerCase();
-}
-
-export function createSelectOption(val, text) {
-  const defaultOpt = document.createElement("option");
-  defaultOpt.value = val;
-  defaultOpt.textContent = text;
-  return defaultOpt;
-}
-
-export function resetSelectInput(
-  selectElement,
-  defaultContent = "Select an option"
-) {
-  selectElement.options.length = 0;
-  selectElement.appendChild(createSelectOption("none", defaultContent));
-}
-
-export function updateSelectInput(list, selectElement, resetBeforehand = true) {
-  if (resetBeforehand) {
-    resetSelectInput(selectElement);
-  }
-  for (const i of list) {
-    selectElement.appendChild(createSelectOption("x-" + i, i));
-  }
-}
-
-export function preselectSelectInput(newValue, selectElement) {
-  selectElement.value = "x-" + newValue;
 }

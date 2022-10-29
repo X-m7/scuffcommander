@@ -1,6 +1,7 @@
 import * as modSingleAction from "./single-action.js";
 import * as modConditionAction from "./condition-action.js";
 import * as modPlugins from "./plugins/plugins.js";
+import * as modCommon from "../common.js";
 
 const { invoke } = window.__TAURI__.tauri;
 
@@ -70,14 +71,6 @@ export function deleteChainItem(i) {
   invoke("delete_entry_from_temp_chain", { index: i }).then(refreshTempChain);
 }
 
-function createButtonNode(text, onclick) {
-  const button = document.createElement("button");
-  button.textContent = text;
-  button.addEventListener("click", onclick);
-  button.setAttribute("type", "button");
-  return button;
-}
-
 function refreshTempChain() {
   invoke("get_temp_chain_display").then((actions) => {
     clearChainView();
@@ -88,10 +81,12 @@ function refreshTempChain() {
       uiList.appendChild(newElement);
       const iInt = parseInt(i);
       newElement.appendChild(
-        createButtonNode("Delete", () => deleteChainItem(iInt))
+        modCommon.createButtonNode("Delete", () => deleteChainItem(iInt))
       );
       newElement.appendChild(
-        createButtonNode("Add new action above", () => addToChain(iInt))
+        modCommon.createButtonNode("Add new action above", () =>
+          addToChain(iInt)
+        )
       );
     }
   });

@@ -1,88 +1,14 @@
+import * as modCommon from "./common.js";
+import * as modButtonStyle from "./button-style.js";
+
 const { invoke } = window.__TAURI__.tauri;
 
-/*
- * Common helper functions copied from actions-modules/helpers.js
- * TODO: move out into common helper module
- */
-
-function createSelectOption(val, text) {
-  const defaultOpt = document.createElement("option");
-  defaultOpt.value = val;
-  defaultOpt.textContent = text;
-  return defaultOpt;
-}
-
-function resetSelectInput(selectElement, defaultContent = "Select an option") {
-  selectElement.options.length = 0;
-  selectElement.appendChild(createSelectOption("none", defaultContent));
-}
-
-function updateSelectInput(list, selectElement, resetBeforehand = true) {
-  if (resetBeforehand) {
-    resetSelectInput(selectElement);
-  }
-  for (const i of list) {
-    selectElement.appendChild(createSelectOption("x-" + i, i));
-  }
-}
-
-function preselectSelectInput(newValue, selectElement) {
-  selectElement.value = "x-" + newValue;
-}
-
-// this one was specific to chain actions
-function createButtonNode(text, onclick) {
-  const button = document.createElement("button");
-  button.textContent = text;
-  button.addEventListener("click", onclick);
-  button.setAttribute("type", "button");
-  return button;
-}
-
-/*
- * Common button style functions (useful for the global style later)
- */
-
-function resetButtonStyleInputs() {
-  document.buttonStyleDetails.setAttribute("hidden", true);
-
-  document.buttonStyleDetails.width.value = 3;
-  document.buttonStyleDetails.height.value = 3;
-  document.buttonStyleDetails.bgColor.value = "#FFFFFF";
-  document.buttonStyleDetails.fgColor.value = "#000000";
-}
-
-// takes ButtonStyle struct as input
-function loadButtonStyleData(data) {
-  // parseFloat strips the units out (so "2cm" => 2 for example)
-  document.buttonStyleDetails.width.value = parseFloat(data.width);
-  document.buttonStyleDetails.height.value = parseFloat(data.height);
-  document.buttonStyleDetails.bgColor.value = data.bg_color;
-  document.buttonStyleDetails.fgColor.value = data.fg_color;
-
-  document.buttonStyleDetails.removeAttribute("hidden");
-}
-
-function getButtonStyleStruct() {
-  const out = {};
-  out.width = document.buttonStyleDetails.width.value + "cm";
-  out.height = document.buttonStyleDetails.height.value + "cm";
-  out.bg_color = document.buttonStyleDetails.bgColor.value;
-  out.fg_color = document.buttonStyleDetails.fgColor.value;
-
-  return out;
-}
-
-/*
- * End common helper functions
- */
-
 function refreshPageSelect(pages) {
-  resetSelectInput(document.pageSelect.page);
+  modCommon.resetSelectInput(document.pageSelect.page);
   document.pageSelect.page.appendChild(
-    createSelectOption("new", "Create a new page")
+    modCommon.createSelectOption("new", "Create a new page")
   );
-  updateSelectInput(pages, document.pageSelect.page, false);
+  modCommon.updateSelectInput(pages, document.pageSelect.page, false);
 }
 
 function resetAllPageDetailInputs() {
@@ -105,7 +31,7 @@ function resetButtonDetailInputs() {
   document.buttonDetails.enableStyleOverride.checked = false;
   document.buttonDetails.enableImage.checked = false;
 
-  resetButtonStyleInputs();
+  modButtonStyle.resetButtonStyleInputs();
   resetButtonImageInput();
 }
 
@@ -142,7 +68,7 @@ function showPageDetailsForm(editIndex = null) {
 
   if (editIndex === null) {
     document.getElementById("newButtonText").removeAttribute("hidden");
-    resetButtonStyleInputs();
+    modButtonStyle.resetButtonStyleInputs();
   } else {
     document.getElementById("editButtonId").textContent = editIndex + 1;
     document.getElementById("editButtonText").removeAttribute("hidden");
@@ -169,17 +95,17 @@ function loadButtonData(id, pos) {
       const sel = document.buttonDetails.id;
       // add back the currently selected option, then preselect it
       sel.appendChild(
-        createSelectOption("x-" + data.target_id, data.target_id)
+        modCommon.createSelectOption("x-" + data.target_id, data.target_id)
       );
-      preselectSelectInput(data.target_id, sel);
+      modCommon.preselectSelectInput(data.target_id, sel);
     });
 
     if (data.style_override !== null) {
       document.buttonDetails.enableStyleOverride.checked = true;
-      loadButtonStyleData(data.style_override);
+      modButtonStyle.loadButtonStyleData(data.style_override);
     } else {
       document.buttonDetails.enableStyleOverride.checked = false;
-      resetButtonStyleInputs();
+      modButtonStyle.resetButtonStyleInputs();
     }
 
     if (data.img != null) {
@@ -208,25 +134,31 @@ function loadPage(id) {
       const iInt = parseInt(i);
 
       newElement.appendChild(
-        createButtonNode("Edit", () => loadButtonData(id, iInt))
+        modCommon.createButtonNode("Edit", () => loadButtonData(id, iInt))
       );
 
       // can't move top button any higher
       if (iInt > 0) {
         newElement.appendChild(
-          createButtonNode("Move up", () => moveButtonUpInPage(id, iInt))
+          modCommon.createButtonNode("Move up", () =>
+            moveButtonUpInPage(id, iInt)
+          )
         );
       }
 
       // can't move bottom button any lower
       if (iInt < buttons.length - 1) {
         newElement.appendChild(
-          createButtonNode("Move down", () => moveButtonDownInPage(id, iInt))
+          modCommon.createButtonNode("Move down", () =>
+            moveButtonDownInPage(id, iInt)
+          )
         );
       }
 
       newElement.appendChild(
-        createButtonNode("Delete", () => deleteButtonFromPage(id, iInt))
+        modCommon.createButtonNode("Delete", () =>
+          deleteButtonFromPage(id, iInt)
+        )
       );
     }
 
@@ -257,7 +189,7 @@ function updateActionOrPageSelect(then = null) {
         outputType: type,
       })
         .then((list) => {
-          updateSelectInput(list, document.buttonDetails.id);
+          modCommon.updateSelectInput(list, document.buttonDetails.id);
         })
         .then(then);
       break;
@@ -278,7 +210,7 @@ function getUiButtonStruct() {
   out[type].target_id = document.buttonDetails.id.value.substring(2);
 
   if (document.buttonDetails.enableStyleOverride.checked) {
-    out[type].style_override = getButtonStyleStruct();
+    out[type].style_override = modButtonStyle.getButtonStyleStruct();
   } else {
     out[type].style_override = null;
   }
@@ -405,14 +337,14 @@ window.renamePage = function () {
 
   invoke("rename_page", { currentId: currentId, newId: newPageId }).then(() => {
     loadPages(() => {
-      preselectSelectInput(newPageId, document.pageSelect.page);
+      modCommon.preselectSelectInput(newPageId, document.pageSelect.page);
       selectPage();
     });
   });
 };
 
 window.showHideButtonStyleInputs = function () {
-  resetButtonStyleInputs();
+  modButtonStyle.resetButtonStyleInputs();
   if (document.buttonDetails.enableStyleOverride.checked) {
     document.buttonStyleDetails.removeAttribute("hidden");
   }

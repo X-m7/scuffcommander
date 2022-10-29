@@ -1,4 +1,5 @@
 import * as modHelpers from "./helpers.js";
+import * as modCommon from "../common.js";
 import * as modPlugins from "./plugins/plugins.js";
 
 const { invoke } = window.__TAURI__.tauri;
@@ -50,14 +51,11 @@ export function updateThenElseSelect(
   currentActionThen = null,
   currentActionElse = null
 ) {
-  modHelpers.resetSelectInput(
+  modCommon.resetSelectInput(
     document.conditionAction.thenAction,
     "Select an existing action to copy"
   );
-  modHelpers.resetSelectInput(
-    document.conditionAction.elseAction,
-    "Do nothing"
-  );
+  modCommon.resetSelectInput(document.conditionAction.elseAction, "Do nothing");
 
   if (currentActionThen !== null) {
     invoke("convert_action_to_string", { action: currentActionThen }).then(
@@ -91,12 +89,12 @@ export function updateThenElseSelect(
     );
   }
 
-  modHelpers.updateSelectInput(
+  modCommon.updateSelectInput(
     actionsFiltered,
     document.conditionAction.thenAction,
     false
   );
-  modHelpers.updateSelectInput(
+  modCommon.updateSelectInput(
     actionsFiltered,
     document.conditionAction.elseAction,
     false
