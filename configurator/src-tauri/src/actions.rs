@@ -36,6 +36,8 @@ pub async fn get_actions(
         actions_vec.push(action.clone());
     }
 
+    actions_vec.sort_unstable();
+
     Ok(actions_vec)
 }
 

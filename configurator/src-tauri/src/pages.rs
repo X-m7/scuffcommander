@@ -14,6 +14,8 @@ pub async fn get_page_names(
         out.push(page.clone());
     }
 
+    out.sort_unstable();
+
     Ok(out)
 }
 
@@ -168,6 +170,8 @@ async fn get_action_name_list_filtered(
         }
     }
 
+    out.sort_unstable();
+
     Ok(out)
 }
 
@@ -205,6 +209,8 @@ async fn get_page_name_list_filtered(
             out.push(page.clone());
         }
     }
+
+    out.sort_unstable();
 
     Ok(out)
 }
