@@ -87,8 +87,6 @@ function refreshPageSelect(pages) {
 
 function resetAllPageDetailInputs() {
   document.pageDetails.setAttribute("hidden", true);
-  document.getElementById("imageInfo").setAttribute("hidden", true);
-  document.getElementById("imageLocationDisplay").setAttribute("hidden", true);
 
   document.pageDetails.id.value = "";
   document.getElementById("buttonsInPage").replaceChildren();
@@ -101,6 +99,8 @@ function resetAllPageDetailInputs() {
 function resetButtonDetailInputs() {
   document.getElementById("newButtonText").setAttribute("hidden", true);
   document.getElementById("editButtonText").setAttribute("hidden", true);
+  document.getElementById("imageInfo").setAttribute("hidden", true);
+  document.getElementById("imageLocationDisplay").setAttribute("hidden", true);
 
   document.getElementById("editButtonId").textContent = "";
   document.buttonDetails.type.value = "none";
@@ -260,8 +260,8 @@ function updateActionOrPageSelect(then = null) {
   }
 }
 
-function loadPages() {
-  invoke("get_page_names").then(refreshPageSelect);
+function loadPages(then = null) {
+  invoke("get_page_names").then(refreshPageSelect).then(then);
 }
 
 function getUiButtonStruct() {
@@ -278,7 +278,6 @@ function getUiButtonStruct() {
 
   // TODO: get img (see checkbox and imageLocation)
   // TODO: respond to checkbox change of show image
-  // TODO: rename page support
   out[type].img = null;
 
   return out;
@@ -359,6 +358,29 @@ window.deletePage = function () {
 
 window.updateActionOrPageSelect = function () {
   updateActionOrPageSelect();
+};
+
+window.renamePage = function () {
+  const selectedPage = document.pageSelect.page.value;
+  const newPageId = document.pageDetails.id.value;
+
+  if (selectedPage === "none") {
+    return;
+  }
+
+  if (selectedPage === "new") {
+    showMsg("To create a new page please add a button");
+    return;
+  }
+
+  const currentId = selectedPage.substring(2);
+
+  invoke("rename_page", { currentId: currentId, newId: newPageId }).then(() => {
+    loadPages(() => {
+      preselectSelectInput(newPageId, document.pageSelect.page);
+      selectPage();
+    });
+  });
 };
 
 window.showHideButtonStyleInputs = function () {

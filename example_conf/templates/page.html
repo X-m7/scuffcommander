@@ -41,23 +41,23 @@
     {{#each buttons as |b|}} {{#with b.ExecuteAction}}
     <button
       type="button"
-      style="{{#with style_override}} color:{{fg_color}}; background_color:{{bg_color}}; width:{{width}}; height:{{height}}; {{/with}}"
+      style="{{#with style_override}} color:{{fg_color}}; background-color:{{bg_color}}; width:{{width}}; height:{{height}}; {{/with}}"
       onclick="action('{{target_id}}')"
     >
       {{#if img}}
       <img src="data:{{img.format}};base64,{{img.data}}" alt="{{target_id}}" />
-      {{else}} {{target_id}} {{/if}} {{/with}}
+      {{else}} {{target_id}} {{/if}}
     </button>
-    {{#with b.OpenPage}}
+    {{/with}} {{#with b.OpenPage}}
     <button
       type="button"
-      style="{{#with style_override}} color:{{fg_color}}; background_color:{{bg_color}}; width:{{width}}; height:{{height}}; {{/with}}"
+      style="{{#with style_override}} color:{{fg_color}}; background-color:{{bg_color}}; width:{{width}}; height:{{height}}; {{/with}}"
       onclick="page('{{target_id}}')"
     >
       {{#if img}}
       <img src="data:{{img.format}};base64,{{img.data}}" alt="{{target_id}}" />
-      {{else}} {{target_id}} {{/if}} {{/with}}
+      {{else}} {{target_id}} {{/if}}
     </button>
-    {{/each}}
+    {{/with}} {{/each}}
   </body>
 </html>

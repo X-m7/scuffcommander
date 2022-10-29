@@ -284,3 +284,38 @@ pub async fn add_new_button_to_page(
         Ok(false)
     }
 }
+
+#[tauri::command]
+pub async fn rename_page(
+    current_id: String,
+    new_id: String,
+    ui_state: tauri::State<'_, UIConfigState>,
+) -> Result<(), String> {
+    if current_id.is_empty() || new_id.is_empty() {
+        return Err("ID can't be empty".to_string());
+    }
+
+    let pages = &mut ui_state.0.lock().await.pages;
+
+    if pages.contains_key(&new_id) {
+        return Err("A page already exists with the given ID".to_string());
+    } else if !pages.contains_key(&current_id) {
+        return Err("The page with the given ID does not exist".to_string());
+    }
+
+    let page = pages.remove(&current_id).unwrap();
+    pages.insert(new_id.clone(), page);
+
+    // Find occurrences of the old name and change them too
+    for page in pages.values_mut() {
+        for button in &mut page.buttons {
+            if let UIButton::OpenPage(data) = button {
+                if data.target_id == current_id {
+                    data.target_id = new_id.clone();
+                }
+            }
+        }
+    }
+
+    Ok(())
+}
