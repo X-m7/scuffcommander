@@ -177,7 +177,7 @@ impl VTSConnector {
     }
 
     pub async fn new(conf: VTSConfig) -> VTSConnector {
-        let (client, mut new_tokens) = Client::builder()
+        let (client, mut events) = Client::builder()
             .auth_token(Self::read_token(&conf.token_file).await)
             .url(conf.addr)
             .authentication("VTScuffCommander", "ScuffCommanderDevs", None)
@@ -188,12 +188,15 @@ impl VTSConnector {
         tokio::spawn(async move {
             // This returns whenever the authentication middleware receives a new auth token.
             // We can handle it by saving it somewhere, etc.
-            while let Some(token) = new_tokens.next().await {
-                println!("Got new auth token: {}", token);
-                match write(&token_file, token).await {
-                    Ok(_) => println!("Saved new token to {}", token_file),
-                    Err(e) => println!("Failed to save token: {}", e),
+            while let Some(event) = events.next().await {
+                if let vtubestudio::client::ClientEvent::NewAuthToken(token) = event {
+                    println!("Got new auth token: {}", token);
+                    match write(&token_file, token).await {
+                        Ok(_) => println!("Saved new token to {}", token_file),
+                        Err(e) => println!("Failed to save token: {}", e),
+                    }
                 }
+
             }
         });
 
