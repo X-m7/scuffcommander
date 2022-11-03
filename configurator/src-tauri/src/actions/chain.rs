@@ -18,9 +18,10 @@ pub async fn store_temp_chain(
     id: String,
     actions_state: tauri::State<'_, ActionConfigState>,
     temp_chain: tauri::State<'_, TemporaryChain>,
+    overwrite: bool,
 ) -> Result<(), String> {
     let actions = &mut actions_state.0.lock().await.actions;
-    if actions.contains_key(&id) {
+    if !overwrite && actions.contains_key(&id) {
         return Err("Action with given ID already exists".to_string());
     }
 

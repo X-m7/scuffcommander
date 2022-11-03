@@ -37,12 +37,13 @@ export function getConditionData() {
   };
 }
 
-export function addNewConditionAction(then = null) {
+export function addNewConditionAction(then = null, overwrite = false) {
   const data = getConditionData();
   // once the action has been added refresh the list of actions
   invoke("add_new_condition_action", {
     actionData: data,
     id: document.actionModify.id.value,
+    overwrite: overwrite,
   }).then(then);
 }
 

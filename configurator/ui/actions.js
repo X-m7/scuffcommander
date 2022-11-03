@@ -39,13 +39,12 @@ window.saveCurrentAction = function () {
       console.log("Invalid action selected");
       break;
     case "new":
-      modHelpers.addNewAction();
+      // false means do not allow overwriting
+      modHelpers.addNewAction(false);
       break;
     default:
-      // delete the existing action, then create a new one with the updated details
-      invoke("delete_action", { id: id.substring(2) }).then(
-        modHelpers.addNewAction
-      );
+      // this case is for editing an existing action so allow overwrites
+      modHelpers.addNewAction(true);
       break;
   }
 };

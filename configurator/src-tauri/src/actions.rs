@@ -46,6 +46,7 @@ pub async fn add_new_single_action(
     id: String,
     plugin_type: PluginType,
     plugin_data: Value,
+    overwrite: bool,
     actions_state: tauri::State<'_, ActionConfigState>,
     plugins_state: tauri::State<'_, PluginStates>,
 ) -> Result<(), String> {
@@ -56,7 +57,7 @@ pub async fn add_new_single_action(
     if let Some(plugin) = plugins_state.plugins.lock().await.get_mut(&plugin_type) {
         let action = PluginAction::from_json(plugin, plugin_data).await?;
         let actions = &mut actions_state.0.lock().await.actions;
-        if actions.contains_key(&id) {
+        if !overwrite && actions.contains_key(&id) {
             return Err("Action with given ID already exists".to_string());
         }
         actions.insert(id, Action::Single(action));

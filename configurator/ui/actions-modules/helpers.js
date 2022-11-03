@@ -67,22 +67,23 @@ export function loadActions() {
   invoke("get_actions").then(updateActions);
 }
 
-export function addNewAction() {
+export function addNewAction(overwrite = false) {
   const type = document.actionModify.type.value;
   switch (type) {
     case "none":
       console.log("Invalid action type");
       break;
     case "single":
-      modSingleAction.addNewSingleAction(loadActions);
+      modSingleAction.addNewSingleAction(loadActions, overwrite);
       break;
     case "chain":
-      invoke("store_temp_chain", { id: document.actionModify.id.value }).then(
-        loadActions
-      );
+      invoke("store_temp_chain", {
+        id: document.actionModify.id.value,
+        overwrite: overwrite,
+      }).then(loadActions);
       break;
     case "if":
-      modConditionAction.addNewConditionAction(loadActions);
+      modConditionAction.addNewConditionAction(loadActions, overwrite);
       break;
     default:
       console.log("Unsupported action type");

@@ -12,7 +12,7 @@ export function getSingleActionData() {
   };
 }
 
-export function addNewSingleAction(then = null) {
+export function addNewSingleAction(then = null, overwrite = false) {
   const id = document.actionModify.id.value;
   const data = getSingleActionData();
   // once the action has been added refresh the list of actions
@@ -20,6 +20,7 @@ export function addNewSingleAction(then = null) {
     id: id,
     pluginType: data.pluginType,
     pluginData: data.pluginData,
+    overwrite: overwrite,
   }).then(then);
 }
 

@@ -52,6 +52,7 @@ pub async fn get_condition_action_from_ui(
 pub async fn add_new_condition_action(
     id: String,
     action_data: ConditionActionData,
+    overwrite: bool,
     actions_state: tauri::State<'_, ActionConfigState>,
     plugins_state: tauri::State<'_, PluginStates>,
 ) -> Result<(), String> {
@@ -62,7 +63,7 @@ pub async fn add_new_condition_action(
     let action = get_condition_action_from_ui(action_data, &actions_state, &plugins_state).await?;
     let actions = &mut actions_state.0.lock().await.actions;
 
-    if actions.contains_key(&id) {
+    if !overwrite && actions.contains_key(&id) {
         return Err("Action with given ID already exists".to_string());
     }
 
