@@ -6,11 +6,12 @@ import * as modCommon from "../common.js";
 const { invoke } = window.__TAURI__.tauri;
 
 export function chooseTypeChain() {
+  document.singleAction.setAttribute("hidden", true);
+  document.conditionAction.setAttribute("hidden", true);
+
   const type = document.chainAction.type.value;
   switch (type) {
     case "none":
-      document.singleAction.setAttribute("hidden", true);
-      document.conditionAction.setAttribute("hidden", true);
       break;
     case "single":
       document.singleAction.removeAttribute("hidden");
