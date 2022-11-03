@@ -1,6 +1,6 @@
 use crate::actions::ActionConfigState;
 use crate::config::UIConfigState;
-use scuffcommander_core::{UIButton, UIButtonType, UIPage};
+use scuffcommander_core::{Base64Image, UIButton, UIButtonType, UIPage};
 use std::collections::HashSet;
 
 #[tauri::command]
@@ -234,6 +234,21 @@ pub async fn get_page_or_action_name_list(
     }
 }
 
+async fn get_base64image_from_path(path: &str) -> Result<Base64Image, String> {
+    let path = std::path::Path::new(path);
+    let ext = path
+        .extension()
+        .ok_or_else(|| "Can't get file extension".to_string())?
+        .to_str()
+        .ok_or_else(|| "File extension is not valid Unicode".to_string())?;
+    let raw_img_data = async_std::fs::read(path).await.map_err(|e| e.to_string())?;
+
+    Ok(Base64Image {
+        format: format!("image/{}", ext),
+        data: base64::encode(raw_img_data),
+    })
+}
+
 #[tauri::command]
 pub async fn edit_button_in_page(
     id: String,
@@ -259,17 +274,7 @@ pub async fn edit_button_in_page(
         if img.format == "keeporiginal" {
             data.get_mut_data().img = buttons[index].get_mut_data().img.take();
         } else {
-            let path = std::path::Path::new(&img.data);
-            let ext = path
-                .extension()
-                .ok_or_else(|| "Can't get file extension".to_string())?
-                .to_str()
-                .ok_or_else(|| "File extension is not valid Unicode".to_string())?;
-            let raw_img_data = async_std::fs::read(path).await.map_err(|e| e.to_string())?;
-            data.get_mut_data().img = Some(scuffcommander_core::Base64Image {
-                format: format!("image/{}", ext),
-                data: base64::encode(raw_img_data),
-            });
+            data.get_mut_data().img = Some(get_base64image_from_path(&img.data).await?);
         }
     }
 
@@ -282,11 +287,20 @@ pub async fn edit_button_in_page(
 #[tauri::command]
 pub async fn add_new_button_to_page(
     id: String,
-    data: UIButton,
+    mut data: UIButton,
     ui_state: tauri::State<'_, UIConfigState>,
 ) -> Result<bool, String> {
     if id.is_empty() {
         return Err("ID can't be empty".to_string());
+    }
+
+    // convert image path from UI to the proper data (if present)
+    if let Some(img) = &data.get_data().img {
+        if img.format == "keeporiginal" {
+            return Err("No original image to keep since this is adding a new button".to_string());
+        } else {
+            data.get_mut_data().img = Some(get_base64image_from_path(&img.data).await?);
+        }
     }
 
     let pages = &mut ui_state.0.lock().await.pages;
