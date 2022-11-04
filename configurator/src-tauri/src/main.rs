@@ -3,7 +3,7 @@
     windows_subsystem = "windows"
 )]
 
-use async_std::sync::Mutex;
+use tokio::sync::Mutex;
 use scuffcommander_configurator as app_mod;
 use scuffcommander_core::plugins::PluginStates;
 use scuffcommander_core::{ActionConfig, AppConfig, UIConfig};

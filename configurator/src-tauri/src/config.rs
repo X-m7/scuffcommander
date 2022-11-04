@@ -1,9 +1,9 @@
-use async_std::fs::write;
+use tokio::fs::write;
 use scuffcommander_core::AppConfig;
 
 pub struct ConfigFolder(pub String);
 pub struct AppConfigState(pub AppConfig);
-pub struct UIConfigState(pub async_std::sync::Mutex<scuffcommander_core::UIConfig>);
+pub struct UIConfigState(pub tokio::sync::Mutex<scuffcommander_core::UIConfig>);
 
 #[tauri::command]
 pub async fn save_ui_config(

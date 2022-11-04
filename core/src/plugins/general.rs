@@ -20,7 +20,7 @@ impl GeneralAction {
     pub async fn run(&self) {
         match self {
             GeneralAction::Delay(dur) => {
-                async_std::task::sleep(core::time::Duration::from_secs_f64(*dur)).await
+                tokio::time::sleep(core::time::Duration::from_secs_f64(*dur)).await
             }
         }
     }

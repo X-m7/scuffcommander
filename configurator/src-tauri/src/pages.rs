@@ -241,7 +241,7 @@ async fn get_base64image_from_path(path: &str) -> Result<Base64Image, String> {
         .ok_or_else(|| "Can't get file extension".to_string())?
         .to_str()
         .ok_or_else(|| "File extension is not valid Unicode".to_string())?;
-    let raw_img_data = async_std::fs::read(path).await.map_err(|e| e.to_string())?;
+    let raw_img_data = tokio::fs::read(path).await.map_err(|e| e.to_string())?;
 
     Ok(Base64Image {
         format: format!("image/{}", ext),

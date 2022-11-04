@@ -14,7 +14,7 @@ The configurator app uses the same code as the server to load the configuration 
 - vtubestudio-rs
 
 ## Compiling
-1. Set up Rust (tested with 1.64)
+1. Set up Rust (tested with 1.65)
 2. Run `cargo build` in the `server` folder to compile the server
 3. Run `cargo build` in the `configurator/src-tauri` folder to compile the configurator
 

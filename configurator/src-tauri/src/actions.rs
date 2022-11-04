@@ -1,8 +1,8 @@
 pub mod chain;
 pub mod condition;
 
-use async_std::fs::write;
-use async_std::sync::Mutex;
+use tokio::fs::write;
+use tokio::sync::Mutex;
 use scuffcommander_core::plugins::{PluginAction, PluginStates, PluginType};
 use scuffcommander_core::{Action, ActionConfig};
 use serde_json::value::Value;

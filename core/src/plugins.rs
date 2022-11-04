@@ -3,7 +3,7 @@ pub mod obs;
 pub mod vts;
 
 use super::Condition;
-use async_std::sync::Mutex;
+use tokio::sync::Mutex;
 use derive_more::Display;
 use serde::{Deserialize, Serialize};
 use serde_json::value::Value;

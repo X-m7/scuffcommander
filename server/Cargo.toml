@@ -10,3 +10,6 @@ actix-web = "4"
 serde_json = "1.0"
 handlebars = { version = "4.3.5", features = ["dir_source"] }
 scuffcommander-core = { path = "../core" }
+
+[profile.dev]
+split-debuginfo = "packed"

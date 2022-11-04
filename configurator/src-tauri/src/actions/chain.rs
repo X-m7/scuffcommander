@@ -1,5 +1,5 @@
 use super::ActionConfigState;
-use async_std::sync::Mutex;
+use tokio::sync::Mutex;
 use scuffcommander_core::plugins::{PluginAction, PluginStates, PluginType};
 use scuffcommander_core::Action;
 use serde_json::value::Value;
