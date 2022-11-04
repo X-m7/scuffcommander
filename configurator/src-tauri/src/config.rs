@@ -1,5 +1,5 @@
-use tokio::fs::write;
 use scuffcommander_core::AppConfig;
+use tokio::fs::write;
 
 pub struct ConfigFolder(pub String);
 pub struct AppConfigState(pub AppConfig);

@@ -1,8 +1,8 @@
 use super::ActionConfigState;
-use tokio::sync::Mutex;
 use scuffcommander_core::plugins::{PluginAction, PluginStates, PluginType};
 use scuffcommander_core::Action;
 use serde_json::value::Value;
+use tokio::sync::Mutex;
 
 pub struct TemporaryChain(pub Mutex<Vec<Action>>);
 
@@ -61,18 +61,20 @@ pub async fn add_new_single_action_to_temp_chain(
     plugins_state: tauri::State<'_, PluginStates>,
     temp_chain: tauri::State<'_, TemporaryChain>,
 ) -> Result<(), String> {
-    if let Some(plugin) = plugins_state.plugins.lock().await.get_mut(&plugin_type) {
-        let action = Action::Single(PluginAction::from_json(plugin, plugin_data).await?);
-        let mut temp_chain = temp_chain.0.lock().await;
-        if let Some(i) = index {
-            temp_chain.insert(i, action);
-        } else {
-            temp_chain.push(action);
-        }
-        Ok(())
+    let mut plugins = plugins_state.plugins.lock().await;
+
+    let Some(plugin) = plugins.get_mut(&plugin_type) else {
+        return Err("Selected plugin has not been configured".to_string());
+    };
+
+    let action = Action::Single(PluginAction::from_json(plugin, plugin_data).await?);
+    let mut temp_chain = temp_chain.0.lock().await;
+    if let Some(i) = index {
+        temp_chain.insert(i, action);
     } else {
-        Err("Selected plugin has not been configured".to_string())
+        temp_chain.push(action);
     }
+    Ok(())
 }
 
 // if index is given the behaviour is the same as the insert method of Vec

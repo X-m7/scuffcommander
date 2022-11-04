@@ -7,17 +7,17 @@ pub async fn get_obs_scenes(
 ) -> Result<Vec<String>, String> {
     let mut plugins = plugins_data.plugins.lock().await;
 
-    if let Some(PluginInstance::OBS(obs)) = plugins.get_mut(&PluginType::OBS) {
-        let scenes = obs.get_scene_list().await?;
+    let Some(PluginInstance::OBS(obs)) = plugins.get_mut(&PluginType::OBS) else {
+        return Err("OBS plugin not configured".to_string());
+    };
 
-        let mut scene_names = Vec::new();
-        for scene in scenes {
-            scene_names.push(scene.name);
-        }
-        Ok(scene_names)
-    } else {
-        Err("OBS plugin not configured".to_string())
+    let scenes = obs.get_scene_list().await?;
+
+    let mut scene_names = Vec::new();
+    for scene in scenes {
+        scene_names.push(scene.name);
     }
+    Ok(scene_names)
 }
 
 #[tauri::command]

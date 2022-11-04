@@ -16,36 +16,34 @@ pub async fn get_condition_action_from_ui(
     actions_state: &tauri::State<'_, ActionConfigState>,
     plugins_state: &tauri::State<'_, PluginStates>,
 ) -> Result<Action, String> {
-    if let Some(plugin) = plugins_state
-        .plugins
-        .lock()
-        .await
-        .get_mut(&action_data.plugin_type)
-    {
-        let condition = Condition::from_json(plugin, action_data.plugin_data).await?;
-        let actions = &mut actions_state.0.lock().await.actions;
+    let mut plugins = plugins_state.plugins.lock().await;
 
-        if !actions.contains_key(&action_data.then_action) {
-            return Err("Action with given ID does not exist".to_string());
-        }
-        let then_action = actions.get(&action_data.then_action).unwrap().clone();
+    let Some(plugin) = plugins.get_mut(&action_data.plugin_type)
+    else {
+        return Err("Selected plugin has not been configured".to_string());
+    };
 
-        if let Some(else_action) = action_data.else_action {
-            if !actions.contains_key(&else_action) {
-                return Err("Action with given ID does not exist".to_string());
-            }
+    let condition = Condition::from_json(plugin, action_data.plugin_data).await?;
+    let actions = &mut actions_state.0.lock().await.actions;
 
-            Ok(Action::If(
-                condition,
-                Box::new(then_action),
-                Some(Box::new(actions.get(&else_action).unwrap().clone())),
-            ))
-        } else {
-            Ok(Action::If(condition, Box::new(then_action), None))
-        }
-    } else {
-        Err("Selected plugin has not been configured".to_string())
+    if !actions.contains_key(&action_data.then_action) {
+        return Err("Action with given ID does not exist".to_string());
     }
+    let then_action = actions.get(&action_data.then_action).unwrap().clone();
+
+    let Some(else_action) = action_data.else_action else {
+        return Ok(Action::If(condition, Box::new(then_action), None));
+    };
+
+    if !actions.contains_key(&else_action) {
+        return Err("Action with given ID does not exist".to_string());
+    }
+
+    Ok(Action::If(
+        condition,
+        Box::new(then_action),
+        Some(Box::new(actions.get(&else_action).unwrap().clone())),
+    ))
 }
 
 #[tauri::command]

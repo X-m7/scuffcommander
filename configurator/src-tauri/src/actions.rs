@@ -1,11 +1,11 @@
 pub mod chain;
 pub mod condition;
 
-use tokio::fs::write;
-use tokio::sync::Mutex;
 use scuffcommander_core::plugins::{PluginAction, PluginStates, PluginType};
 use scuffcommander_core::{Action, ActionConfig};
 use serde_json::value::Value;
+use tokio::fs::write;
+use tokio::sync::Mutex;
 
 pub struct ActionConfigState(pub Mutex<ActionConfig>);
 
@@ -54,18 +54,20 @@ pub async fn add_new_single_action(
         return Err("ID can't be empty".to_string());
     }
 
-    if let Some(plugin) = plugins_state.plugins.lock().await.get_mut(&plugin_type) {
-        let action = PluginAction::from_json(plugin, plugin_data).await?;
-        let actions = &mut actions_state.0.lock().await.actions;
-        if !overwrite && actions.contains_key(&id) {
-            return Err("Action with given ID already exists".to_string());
-        }
-        actions.insert(id, Action::Single(action));
+    let mut plugins = plugins_state.plugins.lock().await;
 
-        Ok(())
-    } else {
-        Err("Selected plugin has not been configured".to_string())
+    let Some(plugin) = plugins.get_mut(&plugin_type) else {
+        return Err("Selected plugin has not been configured".to_string());
+    };
+
+    let action = PluginAction::from_json(plugin, plugin_data).await?;
+    let actions = &mut actions_state.0.lock().await.actions;
+    if !overwrite && actions.contains_key(&id) {
+        return Err("Action with given ID already exists".to_string());
     }
+    actions.insert(id, Action::Single(action));
+
+    Ok(())
 }
 
 #[tauri::command]

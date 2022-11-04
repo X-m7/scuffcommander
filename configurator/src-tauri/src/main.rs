@@ -3,10 +3,10 @@
     windows_subsystem = "windows"
 )]
 
-use tokio::sync::Mutex;
 use scuffcommander_configurator as app_mod;
 use scuffcommander_core::plugins::PluginStates;
 use scuffcommander_core::{ActionConfig, AppConfig, UIConfig};
+use tokio::sync::Mutex;
 
 #[tokio::main]
 async fn main() {

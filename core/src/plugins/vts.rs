@@ -1,7 +1,7 @@
-use tokio::fs::{read_to_string, write};
 use serde::{Deserialize, Serialize};
 use serde_json::value::Value;
 use std::fmt::{Display, Formatter};
+use tokio::fs::{read_to_string, write};
 use vtubestudio::Client;
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -196,7 +196,6 @@ impl VTSConnector {
                         Err(e) => println!("Failed to save token: {}", e),
                     }
                 }
-
             }
         });
 
