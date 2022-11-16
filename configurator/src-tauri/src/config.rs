@@ -3,7 +3,7 @@ use tokio::fs::write;
 
 pub struct ConfigFolder(pub String);
 pub struct AppConfigState(pub AppConfig);
-pub struct UIConfigState(pub tokio::sync::Mutex<scuffcommander_core::UIConfig>);
+pub struct UIConfigState(pub tokio::sync::Mutex<scuffcommander_core::ui::UIConfig>);
 
 #[tauri::command]
 pub async fn save_ui_config(

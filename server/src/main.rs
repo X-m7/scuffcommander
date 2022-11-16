@@ -1,8 +1,10 @@
 use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
 use handlebars::Handlebars;
 
+use scuffcommander_core::action::ActionConfig;
 use scuffcommander_core::plugins::PluginStates;
-use scuffcommander_core::{ActionConfig, AppConfig, UIConfig};
+use scuffcommander_core::ui::UIConfig;
+use scuffcommander_core::AppConfig;
 
 #[get("/")]
 async fn hello() -> impl Responder {

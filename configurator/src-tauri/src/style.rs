@@ -1,5 +1,5 @@
 use crate::config::UIConfigState;
-use scuffcommander_core::UIStyle;
+use scuffcommander_core::ui::UIStyle;
 
 #[tauri::command]
 pub async fn store_ui_style(

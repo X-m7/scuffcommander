@@ -1,6 +1,6 @@
 use super::ActionConfigState;
+use scuffcommander_core::action::{Action, Condition};
 use scuffcommander_core::plugins::{PluginStates, PluginType};
-use scuffcommander_core::{Action, Condition};
 use serde_json::value::Value;
 
 #[derive(serde::Serialize, serde::Deserialize)]

@@ -4,8 +4,10 @@
 )]
 
 use scuffcommander_configurator as app_mod;
+use scuffcommander_core::action::ActionConfig;
 use scuffcommander_core::plugins::PluginStates;
-use scuffcommander_core::{ActionConfig, AppConfig, UIConfig};
+use scuffcommander_core::ui::UIConfig;
+use scuffcommander_core::AppConfig;
 use tokio::sync::Mutex;
 
 #[tokio::main]

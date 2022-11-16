@@ -1,6 +1,6 @@
 use crate::actions::ActionConfigState;
 use crate::config::UIConfigState;
-use scuffcommander_core::{Base64Image, UIButton, UIButtonType, UIPage};
+use scuffcommander_core::ui::{Base64Image, UIButton, UIButtonType, UIPage};
 use std::collections::HashSet;
 
 #[tauri::command]

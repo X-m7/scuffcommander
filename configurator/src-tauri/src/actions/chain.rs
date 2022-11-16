@@ -1,6 +1,6 @@
 use super::ActionConfigState;
+use scuffcommander_core::action::Action;
 use scuffcommander_core::plugins::{PluginAction, PluginStates, PluginType};
-use scuffcommander_core::Action;
 use serde_json::value::Value;
 use tokio::sync::Mutex;
 

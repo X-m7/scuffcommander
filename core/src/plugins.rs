@@ -2,7 +2,7 @@ pub mod general;
 pub mod obs;
 pub mod vts;
 
-use super::Condition;
+use crate::action::Condition;
 use derive_more::Display;
 use serde::{Deserialize, Serialize};
 use serde_json::value::Value;
