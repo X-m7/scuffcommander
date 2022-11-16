@@ -174,15 +174,9 @@ impl Condition {
             return Err("Invalid data input for condition".to_string());
         }
 
-        let plugin_specific_type = &data["type"];
-        let target = &data["param"];
-
-        if plugin_specific_type.is_null() || target.is_null() {
+        let (Some(plugin_specific_type), Some(target)) = (&data["type"].as_str(), &data["param"].as_str()) else {
             return Err("Invalid data input for condition".to_string());
-        }
-
-        let plugin_specific_type = plugin_specific_type.as_str().unwrap();
-        let target = target.as_str().unwrap();
+        };
 
         let (query, target) = match plugin {
             PluginInstance::OBS(_) => {

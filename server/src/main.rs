@@ -19,11 +19,9 @@ async fn page(
 ) -> impl Responder {
     let id = page_id.into_inner();
 
-    if !ui_data.pages.contains_key(&id) {
+    let Some(page) = ui_data.pages.get(&id) else {
         return HttpResponse::NotFound().body("Page not found");
-    }
-
-    let page = ui_data.pages.get(&id).unwrap();
+    };
 
     let data = serde_json::json!( { "buttons": page.buttons, "style": ui_data.style } );
     let body = hb.render("page", &data).expect("Template render failed");
@@ -40,11 +38,9 @@ async fn click(
     let button = path.into_inner();
     let actions = &actions_data.actions;
 
-    if !actions.contains_key(button.as_str()) {
+    let Some(action) = actions.get(button.as_str()) else {
         return format!("Action with ID {} not configured", button);
-    }
-
-    let action = actions.get(button.as_str()).unwrap();
+    };
 
     if let Err(e) = action.run(&mut *data.plugins.lock().await).await {
         return e;

@@ -90,13 +90,11 @@ pub async fn load_action_details(
 ) -> Result<Action, String> {
     let actions = &actions_state.0.lock().await.actions;
 
-    let action = actions.get(&id);
-
-    if action.is_none() {
+    let Some(action) = actions.get(&id) else {
         return Err("Action with given ID not found".to_string());
-    }
+    };
 
-    Ok(action.unwrap().clone())
+    Ok(action.clone())
 }
 
 #[tauri::command]

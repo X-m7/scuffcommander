@@ -231,12 +231,11 @@ impl Condition {
     ) -> Result<bool, String> {
         let plugin_type = self.query.get_required_type();
 
-        let plugin = plugins.get_mut(&plugin_type);
-        if plugin.is_none() {
+        let Some(plugin) = plugins.get_mut(&plugin_type) else {
             return Err(format!("Plugin {} not configured", plugin_type));
-        }
+        };
 
-        Ok(self.query.get(plugin.unwrap()).await? == self.target)
+        Ok(self.query.get(plugin).await? == self.target)
     }
 }
 

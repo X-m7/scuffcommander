@@ -38,11 +38,10 @@ pub async fn copy_action_to_temp_chain(
     temp_chain: tauri::State<'_, TemporaryChain>,
 ) -> Result<(), String> {
     let actions = &mut actions_state.0.lock().await.actions;
-    if !actions.contains_key(&id) {
-        return Err("Action with given ID does not exist".to_string());
-    }
 
-    let action = actions.get(&id).unwrap();
+    let Some(action) = actions.get(&id) else {
+        return Err("Action with given ID does not exist".to_string());
+    };
 
     if let Action::Chain(chain) = action {
         let _ = std::mem::replace(&mut *temp_chain.0.lock().await, chain.clone());

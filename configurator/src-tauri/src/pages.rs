@@ -27,11 +27,11 @@ pub async fn get_page_buttons_info(
     let mut out = Vec::new();
     let pages = &ui_state.0.lock().await.pages;
 
-    if !pages.contains_key(&id) {
+    let Some(pages) = pages.get(&id) else {
         return Err("Page with given ID not found".to_string());
-    }
+    };
 
-    for button in &pages.get(&id).unwrap().buttons {
+    for button in &pages.buttons {
         out.push(format!("{button}"));
     }
 
@@ -46,11 +46,11 @@ pub async fn delete_button_from_page(
 ) -> Result<(), String> {
     let pages = &mut ui_state.0.lock().await.pages;
 
-    if !pages.contains_key(&id) {
+    let Some(page) = pages.get_mut(&id) else {
         return Err("Page with given ID not found".to_string());
-    }
+    };
 
-    pages.get_mut(&id).unwrap().buttons.remove(index);
+    page.buttons.remove(index);
 
     Ok(())
 }
@@ -77,11 +77,11 @@ async fn move_button_to_index(
 ) -> Result<(), String> {
     let pages = &mut ui_state.0.lock().await.pages;
 
-    if !pages.contains_key(&id) {
+    let Some(page) = pages.get_mut(&id) else {
         return Err("Page with given ID not found".to_string());
-    }
+    };
 
-    let buttons = &mut pages.get_mut(&id).unwrap().buttons;
+    let buttons = &mut page.buttons;
 
     if index_initial >= buttons.len() {
         return Err("Starting index out of bounds".to_string());
@@ -124,11 +124,11 @@ pub async fn get_page_button_data(
 ) -> Result<UIButton, String> {
     let pages = &mut ui_state.0.lock().await.pages;
 
-    if !pages.contains_key(&id) {
+    let Some(page) = pages.get(&id) else {
         return Err("Page with given ID not found".to_string());
-    }
+    };
 
-    let buttons = &pages.get(&id).unwrap().buttons;
+    let buttons = &page.buttons;
 
     if index >= buttons.len() {
         return Err("Button index out of bounds".to_string());
@@ -149,11 +149,12 @@ async fn get_action_name_list_filtered(
     if let Some(id) = id {
         let mut existing_actions = HashSet::new();
         let pages = &mut ui_state.0.lock().await.pages;
-        if !pages.contains_key(&id) {
-            return Err("Page with given ID not found".to_string());
-        }
 
-        for button in &pages.get(&id).unwrap().buttons {
+        let Some(page) = pages.get(&id) else {
+            return Err("Page with given ID not found".to_string());
+        };
+
+        for button in &page.buttons {
             if let UIButton::ExecuteAction(data) = button {
                 existing_actions.insert(&data.target_id);
             }
@@ -184,16 +185,16 @@ async fn get_page_name_list_filtered(
 
     // if ID is given get the list of actions already targeted and skip them
     if let Some(id) = id {
-        if !pages.contains_key(&id) {
+        let Some(page) = pages.get(&id) else {
             return Err("Page with given ID not found".to_string());
-        }
+        };
 
         let mut existing_pages = HashSet::new();
 
         // also include the current page ID (no point in a recursive link)
         existing_pages.insert(&id);
 
-        for button in &pages.get(&id).unwrap().buttons {
+        for button in &page.buttons {
             if let UIButton::OpenPage(data) = button {
                 existing_pages.insert(&data.target_id);
             }
@@ -258,11 +259,11 @@ pub async fn edit_button_in_page(
 ) -> Result<(), String> {
     let pages = &mut ui_state.0.lock().await.pages;
 
-    if !pages.contains_key(&id) {
+    let Some(page) = pages.get_mut(&id) else {
         return Err("Page with the given ID does not exist".to_string());
-    }
+    };
 
-    let buttons = &mut pages.get_mut(&id).unwrap().buttons;
+    let buttons = &mut page.buttons;
 
     if index >= buttons.len() {
         return Err("Button index out of bounds".to_string());
@@ -305,16 +306,19 @@ pub async fn add_new_button_to_page(
 
     let pages = &mut ui_state.0.lock().await.pages;
 
-    if let std::collections::hash_map::Entry::Vacant(e) = pages.entry(id.clone()) {
-        e.insert(UIPage {
-            buttons: vec![data],
-        });
+    match pages.entry(id.clone()) {
+        std::collections::hash_map::Entry::Vacant(e) => {
+            e.insert(UIPage {
+                buttons: vec![data],
+            });
 
-        Ok(true)
-    } else {
-        pages.get_mut(&id).unwrap().buttons.push(data);
+            Ok(true)
+        }
+        std::collections::hash_map::Entry::Occupied(mut e) => {
+            e.get_mut().buttons.push(data);
 
-        Ok(false)
+            Ok(false)
+        }
     }
 }
 
@@ -332,11 +336,11 @@ pub async fn rename_page(
 
     if pages.contains_key(&new_id) {
         return Err("A page already exists with the given ID".to_string());
-    } else if !pages.contains_key(&current_id) {
-        return Err("The page with the given ID does not exist".to_string());
     }
 
-    let page = pages.remove(&current_id).unwrap();
+    let Some(page) = pages.remove(&current_id) else {
+        return Err("The page with the given ID does not exist".to_string());
+    };
     pages.insert(new_id.clone(), page);
 
     // Find occurrences of the old name and change them too
