@@ -1,10 +1,10 @@
 {
   "build": {
-    "beforeBuildCommand": "",
-    "beforeDevCommand": "",
-    "devPath": "../ui",
-    "distDir": "../ui",
-    "withGlobalTauri": true
+    "beforeBuildCommand": "(cd ui; npm run build)",
+    "beforeDevCommand": "(cd ui; npm run dev)",
+    "devPath": "http://localhost:8080",
+    "distDir": "../ui/build",
+    "withGlobalTauri": false
   },
   "package": {
     "productName": "scuffcommander-configurator",
