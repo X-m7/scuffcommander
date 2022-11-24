@@ -1,73 +1,112 @@
-import { h, Fragment } from "preact";
+import { h } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import style from "./style.css";
 import { invoke } from "@tauri-apps/api";
-import { AppConfig, PluginConfig } from "./types";
 
-interface AppConfigViewProps {
-  conf?: AppConfig;
-}
+import VTSForm from "./vts";
+import OBSForm from "./obs";
+import ServerForm from "./server";
+import {
+  AppConfig,
+  OBSConfigData,
+  VTSConfigData,
+  ServerConfig,
+  PluginConfig,
+} from "./types";
 
-const renderPluginConfig = (conf: PluginConfig) => {
-  if (typeof conf === "string") {
-    return undefined;
-  }
-  if ("OBS" in conf) {
-    return (
-      <Fragment>
-        <h2>OBS Studio Plugin</h2>
-        WebSocket address: {conf.OBS.addr} <br />
-        WebSocket port: {conf.OBS.port} <br />
-        WebSocket password: {conf.OBS.password}
-      </Fragment>
-    );
-  }
-  if ("VTS" in conf) {
-    return (
-      <Fragment>
-        <h2>VTube Studio Plugin Configuration</h2>
-        WebSocket address: {conf.VTS.addr} <br />
-        Token file: {conf.VTS.token_file}
-      </Fragment>
-    );
-  }
-
-  return undefined;
-};
-
-const AppConfigView = ({ conf }: AppConfigViewProps) => {
-  if (typeof conf === "undefined") {
-    return <div />;
-  }
-  return (
-    <Fragment>
-      <h2>Server</h2>
-      Address: {conf.addr}
-      <br />
-      Port: {conf.port}
-      <br />
-      {conf.plugins.map(renderPluginConfig)}
-    </Fragment>
-  );
-};
+/*
+ * Main component
+ */
 
 const Config = () => {
-  const [appConfig, setAppConfig] = useState<AppConfig | undefined>(undefined);
+  const [obsConfig, setObsConfig] = useState<OBSConfigData | undefined>(
+    undefined
+  );
+  const [vtsConfig, setVtsConfig] = useState<VTSConfigData | undefined>(
+    undefined
+  );
+  const [serverConfig, setServerConfig] = useState<ServerConfig | undefined>(
+    undefined
+  );
+  const [statusState, setStatusState] = useState<string>("");
 
-  const loadAppConfig = async () => {
-    const conf = await invoke("get_config");
-    setAppConfig(conf as AppConfig);
+  // blank array param means only run on component mount (once)
+  useEffect(() => {
+    invoke("get_config").then((conf) => {
+      const loadedAppConfig = conf as AppConfig;
+      setServerConfig({
+        addr: loadedAppConfig.addr,
+        port: loadedAppConfig.port,
+      });
+
+      for (const plugin of loadedAppConfig.plugins) {
+        if (typeof plugin === "string") {
+          continue;
+        }
+
+        if ("OBS" in plugin) {
+          setObsConfig(plugin.OBS);
+        } else if ("VTS" in plugin) {
+          setVtsConfig(plugin.VTS);
+        }
+      }
+    });
+  }, []);
+
+  const onServerConfChange = (newData: ServerConfig) => {
+    setServerConfig(newData);
   };
 
-  useEffect(() => {
-    loadAppConfig().then();
-  }, []);
+  const onObsConfChange = (newData: OBSConfigData) => {
+    setObsConfig(newData);
+  };
+
+  const onVtsConfChange = (newData: VTSConfigData) => {
+    setVtsConfig(newData);
+  };
+
+  const saveConfig = (e: Event) => {
+    e.preventDefault();
+
+    if (
+      typeof serverConfig === "undefined" ||
+      typeof obsConfig === "undefined" ||
+      typeof vtsConfig === "undefined"
+    ) {
+      setStatusState("Error occurred: Configuration has not finished loading");
+      return;
+    }
+
+    const plugins: PluginConfig[] = [
+      { OBS: obsConfig },
+      { VTS: vtsConfig },
+      "General",
+    ];
+    const appConfig: AppConfig = {
+      addr: serverConfig.addr,
+      port: serverConfig.port,
+      plugins,
+    };
+    invoke("save_config", { conf: appConfig })
+      .then(() => {
+        setStatusState("Configuration saved, please restart the app to apply");
+      })
+      .catch((err) => {
+        setStatusState(`Error occurred: ${err.toString()}`);
+      });
+  };
 
   return (
     <div class={style.config}>
       <h1>General Configuration</h1>
 
-      <AppConfigView conf={appConfig} />
+      <form onSubmit={saveConfig}>
+        <p>{statusState}</p>
+        <ServerForm conf={serverConfig} onChange={onServerConfChange} />
+        <OBSForm conf={obsConfig} onChange={onObsConfChange} />
+        <VTSForm conf={vtsConfig} onChange={onVtsConfChange} />
+        <button type="submit">Save</button>
+      </form>
     </div>
   );
 };
