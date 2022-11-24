@@ -12,6 +12,9 @@ const Header = () => (
       <Link activeClassName={style.active} href="/config">
         General
       </Link>
+      <Link activeClassName={style.active} href="/actions">
+        Actions
+      </Link>
     </nav>
   </header>
 );
