@@ -22,6 +22,15 @@ export enum OBSActionType {
   CheckConnection,
 }
 
+export enum VTSActionType {
+  None,
+  ToggleExpression,
+  LoadModel,
+  MoveModel,
+  TriggerHotkey,
+  CheckConnection,
+}
+
 /*
  * Exact representation of the Action type coming from the Rust side
  */

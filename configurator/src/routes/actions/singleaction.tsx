@@ -1,7 +1,8 @@
 import { h, Fragment, Component } from "preact";
 
 import EditOBSAction from "./obsaction";
-import { SingleAction, PluginType, OBSAction } from "./types";
+import EditVTSAction from "./vtsaction";
+import { SingleAction, PluginType, OBSAction, VTSAction } from "./types";
 
 interface EditSingleActionProps {
   data?: SingleAction;
@@ -43,6 +44,7 @@ class EditSingleAction extends Component<
 
   showSelectedPluginDetails = () => {
     let obsAction: OBSAction | undefined;
+    let vtsAction: VTSAction | undefined;
 
     switch (this.state.pluginType) {
       case PluginType.None:
@@ -53,10 +55,12 @@ class EditSingleAction extends Component<
         if (this.props.data) {
           obsAction = this.props.data.content as OBSAction | undefined;
         }
-
         return <EditOBSAction data={obsAction} msgFunc={this.props.msgFunc} />;
       case PluginType.VTS:
-        return <p>VTS</p>;
+        if (this.props.data) {
+          vtsAction = this.props.data.content as VTSAction | undefined;
+        }
+        return <EditVTSAction data={vtsAction} msgFunc={this.props.msgFunc} />;
     }
   };
 
