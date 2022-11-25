@@ -2,6 +2,7 @@ import { h, Fragment, Component } from "preact";
 import { invoke } from "@tauri-apps/api";
 
 import { OBSActionType, OBSAction } from "./types";
+import { generateSelectOptions } from "./common";
 
 interface EditOBSActionProps {
   data?: OBSAction;
@@ -96,20 +97,6 @@ class EditOBSAction extends Component<EditOBSActionProps, EditOBSActionState> {
     });
   };
 
-  renderSelectInputOptions = () => {
-    const content = [];
-
-    for (const opt of this.state.programSceneList) {
-      content.push(
-        <option key={`x-${opt}`} value={`x-${opt}`}>
-          {opt}
-        </option>
-      );
-    }
-
-    return content;
-  };
-
   render() {
     return (
       <Fragment>
@@ -133,7 +120,7 @@ class EditOBSAction extends Component<EditOBSActionProps, EditOBSActionState> {
             onChange={this.onActionParamSelect}
           >
             <option value="none">Select an option</option>
-            {this.renderSelectInputOptions()}
+            {generateSelectOptions(this.state.programSceneList)}
           </select>
         </label>
       </Fragment>

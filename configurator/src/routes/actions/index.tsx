@@ -1,23 +1,10 @@
-import { h, Fragment } from "preact";
+import { h } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import style from "./style.css";
 import { invoke } from "@tauri-apps/api";
 
 import EditAction from "./editor";
-
-const generateSelectOptions = (opts: string[]) => {
-  return (
-    <Fragment>
-      {opts.map((opt) => {
-        return (
-          <option key={`x-${opt}`} value={`x-${opt}`}>
-            {opt}
-          </option>
-        );
-      })}
-    </Fragment>
-  );
-};
+import { generateSelectOptions } from "./common";
 
 const Actions = () => {
   const [statusState, setStatusState] = useState<string>("");
