@@ -1,9 +1,17 @@
-// Follows the Action enum variants, plus None being specific to the UI
+// Enum variant of ActionTag, plus None being specific to the UI
 export enum ActionType {
   None,
   Single,
   Chain,
   If,
+}
+
+// Enum variant of SingleActionTag, plus None being specific to the UI
+export enum PluginType {
+  None,
+  OBS,
+  VTS,
+  General,
 }
 
 /*
