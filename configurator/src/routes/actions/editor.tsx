@@ -8,6 +8,7 @@ import EditSingleAction from "./singleaction";
 interface EditActionDetailsProps extends EditActionProps {
   actionType: ActionType;
   actionData?: ActionContent;
+  msgFunc: (msg: string) => void;
 }
 
 const EditActionDetails = (props: EditActionDetailsProps) => {
@@ -18,6 +19,7 @@ const EditActionDetails = (props: EditActionDetailsProps) => {
         <EditSingleAction
           key={props.action}
           data={props.actionData as SingleAction | undefined}
+          msgFunc={props.msgFunc}
         />
       );
     case ActionType.Chain:

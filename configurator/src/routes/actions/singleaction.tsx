@@ -5,6 +5,7 @@ import { SingleAction, PluginType, OBSAction } from "./types";
 
 interface EditSingleActionProps {
   data?: SingleAction;
+  msgFunc: (msg: string) => void;
 }
 
 interface EditSingleActionState {
@@ -53,7 +54,7 @@ class EditSingleAction extends Component<
           obsAction = this.props.data.content as OBSAction | undefined;
         }
 
-        return <EditOBSAction data={obsAction} />;
+        return <EditOBSAction data={obsAction} msgFunc={this.props.msgFunc} />;
       case PluginType.VTS:
         return <p>VTS</p>;
     }

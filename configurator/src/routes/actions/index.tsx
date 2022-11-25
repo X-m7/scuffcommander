@@ -35,6 +35,10 @@ const Actions = () => {
     }
   };
 
+  const clearStatusMsg = () => {
+    setStatusState("");
+  };
+
   useEffect(() => {
     invoke("get_actions")
       .then((actsList) => {
@@ -51,7 +55,14 @@ const Actions = () => {
       <h1>Actions Configuration</h1>
 
       <form onSubmit={saveActions}>
-        <p>{statusState}</p>
+        <p>
+          {statusState}
+          {statusState.length > 0 && (
+            <button type="button" onClick={clearStatusMsg}>
+              Clear
+            </button>
+          )}
+        </p>
         <label>
           Create a new action or select an existing one:
           <select value={selectedAction} onChange={onSelectedActionChange}>

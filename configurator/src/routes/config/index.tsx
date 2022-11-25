@@ -65,6 +65,10 @@ const Config = () => {
     setVtsConfig(newData);
   };
 
+  const clearStatusMsg = () => {
+    setStatusState("");
+  };
+
   const saveConfig = (e: Event) => {
     e.preventDefault();
 
@@ -101,7 +105,14 @@ const Config = () => {
       <h1>General Configuration</h1>
 
       <form onSubmit={saveConfig}>
-        <p>{statusState}</p>
+        <p>
+          {statusState}
+          {statusState.length > 0 && (
+            <button type="button" onClick={clearStatusMsg}>
+              Clear
+            </button>
+          )}
+        </p>
         <ServerForm conf={serverConfig} onChange={onServerConfChange} />
         <OBSForm conf={obsConfig} onChange={onObsConfChange} />
         <VTSForm conf={vtsConfig} onChange={onVtsConfChange} />

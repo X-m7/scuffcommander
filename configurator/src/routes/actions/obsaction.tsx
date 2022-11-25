@@ -5,6 +5,7 @@ import { OBSActionType, OBSAction } from "./types";
 
 interface EditOBSActionProps {
   data?: OBSAction;
+  msgFunc: (msg: string) => void;
 }
 
 interface EditOBSActionState {
@@ -57,8 +58,7 @@ class EditOBSAction extends Component<EditOBSActionProps, EditOBSActionState> {
             });
           })
           .catch((err) => {
-            //TODO: show error
-            console.log(err.toString());
+            this.props.msgFunc(`Error occurred: ${err.toString()}`);
           });
         break;
       case OBSActionType.None:
