@@ -11,7 +11,7 @@ tokio = { version = "1", features = ["full"] }
 derive_more = "0.99"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-obws = "0.10.0-beta.4"
+obws = "0.10.0"
 vtubestudio = "0.8"
 
 [profile.dev]
