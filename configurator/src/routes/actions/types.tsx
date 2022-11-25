@@ -12,7 +12,7 @@ export enum ActionType {
 
 // only a single possibility at present, tag="Delay" and content=number
 export type GeneralAction = {
-  tag: string;
+  tag: "Delay";
   content: number;
 };
 
@@ -26,14 +26,21 @@ export type VTSMoveModelData = {
 
 export type VTSActionData = string | VTSMoveModelData;
 
-// tag can be ToggleExpression, LoadModel, MoveModel, TriggerHotkey or CheckConnection
+export type VTSActionTag =
+  | "ToggleExpression"
+  | "LoadModel"
+  | "MoveModel"
+  | "TriggerHotkey"
+  | "CheckConnection";
+
 // content for most is just a single string, or nothing for CheckConnection
 export type VTSAction = {
   tag: string;
   content?: VTSActionData;
 };
 
-// tag is ProgramSceneChange or CheckConnection
+export type OBSActionTag = "ProgramSceneChange" | "CheckConnection";
+
 // content is just the target scene for ProgramSceneChange or nothing for CheckConnection
 export type OBSAction = {
   tag: string;
@@ -42,9 +49,10 @@ export type OBSAction = {
 
 export type PluginAction = OBSAction | VTSAction | GeneralAction;
 
-// tag is OBS, VTS or General
+export type SingleActionTag = "OBS" | "VTS" | "General";
+
 export type SingleAction = {
-  tag: string;
+  tag: SingleActionTag;
   content: PluginAction;
 };
 
@@ -53,9 +61,10 @@ export type VTSQuery = "ActiveModelId" | "Version";
 
 export type PluginQueryContent = OBSQuery | VTSQuery;
 
-// tag is OBS or VTS
+export type PluginQueryTag = "OBS" | "VTS";
+
 export type PluginQuery = {
-  tag: string;
+  tag: PluginQueryTag;
   content: PluginQueryContent;
 };
 
@@ -70,8 +79,9 @@ export type ActionContent =
   | Action[]
   | [Condition, Action, Action?];
 
-// tag is Single, Chain or If
+export type ActionTag = "Single" | "Chain" | "If";
+
 export type Action = {
-  tag: string;
+  tag: ActionTag;
   content: ActionContent;
 };
