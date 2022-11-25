@@ -17,7 +17,7 @@ const EditActionDetails = (props: EditActionDetailsProps) => {
       return (
         <EditSingleAction
           key={props.action}
-          data={props.actionData as SingleAction}
+          data={props.actionData as SingleAction | undefined}
         />
       );
     case ActionType.Chain:

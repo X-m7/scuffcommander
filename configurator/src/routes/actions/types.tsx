@@ -1,4 +1,7 @@
-// Enum variant of ActionTag, plus None being specific to the UI
+/*
+ * Enum variants of tags plus None, for UI selector use
+ */
+
 export enum ActionType {
   None,
   Single,
@@ -6,12 +9,17 @@ export enum ActionType {
   If,
 }
 
-// Enum variant of SingleActionTag, plus None being specific to the UI
 export enum PluginType {
   None,
   OBS,
   VTS,
   General,
+}
+
+export enum OBSActionType {
+  None,
+  ProgramSceneChange,
+  CheckConnection,
 }
 
 /*

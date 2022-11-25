@@ -1,8 +1,10 @@
 import { h, Fragment, Component } from "preact";
-import { SingleAction, SingleActionTag, PluginType } from "./types";
+
+import EditOBSAction from "./obsaction";
+import { SingleAction, PluginType, OBSAction } from "./types";
 
 interface EditSingleActionProps {
-  data: SingleAction;
+  data?: SingleAction;
 }
 
 interface EditSingleActionState {
@@ -15,22 +17,15 @@ class EditSingleAction extends Component<
 > {
   constructor(props: EditSingleActionProps) {
     super(props);
-    this.state = {
-      pluginType: this.getPluginType(props.data.tag as SingleActionTag),
-    };
-  }
 
-  getPluginType(tag: SingleActionTag) {
-    switch (tag) {
-      case "General":
-        return PluginType.General;
-      case "OBS":
-        return PluginType.OBS;
-      case "VTS":
-        return PluginType.VTS;
-      default:
-        return PluginType.None;
+    let pluginType = PluginType.None;
+    if (props.data) {
+      pluginType = PluginType[props.data.tag as keyof typeof PluginType];
     }
+
+    this.state = {
+      pluginType,
+    };
   }
 
   onPluginTypeChange = (e: Event) => {
@@ -42,6 +37,25 @@ class EditSingleAction extends Component<
           10
         ) as PluginType,
       });
+    }
+  };
+
+  showSelectedPluginDetails = () => {
+    let obsAction: OBSAction | undefined;
+
+    switch (this.state.pluginType) {
+      case PluginType.None:
+        return <Fragment />;
+      case PluginType.General:
+        return <p>General</p>;
+      case PluginType.OBS:
+        if (this.props.data) {
+          obsAction = this.props.data.content as OBSAction | undefined;
+        }
+
+        return <EditOBSAction data={obsAction} />;
+      case PluginType.VTS:
+        return <p>VTS</p>;
     }
   };
 
@@ -60,6 +74,8 @@ class EditSingleAction extends Component<
             <option value={PluginType.VTS}>VTube Studio</option>
           </select>
         </label>
+        <hr />
+        {this.showSelectedPluginDetails()}
       </Fragment>
     );
   }
