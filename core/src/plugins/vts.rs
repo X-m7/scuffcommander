@@ -335,7 +335,7 @@ impl VTSConnector {
         Ok(out)
     }
 
-    async fn get_expression_id_from_name(&mut self, name: &str) -> Result<String, String> {
+    pub async fn get_expression_id_from_name(&mut self, name: &str) -> Result<String, String> {
         let exprs = self.get_expression_list().await?;
 
         for expr in exprs {
@@ -382,7 +382,7 @@ impl VTSConnector {
         Ok(out)
     }
 
-    async fn get_model_id_from_name(&mut self, name: &str) -> Result<String, String> {
+    pub async fn get_model_id_from_name(&mut self, name: &str) -> Result<String, String> {
         let models = self.get_model_list().await?;
 
         for model in models {
@@ -420,7 +420,7 @@ impl VTSConnector {
         }
     }
 
-    async fn get_hotkey_id_from_name(&mut self, name: &str) -> Result<String, String> {
+    pub async fn get_hotkey_id_from_name(&mut self, name: &str) -> Result<String, String> {
         for hotkey in self.get_hotkey_list().await? {
             if name == hotkey.name {
                 return Ok(hotkey.hotkey_id);

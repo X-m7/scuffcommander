@@ -28,6 +28,7 @@ const EditAction = ({
     if (actionProp === "none" || actionProp === "new") {
       setActionId("");
       setActionType(ActionType.None);
+      setActionData(undefined);
       return;
     }
 
@@ -36,6 +37,8 @@ const EditAction = ({
     invoke("load_action_details", { id: newActionId })
       .then((loadedActionRaw) => {
         const loadedAction = loadedActionRaw as Action;
+
+        setActionId(newActionId);
         setActionData(loadedAction.content);
 
         switch (loadedAction.tag) {
@@ -53,20 +56,11 @@ const EditAction = ({
             msgFunc("Loaded action has an unrecognised type");
             break;
         }
-
-        // this is how the inner components know they need to refresh,
-        // so do this after the action details have been loaded
-        setActionId(newActionId);
       })
       .catch((err) => {
         msgFunc(`Error occurred: ${err.toString()}`);
       });
   }, [actionProp, msgFunc]);
-
-  // hide on none
-  if (actionProp === "none") {
-    return <Fragment />;
-  }
 
   const onActionIdInput = (e: Event) => {
     if (e.target) {
@@ -98,11 +92,9 @@ const EditAction = ({
   const renderActionDetailsEditor = () => {
     switch (actionType) {
       case ActionType.Single:
-        // if the key attribute changes the component will be reset
         return (
           <EditSingleAction
             ref={singleActionRef}
-            key={actionId}
             data={actionData as SingleAction | undefined}
             msgFunc={msgFunc}
           />
@@ -116,13 +108,13 @@ const EditAction = ({
     }
   };
 
-  const getSingleActionData = () => {
+  const getSingleActionData = async () => {
     if (!singleActionRef.current) {
       console.log("Component reference not ready");
       return undefined;
     }
 
-    const content = singleActionRef.current.getActionData();
+    const content = await singleActionRef.current.getActionData();
 
     // if undefined here means error message already shown
     if (!content) {
@@ -135,7 +127,7 @@ const EditAction = ({
     } as Action;
   };
 
-  const saveCurrentAction = () => {
+  const saveCurrentAction = async () => {
     if (actionId.length === 0) {
       msgFunc("Action ID cannot be empty");
       return;
@@ -152,7 +144,7 @@ const EditAction = ({
         msgFunc("Please select an action type");
         break;
       case ActionType.Single:
-        singleActionData = getSingleActionData();
+        singleActionData = await getSingleActionData();
         if (!singleActionData) {
           return;
         }
@@ -172,6 +164,11 @@ const EditAction = ({
         break;
     }
   };
+
+  // hide on none
+  if (actionProp === "none") {
+    return <Fragment />;
+  }
 
   return (
     <Fragment>

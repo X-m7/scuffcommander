@@ -99,7 +99,7 @@ class EditOBSAction extends Component<EditOBSActionProps, EditOBSActionState> {
     });
   };
 
-  getActionData = () => {
+  getActionData = async () => {
     if (this.state.actionType === OBSActionType.None) {
       this.props.msgFunc(
         "Please select an option for the OBS Studio action type"

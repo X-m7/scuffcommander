@@ -77,7 +77,7 @@ class EditGeneralAction extends Component<
     });
   };
 
-  getActionData = () => {
+  getActionData = async () => {
     if (this.state.actionType === GeneralActionType.None) {
       this.props.msgFunc("Please select an option for the General action type");
       return undefined;

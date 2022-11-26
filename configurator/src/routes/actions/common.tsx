@@ -5,7 +5,7 @@ export const generateSelectOptions = (opts: string[]) => {
     <Fragment>
       {opts.map((opt) => {
         return (
-          <option key={`x-${opt}`} value={`x-${opt}`}>
+          <option key={opt} value={`x-${opt}`}>
             {opt}
           </option>
         );

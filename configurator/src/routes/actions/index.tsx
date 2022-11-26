@@ -81,6 +81,7 @@ const Actions = () => {
         <button type="submit">Save Actions</button>
         <br />
         <EditAction
+          key={selectedAction}
           action={selectedAction}
           msgFunc={setStatusState}
           onSaveDeleteCallback={onSaveDeleteCallback}

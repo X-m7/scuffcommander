@@ -139,13 +139,33 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
           showModelPosInput: true,
         });
         break;
-      default:
-        this.props.msgFunc("Unimplemented VTS action type");
-        break;
     }
   };
 
-  getActionData = () => {
+  getSelectInputData = async (invokeCmd: string) => {
+    if (this.state.selectInputValue === "none") {
+      this.props.msgFunc(
+        "Please select an option for the VTube Studio action parameter"
+      );
+      return undefined;
+    }
+
+    try {
+      return {
+        tag: VTSActionType[this.state.actionType],
+        content: await invoke(invokeCmd, {
+          name: this.state.selectInputValue.substring(2),
+        }),
+      } as VTSAction;
+    } catch (err) {
+      if (typeof err === "string") {
+        this.props.msgFunc(`Error occurred: ${err.toString()}`);
+      }
+      return undefined;
+    }
+  };
+
+  getActionData = async () => {
     switch (this.state.actionType) {
       case VTSActionType.None:
         this.props.msgFunc(
@@ -153,18 +173,11 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
         );
         return undefined;
       case VTSActionType.ToggleExpression:
+        return await this.getSelectInputData("get_vts_expression_id_from_name");
       case VTSActionType.LoadModel:
+        return await this.getSelectInputData("get_vts_model_id_from_name");
       case VTSActionType.TriggerHotkey:
-        if (this.state.selectInputValue === "none") {
-          this.props.msgFunc(
-            "Please select an option for the VTube Studio action parameter"
-          );
-          return undefined;
-        }
-        return {
-          tag: VTSActionType[this.state.actionType],
-          content: this.state.selectInputValue.substring(2),
-        } as VTSAction;
+        return await this.getSelectInputData("get_vts_hotkey_id_from_name");
       case VTSActionType.MoveModel:
         return {
           tag: "MoveModel",

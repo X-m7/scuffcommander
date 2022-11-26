@@ -6,6 +6,7 @@ import EditGeneralAction from "./generalaction";
 import {
   SingleAction,
   PluginType,
+  PluginAction,
   OBSAction,
   VTSAction,
   GeneralAction,
@@ -18,6 +19,7 @@ interface EditSingleActionProps {
 
 interface EditSingleActionState {
   pluginType: PluginType;
+  data?: PluginAction;
 }
 
 class EditSingleAction extends Component<
@@ -28,12 +30,16 @@ class EditSingleAction extends Component<
     super(props);
 
     let pluginType = PluginType.None;
+    let data: PluginAction | undefined;
+
     if (props.data) {
       pluginType = PluginType[props.data.tag as keyof typeof PluginType];
+      data = props.data.content;
     }
 
     this.state = {
       pluginType,
+      data,
     };
   }
 
@@ -47,6 +53,9 @@ class EditSingleAction extends Component<
           (e.target as HTMLInputElement).value,
           10
         ) as PluginType,
+        // clear this once the plugin type is changed manually
+        // since it means the original loaded data is irrelevant
+        data: undefined,
       });
     }
   };
@@ -60,8 +69,8 @@ class EditSingleAction extends Component<
       case PluginType.None:
         return <Fragment />;
       case PluginType.General:
-        if (this.props.data) {
-          generalAction = this.props.data.content as GeneralAction | undefined;
+        if (this.state.data) {
+          generalAction = this.state.data as GeneralAction | undefined;
         }
         return (
           <EditGeneralAction
@@ -71,8 +80,8 @@ class EditSingleAction extends Component<
           />
         );
       case PluginType.OBS:
-        if (this.props.data) {
-          obsAction = this.props.data.content as OBSAction | undefined;
+        if (this.state.data) {
+          obsAction = this.state.data as OBSAction | undefined;
         }
         return (
           <EditOBSAction
@@ -82,8 +91,8 @@ class EditSingleAction extends Component<
           />
         );
       case PluginType.VTS:
-        if (this.props.data) {
-          vtsAction = this.props.data.content as VTSAction | undefined;
+        if (this.state.data) {
+          vtsAction = this.state.data as VTSAction | undefined;
         }
         return (
           <EditVTSAction
@@ -95,7 +104,7 @@ class EditSingleAction extends Component<
     }
   };
 
-  getActionData = () => {
+  getActionData = async () => {
     if (this.state.pluginType === PluginType.None) {
       this.props.msgFunc("Please select a plugin type");
       return undefined;
@@ -106,7 +115,7 @@ class EditSingleAction extends Component<
       return undefined;
     }
 
-    const content = this.actionRef.current.getActionData();
+    const content = await this.actionRef.current.getActionData();
 
     // if undefined here means error message already shown
     if (!content) {
