@@ -1,7 +1,8 @@
 import { h, Fragment, Component } from "preact";
 import { invoke } from "@tauri-apps/api";
+import style from "./style.css";
 
-import { VTSActionType, VTSAction } from "./types";
+import { VTSActionType, VTSAction, VTSMoveModelData } from "./types";
 import { generateSelectOptions } from "./common";
 
 interface EditVTSActionProps {
@@ -12,8 +13,10 @@ interface EditVTSActionProps {
 interface EditVTSActionState {
   actionType: VTSActionType;
   showSelectInput: boolean;
-  selectInputValue?: string;
+  selectInputValue: string;
   selectInputOptions: string[];
+  showModelPosInput: boolean;
+  modelPosValue: VTSMoveModelData;
 }
 
 class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
@@ -21,9 +24,22 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
     super(props);
 
     let actionType = VTSActionType.None;
+    let showModelPosInput = false;
+    let modelPosValue: VTSMoveModelData = {
+      x: 0,
+      y: 0,
+      rotation: 0,
+      size: 0,
+      time_sec: 0,
+    };
 
     if (props.data) {
       actionType = VTSActionType[props.data.tag as keyof typeof VTSActionType];
+
+      if (actionType === VTSActionType.MoveModel) {
+        modelPosValue = props.data.content as VTSMoveModelData;
+        showModelPosInput = true;
+      }
     }
 
     this.state = {
@@ -31,6 +47,8 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
       showSelectInput: false,
       selectInputValue: "none",
       selectInputOptions: [],
+      showModelPosInput,
+      modelPosValue,
     };
   }
 
@@ -51,6 +69,7 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
           actionType,
           selectInputOptions: listRaw as string[],
           showSelectInput: true,
+          showModelPosInput: false,
         });
 
         // On initialisation also convert the loaded ID to the name
@@ -82,6 +101,8 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
           ...this.state,
           actionType,
           showSelectInput: false,
+          showModelPosInput: false,
+          // reset this too so the selector does not point to an invalid option
           selectInputValue: "none",
         });
         break;
@@ -108,6 +129,14 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
           "get_vts_model_name_from_id",
           init
         );
+        break;
+      case VTSActionType.MoveModel:
+        this.setState({
+          ...this.state,
+          actionType,
+          showSelectInput: false,
+          showModelPosInput: true,
+        });
         break;
       default:
         this.props.msgFunc("Unimplemented VTS action type");
@@ -136,6 +165,76 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
     this.setState({
       ...this.state,
       selectInputValue: (e.target as HTMLInputElement).value,
+    });
+  };
+
+  onPosXInput = (e: Event) => {
+    if (!e.target) {
+      return;
+    }
+
+    this.setState({
+      ...this.state,
+      modelPosValue: {
+        ...this.state.modelPosValue,
+        x: parseFloat((e.target as HTMLInputElement).value),
+      },
+    });
+  };
+
+  onPosYInput = (e: Event) => {
+    if (!e.target) {
+      return;
+    }
+
+    this.setState({
+      ...this.state,
+      modelPosValue: {
+        ...this.state.modelPosValue,
+        y: parseFloat((e.target as HTMLInputElement).value),
+      },
+    });
+  };
+
+  onPosRotateInput = (e: Event) => {
+    if (!e.target) {
+      return;
+    }
+
+    this.setState({
+      ...this.state,
+      modelPosValue: {
+        ...this.state.modelPosValue,
+        rotation: parseFloat((e.target as HTMLInputElement).value),
+      },
+    });
+  };
+
+  onPosSizeInput = (e: Event) => {
+    if (!e.target) {
+      return;
+    }
+
+    this.setState({
+      ...this.state,
+      modelPosValue: {
+        ...this.state.modelPosValue,
+        size: parseFloat((e.target as HTMLInputElement).value),
+      },
+    });
+  };
+
+  onPosTimeInput = (e: Event) => {
+    if (!e.target) {
+      return;
+    }
+
+    this.setState({
+      ...this.state,
+      modelPosValue: {
+        ...this.state.modelPosValue,
+        time_sec: parseFloat((e.target as HTMLInputElement).value),
+      },
     });
   };
 
@@ -168,6 +267,57 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
             {generateSelectOptions(this.state.selectInputOptions)}
           </select>
         </label>
+        <div
+          class={
+            this.state.showModelPosInput ? style.vtsModelPosForm : style.hidden
+          }
+        >
+          <label class={style.vtsModelPosRow}>
+            <span class={style.vtsModelPosCell}>X:</span>
+            <input
+              class={style.vtsModelPosCell}
+              type="text"
+              value={this.state.modelPosValue.x}
+              onInput={this.onPosXInput}
+            />
+          </label>
+          <label class={style.vtsModelPosRow}>
+            <span class={style.vtsModelPosCell}>Y:</span>
+            <input
+              class={style.vtsModelPosCell}
+              type="text"
+              value={this.state.modelPosValue.y}
+              onInput={this.onPosYInput}
+            />
+          </label>
+          <label class={style.vtsModelPosRow}>
+            <span class={style.vtsModelPosCell}>Rotation (degrees):</span>
+            <input
+              class={style.vtsModelPosCell}
+              type="text"
+              value={this.state.modelPosValue.rotation}
+              onInput={this.onPosRotateInput}
+            />
+          </label>
+          <label class={style.vtsModelPosRow}>
+            <span class={style.vtsModelPosCell}>Size:</span>
+            <input
+              class={style.vtsModelPosCell}
+              type="text"
+              value={this.state.modelPosValue.size}
+              onInput={this.onPosSizeInput}
+            />
+          </label>
+          <label class={style.vtsModelPosRow}>
+            <span class={style.vtsModelPosCell}>Animation time (0-2s):</span>
+            <input
+              class={style.vtsModelPosCell}
+              type="text"
+              value={this.state.modelPosValue.time_sec}
+              onInput={this.onPosTimeInput}
+            />
+          </label>
+        </div>
       </Fragment>
     );
   }

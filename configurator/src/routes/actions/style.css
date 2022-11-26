@@ -3,3 +3,19 @@
   min-height: 100%;
   width: 100%;
 }
+
+.hidden {
+  display: none;
+}
+
+.vtsModelPosForm {
+  display: table;
+}
+
+.vtsModelPosRow {
+  display: table-row;
+}
+
+.vtsModelPosCell {
+  display: table-cell;
+}
