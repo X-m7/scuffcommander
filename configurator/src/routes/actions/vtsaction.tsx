@@ -70,6 +70,7 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
           selectInputOptions: listRaw as string[],
           showSelectInput: true,
           showModelPosInput: false,
+          selectInputValue: "none",
         });
 
         // On initialisation also convert the loaded ID to the name
@@ -102,7 +103,6 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
           actionType,
           showSelectInput: false,
           showModelPosInput: false,
-          // reset this too so the selector does not point to an invalid option
           selectInputValue: "none",
         });
         break;
@@ -135,6 +135,7 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
           ...this.state,
           actionType,
           showSelectInput: false,
+          selectInputValue: "none",
           showModelPosInput: true,
         });
         break;
@@ -238,6 +239,19 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
     });
   };
 
+  getCurrentModelPos = () => {
+    invoke("get_vts_current_model_pos")
+      .then((posRaw) => {
+        this.setState({
+          ...this.state,
+          modelPosValue: posRaw as VTSMoveModelData,
+        });
+      })
+      .catch((err) => {
+        this.props.msgFunc(`Error occurred: ${err.toString()}`);
+      });
+  };
+
   render() {
     return (
       <Fragment>
@@ -272,6 +286,13 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
             this.state.showModelPosInput ? style.vtsModelPosForm : style.hidden
           }
         >
+          <button
+            type="button"
+            class={style.vtsModelPosRow}
+            onClick={this.getCurrentModelPos}
+          >
+            Get current model position
+          </button>
           <label class={style.vtsModelPosRow}>
             <span class={style.vtsModelPosCell}>X:</span>
             <input
