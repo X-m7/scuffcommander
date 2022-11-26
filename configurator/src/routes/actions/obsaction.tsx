@@ -43,10 +43,10 @@ class EditOBSAction extends Component<EditOBSActionProps, EditOBSActionState> {
 
   componentDidMount() {
     // need this to load the scene options
-    this.actionTypeUpdate(this.state.actionType);
+    this.actionTypeUpdate(this.state.actionType, true);
   }
 
-  actionTypeUpdate = (newActionType: OBSActionType) => {
+  actionTypeUpdate = (newActionType: OBSActionType, init: boolean) => {
     switch (newActionType) {
       case OBSActionType.ProgramSceneChange:
         invoke("get_obs_scenes")
@@ -56,6 +56,8 @@ class EditOBSAction extends Component<EditOBSActionProps, EditOBSActionState> {
               actionType: newActionType,
               programSceneList: list as string[],
               showActionInput: true,
+              // if called on init leave actionInput alone, otherwise reset
+              actionInput: init ? this.state.actionInput : "none",
             });
           })
           .catch((err) => {
@@ -83,7 +85,7 @@ class EditOBSAction extends Component<EditOBSActionProps, EditOBSActionState> {
       10
     ) as OBSActionType;
 
-    this.actionTypeUpdate(newActionType);
+    this.actionTypeUpdate(newActionType, false);
   };
 
   onActionParamSelect = (e: Event) => {

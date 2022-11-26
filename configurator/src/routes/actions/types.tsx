@@ -31,6 +31,11 @@ export enum VTSActionType {
   CheckConnection,
 }
 
+export enum GeneralActionType {
+  None,
+  Delay,
+}
+
 /*
  * Exact representation of the Action type coming from the Rust side
  */

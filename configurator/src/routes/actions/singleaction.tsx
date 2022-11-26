@@ -2,7 +2,14 @@ import { h, Fragment, Component } from "preact";
 
 import EditOBSAction from "./obsaction";
 import EditVTSAction from "./vtsaction";
-import { SingleAction, PluginType, OBSAction, VTSAction } from "./types";
+import EditGeneralAction from "./generalaction";
+import {
+  SingleAction,
+  PluginType,
+  OBSAction,
+  VTSAction,
+  GeneralAction,
+} from "./types";
 
 interface EditSingleActionProps {
   data?: SingleAction;
@@ -45,12 +52,21 @@ class EditSingleAction extends Component<
   showSelectedPluginDetails = () => {
     let obsAction: OBSAction | undefined;
     let vtsAction: VTSAction | undefined;
+    let generalAction: GeneralAction | undefined;
 
     switch (this.state.pluginType) {
       case PluginType.None:
         return <Fragment />;
       case PluginType.General:
-        return <p>General</p>;
+        if (this.props.data) {
+          generalAction = this.props.data.content as GeneralAction | undefined;
+        }
+        return (
+          <EditGeneralAction
+            data={generalAction}
+            msgFunc={this.props.msgFunc}
+          />
+        );
       case PluginType.OBS:
         if (this.props.data) {
           obsAction = this.props.data.content as OBSAction | undefined;
