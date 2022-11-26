@@ -73,6 +73,10 @@ const EditAction = ({
       setActionType(
         parseInt((e.target as HTMLInputElement).value, 10) as ActionType
       );
+
+      // clear this once the plugin type is changed manually
+      // since it means the original loaded data is irrelevant
+      setActionData(undefined);
     }
   };
 
