@@ -1,7 +1,8 @@
+use scuffcommander_core::action::{Action, ActionConfig, Condition};
+use scuffcommander_core::plugins::general::GeneralAction;
 use scuffcommander_core::plugins::obs::{OBSAction, OBSQuery};
 use scuffcommander_core::plugins::vts::{VTSAction, VTSQuery};
 use scuffcommander_core::plugins::{PluginAction, PluginQuery};
-use scuffcommander_core::{Action, ActionConfig, Condition};
 use std::collections::HashMap;
 
 // Nested conditionals
@@ -143,6 +144,10 @@ fn main() {
         Action::Single(PluginAction::VTS(VTSAction::ToggleExpression(
             "expressiong.exp3.json".to_string(),
         ))),
+    );
+    actions.actions.insert(
+        "Dummy button".to_string(),
+        Action::Single(PluginAction::General(GeneralAction::Delay(69.42))),
     );
 
     // Multiple actions per button

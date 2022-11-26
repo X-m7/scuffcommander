@@ -1,22 +1,12 @@
 {
   "actions": {
-    "Desktop+VTS Scene": {
+    "Waiting Scene": {
       "tag": "Single",
       "content": {
         "tag": "OBS",
         "content": {
           "tag": "ProgramSceneChange",
-          "content": "Desktop + VTS"
-        }
-      }
-    },
-    "Qt Expr Toggle": {
-      "tag": "Single",
-      "content": {
-        "tag": "VTS",
-        "content": {
-          "tag": "ToggleExpression",
-          "content": "Qt.exp3.json"
+          "content": "Waiting"
         }
       }
     },
@@ -64,6 +54,26 @@
           ]
         }
       ]
+    },
+    "Desktop+VTS Scene": {
+      "tag": "Single",
+      "content": {
+        "tag": "OBS",
+        "content": {
+          "tag": "ProgramSceneChange",
+          "content": "Desktop + VTS"
+        }
+      }
+    },
+    "expressiong Toggle": {
+      "tag": "Single",
+      "content": {
+        "tag": "VTS",
+        "content": {
+          "tag": "ToggleExpression",
+          "content": "expressiong.exp3.json"
+        }
+      }
     },
     "Model Dep Expr Toggle": {
       "tag": "Chain",
@@ -116,6 +126,41 @@
         }
       ]
     },
+    "Qt Expr Toggle": {
+      "tag": "Single",
+      "content": {
+        "tag": "VTS",
+        "content": {
+          "tag": "ToggleExpression",
+          "content": "Qt.exp3.json"
+        }
+      }
+    },
+    "Dual Expr Toggle": {
+      "tag": "Chain",
+      "content": [
+        {
+          "tag": "Single",
+          "content": {
+            "tag": "VTS",
+            "content": {
+              "tag": "ToggleExpression",
+              "content": "Qt.exp3.json"
+            }
+          }
+        },
+        {
+          "tag": "Single",
+          "content": {
+            "tag": "VTS",
+            "content": {
+              "tag": "ToggleExpression",
+              "content": "expressiong.exp3.json"
+            }
+          }
+        }
+      ]
+    },
     "Model Toggle": {
       "tag": "If",
       "content": [
@@ -161,48 +206,13 @@
         }
       ]
     },
-    "Waiting Scene": {
+    "Dummy button": {
       "tag": "Single",
       "content": {
-        "tag": "OBS",
+        "tag": "General",
         "content": {
-          "tag": "ProgramSceneChange",
-          "content": "Waiting"
-        }
-      }
-    },
-    "Dual Expr Toggle": {
-      "tag": "Chain",
-      "content": [
-        {
-          "tag": "Single",
-          "content": {
-            "tag": "VTS",
-            "content": {
-              "tag": "ToggleExpression",
-              "content": "Qt.exp3.json"
-            }
-          }
-        },
-        {
-          "tag": "Single",
-          "content": {
-            "tag": "VTS",
-            "content": {
-              "tag": "ToggleExpression",
-              "content": "expressiong.exp3.json"
-            }
-          }
-        }
-      ]
-    },
-    "expressiong Toggle": {
-      "tag": "Single",
-      "content": {
-        "tag": "VTS",
-        "content": {
-          "tag": "ToggleExpression",
-          "content": "expressiong.exp3.json"
+          "tag": "Delay",
+          "content": 69.42
         }
       }
     }
