@@ -77,6 +77,18 @@ class EditGeneralAction extends Component<
     });
   };
 
+  getActionData = () => {
+    if (this.state.actionType === GeneralActionType.None) {
+      this.props.msgFunc("Please select an option for the General action type");
+      return undefined;
+    }
+
+    return {
+      tag: GeneralActionType[this.state.actionType],
+      content: parseFloat(this.state.actionInput),
+    } as GeneralAction;
+  };
+
   render() {
     return (
       <Fragment>
@@ -87,7 +99,7 @@ class EditGeneralAction extends Component<
             onChange={this.onActionTypeChange}
           >
             <option value={GeneralActionType.None}>Select an option</option>
-            <option value={GeneralActionType.Delay}>Delay</option>
+            <option value={GeneralActionType.Delay}>Delay (s)</option>
           </select>
         </label>
         <br />

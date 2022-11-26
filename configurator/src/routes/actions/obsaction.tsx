@@ -99,6 +99,27 @@ class EditOBSAction extends Component<EditOBSActionProps, EditOBSActionState> {
     });
   };
 
+  getActionData = () => {
+    if (this.state.actionType === OBSActionType.None) {
+      this.props.msgFunc(
+        "Please select an option for the OBS Studio action type"
+      );
+      return undefined;
+    }
+
+    if (this.state.actionInput === "none") {
+      this.props.msgFunc(
+        "Please select an option for the OBS Studio action parameter"
+      );
+      return undefined;
+    }
+
+    return {
+      tag: OBSActionType[this.state.actionType],
+      content: this.state.actionInput.substring(2),
+    } as OBSAction;
+  };
+
   render() {
     return (
       <Fragment>

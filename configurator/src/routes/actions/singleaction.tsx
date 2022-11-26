@@ -1,4 +1,4 @@
-import { h, Fragment, Component } from "preact";
+import { h, Fragment, Component, createRef } from "preact";
 
 import EditOBSAction from "./obsaction";
 import EditVTSAction from "./vtsaction";
@@ -37,6 +37,8 @@ class EditSingleAction extends Component<
     };
   }
 
+  actionRef = createRef<EditGeneralAction | EditOBSAction | EditVTSAction>();
+
   onPluginTypeChange = (e: Event) => {
     if (e.target) {
       this.setState({
@@ -63,6 +65,7 @@ class EditSingleAction extends Component<
         }
         return (
           <EditGeneralAction
+            ref={this.actionRef}
             data={generalAction}
             msgFunc={this.props.msgFunc}
           />
@@ -71,13 +74,49 @@ class EditSingleAction extends Component<
         if (this.props.data) {
           obsAction = this.props.data.content as OBSAction | undefined;
         }
-        return <EditOBSAction data={obsAction} msgFunc={this.props.msgFunc} />;
+        return (
+          <EditOBSAction
+            ref={this.actionRef}
+            data={obsAction}
+            msgFunc={this.props.msgFunc}
+          />
+        );
       case PluginType.VTS:
         if (this.props.data) {
           vtsAction = this.props.data.content as VTSAction | undefined;
         }
-        return <EditVTSAction data={vtsAction} msgFunc={this.props.msgFunc} />;
+        return (
+          <EditVTSAction
+            ref={this.actionRef}
+            data={vtsAction}
+            msgFunc={this.props.msgFunc}
+          />
+        );
     }
+  };
+
+  getActionData = () => {
+    if (this.state.pluginType === PluginType.None) {
+      this.props.msgFunc("Please select a plugin type");
+      return undefined;
+    }
+
+    if (!this.actionRef.current) {
+      console.log("Component reference not ready");
+      return undefined;
+    }
+
+    const content = this.actionRef.current.getActionData();
+
+    // if undefined here means error message already shown
+    if (!content) {
+      return undefined;
+    }
+
+    return {
+      tag: PluginType[this.state.pluginType],
+      content,
+    } as SingleAction;
   };
 
   render() {

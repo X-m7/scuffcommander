@@ -26,7 +26,7 @@ const Actions = () => {
     setStatusState("");
   };
 
-  useEffect(() => {
+  const refreshActions = (init: boolean) => {
     invoke("get_actions")
       .then((actsList) => {
         const actions = actsList as string[];
@@ -35,6 +35,19 @@ const Actions = () => {
       .catch((err) => {
         setStatusState(`Error occurred: ${err.toString()}`);
       });
+
+    // reset selected action since it could have been renamed/deleted
+    if (!init) {
+      setSelectedAction("none");
+    }
+  };
+
+  const onSaveDeleteCallback = () => {
+    refreshActions(false);
+  };
+
+  useEffect(() => {
+    refreshActions(true);
   }, []);
 
   return (
@@ -60,7 +73,11 @@ const Actions = () => {
         </label>
         <button type="submit">Save Actions</button>
         <br />
-        <EditAction action={selectedAction} msgFunc={setStatusState} />
+        <EditAction
+          action={selectedAction}
+          msgFunc={setStatusState}
+          onSaveDeleteCallback={onSaveDeleteCallback}
+        />
       </form>
     </div>
   );

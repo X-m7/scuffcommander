@@ -145,6 +145,34 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
     }
   };
 
+  getActionData = () => {
+    switch (this.state.actionType) {
+      case VTSActionType.None:
+        this.props.msgFunc(
+          "Please select an option for the VTube Studio action type"
+        );
+        return undefined;
+      case VTSActionType.ToggleExpression:
+      case VTSActionType.LoadModel:
+      case VTSActionType.TriggerHotkey:
+        if (this.state.selectInputValue === "none") {
+          this.props.msgFunc(
+            "Please select an option for the VTube Studio action parameter"
+          );
+          return undefined;
+        }
+        return {
+          tag: VTSActionType[this.state.actionType],
+          content: this.state.selectInputValue.substring(2),
+        } as VTSAction;
+      case VTSActionType.MoveModel:
+        return {
+          tag: "MoveModel",
+          content: this.state.modelPosValue,
+        } as VTSAction;
+    }
+  };
+
   onActionTypeChange = (e: Event) => {
     if (!e.target) {
       return;

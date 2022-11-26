@@ -2,8 +2,6 @@ pub mod chain;
 pub mod condition;
 
 use scuffcommander_core::action::{Action, ActionConfig};
-use scuffcommander_core::plugins::{PluginAction, PluginStates, PluginType};
-use serde_json::value::Value;
 use tokio::fs::write;
 use tokio::sync::Mutex;
 
@@ -42,30 +40,22 @@ pub async fn get_actions(
 }
 
 #[tauri::command]
-pub async fn add_new_single_action(
+pub async fn add_new_action(
     id: String,
-    plugin_type: PluginType,
-    plugin_data: Value,
+    action: Action,
     overwrite: bool,
     actions_state: tauri::State<'_, ActionConfigState>,
-    plugins_state: tauri::State<'_, PluginStates>,
 ) -> Result<(), String> {
     if id.is_empty() {
         return Err("ID can't be empty".to_string());
     }
 
-    let mut plugins = plugins_state.plugins.lock().await;
-
-    let Some(plugin) = plugins.get_mut(&plugin_type) else {
-        return Err("Selected plugin has not been configured".to_string());
-    };
-
-    let action = PluginAction::from_json(plugin, plugin_data).await?;
     let actions = &mut actions_state.0.lock().await.actions;
+
     if !overwrite && actions.contains_key(&id) {
         return Err("Action with given ID already exists".to_string());
     }
-    actions.insert(id, Action::Single(action));
+    actions.insert(id, action);
 
     Ok(())
 }

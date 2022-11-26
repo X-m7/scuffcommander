@@ -73,7 +73,7 @@ async fn main() {
             app_mod::style::store_ui_style,
             app_mod::style::get_ui_style,
             app_mod::actions::get_actions,
-            app_mod::actions::add_new_single_action,
+            app_mod::actions::add_new_action,
             app_mod::actions::load_action_details,
             app_mod::actions::save_actions,
             app_mod::actions::delete_action,

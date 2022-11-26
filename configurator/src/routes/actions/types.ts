@@ -65,7 +65,7 @@ export type VTSActionTag =
 
 // content for most is just a single string, or nothing for CheckConnection
 export type VTSAction = {
-  tag: string;
+  tag: VTSActionTag;
   content?: VTSActionData;
 };
 
@@ -73,7 +73,7 @@ export type OBSActionTag = "ProgramSceneChange" | "CheckConnection";
 
 // content is just the target scene for ProgramSceneChange or nothing for CheckConnection
 export type OBSAction = {
-  tag: string;
+  tag: OBSActionTag;
   content?: string;
 };
 

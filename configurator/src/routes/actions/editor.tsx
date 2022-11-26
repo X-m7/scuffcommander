@@ -1,42 +1,21 @@
-import { h, Fragment } from "preact";
+import { h, Fragment, createRef } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { invoke } from "@tauri-apps/api";
 
 import { ActionType, Action, ActionContent, SingleAction } from "./types";
 import EditSingleAction from "./singleaction";
 
-interface EditActionDetailsProps extends EditActionProps {
-  actionType: ActionType;
-  actionData?: ActionContent;
-  msgFunc: (msg: string) => void;
-}
-
-const EditActionDetails = (props: EditActionDetailsProps) => {
-  switch (props.actionType) {
-    case ActionType.Single:
-      // if the key attribute changes the component will be reset
-      return (
-        <EditSingleAction
-          key={props.action}
-          data={props.actionData as SingleAction | undefined}
-          msgFunc={props.msgFunc}
-        />
-      );
-    case ActionType.Chain:
-      return <p>Chain</p>;
-    case ActionType.If:
-      return <p>If</p>;
-    default:
-      return <Fragment />;
-  }
-};
-
 interface EditActionProps {
   action: string;
   msgFunc: (msg: string) => void;
+  onSaveDeleteCallback: () => void;
 }
 
-const EditAction = ({ action: actionProp, msgFunc }: EditActionProps) => {
+const EditAction = ({
+  action: actionProp,
+  msgFunc,
+  onSaveDeleteCallback,
+}: EditActionProps) => {
   const [actionId, setActionId] = useState<string>("");
   const [actionType, setActionType] = useState<ActionType>(ActionType.None);
   const [actionData, setActionData] = useState<ActionContent | undefined>(
@@ -103,12 +82,91 @@ const EditAction = ({ action: actionProp, msgFunc }: EditActionProps) => {
     }
   };
 
-  const saveCurrentAction = () => {
+  const deleteCurrentAction = () => {
     msgFunc("Unimplemented");
   };
 
-  const deleteCurrentAction = () => {
-    msgFunc("Unimplemented");
+  /*
+   * Saving related code
+   */
+  const singleActionRef = createRef<EditSingleAction>();
+
+  const renderActionDetailsEditor = () => {
+    switch (actionType) {
+      case ActionType.Single:
+        // if the key attribute changes the component will be reset
+        return (
+          <EditSingleAction
+            ref={singleActionRef}
+            key={actionId}
+            data={actionData as SingleAction | undefined}
+            msgFunc={msgFunc}
+          />
+        );
+      case ActionType.Chain:
+        return <p>Chain</p>;
+      case ActionType.If:
+        return <p>If</p>;
+      default:
+        return <Fragment />;
+    }
+  };
+
+  const getSingleActionData = () => {
+    if (!singleActionRef.current) {
+      console.log("Component reference not ready");
+      return undefined;
+    }
+
+    const content = singleActionRef.current.getActionData();
+
+    // if undefined here means error message already shown
+    if (!content) {
+      return undefined;
+    }
+
+    return {
+      tag: "Single",
+      content,
+    } as Action;
+  };
+
+  const saveCurrentAction = () => {
+    if (actionId.length === 0) {
+      msgFunc("Action ID cannot be empty");
+      return;
+    }
+
+    // allow overwrites only when editing an action without changing its ID
+    const allowOverwrite =
+      actionProp !== "new" && actionId === actionProp.substring(2);
+
+    let singleActionData: Action | undefined;
+
+    switch (actionType) {
+      case ActionType.None:
+        msgFunc("Please select an action type");
+        break;
+      case ActionType.Single:
+        singleActionData = getSingleActionData();
+        if (!singleActionData) {
+          return;
+        }
+
+        invoke("add_new_action", {
+          id: actionId,
+          action: singleActionData,
+          overwrite: allowOverwrite,
+        })
+          .then(onSaveDeleteCallback)
+          .catch((err) => {
+            msgFunc(`Error occurred: ${err.toString()}`);
+          });
+        break;
+      default:
+        msgFunc("Saving given action type not implemented yet");
+        break;
+    }
   };
 
   return (
@@ -139,12 +197,7 @@ const EditAction = ({ action: actionProp, msgFunc }: EditActionProps) => {
         Delete currently selected action
       </button>
       <hr />
-      <EditActionDetails
-        action={actionId}
-        actionType={actionType}
-        actionData={actionData}
-        msgFunc={msgFunc}
-      />
+      {renderActionDetailsEditor()}
     </Fragment>
   );
 };
