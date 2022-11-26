@@ -13,7 +13,14 @@ const Actions = () => {
 
   const saveActions = (e: Event) => {
     e.preventDefault();
-    setStatusState(selectedAction);
+
+    invoke("save_actions")
+      .then(() => {
+        setStatusState("Actions saved");
+      })
+      .catch((err) => {
+        setStatusState(`Error occurred: ${err.toString()}`);
+      });
   };
 
   const onSelectedActionChange = (e: Event) => {

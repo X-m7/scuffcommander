@@ -83,7 +83,11 @@ const EditAction = ({
   };
 
   const deleteCurrentAction = () => {
-    msgFunc("Unimplemented");
+    invoke("delete_action", { id: actionProp.substring(2) })
+      .then(onSaveDeleteCallback)
+      .catch((err) => {
+        msgFunc(`Error occurred: ${err.toString()}`);
+      });
   };
 
   /*
@@ -193,7 +197,11 @@ const EditAction = ({
       <button type="button" onClick={saveCurrentAction}>
         Save
       </button>
-      <button type="button" onClick={deleteCurrentAction}>
+      <button
+        type="button"
+        hidden={actionProp === "new"}
+        onClick={deleteCurrentAction}
+      >
         Delete currently selected action
       </button>
       <hr />
