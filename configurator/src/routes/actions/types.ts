@@ -36,6 +36,12 @@ export enum GeneralActionType {
   Delay,
 }
 
+export enum QueryPluginType {
+  None,
+  OBS,
+  VTS,
+}
+
 /*
  * Exact representation of the Action type coming from the Rust side
  */

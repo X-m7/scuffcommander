@@ -2,8 +2,15 @@ import { h, Fragment, createRef } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { invoke } from "@tauri-apps/api";
 
-import { ActionType, Action, ActionContent, SingleAction } from "./types";
+import {
+  ActionType,
+  Action,
+  ActionContent,
+  SingleAction,
+  Condition,
+} from "./types";
 import EditSingleAction from "./singleaction";
+import EditConditionAction from "./conditionaction";
 
 interface EditActionProps {
   action: string;
@@ -92,6 +99,7 @@ const EditAction = ({
    * Saving related code
    */
   const singleActionRef = createRef<EditSingleAction>();
+  const conditionActionRef = createRef<EditConditionAction>();
 
   const renderActionDetailsEditor = () => {
     switch (actionType) {
@@ -106,7 +114,13 @@ const EditAction = ({
       case ActionType.Chain:
         return <p>Chain</p>;
       case ActionType.If:
-        return <p>If</p>;
+        return (
+          <EditConditionAction
+            ref={conditionActionRef}
+            data={actionData as [Condition, Action, Action?] | undefined}
+            msgFunc={msgFunc}
+          />
+        );
       default:
         return <Fragment />;
     }
@@ -114,7 +128,6 @@ const EditAction = ({
 
   const getSingleActionData = async () => {
     if (!singleActionRef.current) {
-      console.log("Component reference not ready");
       return undefined;
     }
 
