@@ -1,10 +1,9 @@
 import { h, Fragment, Component, createRef } from "preact";
 import { invoke } from "@tauri-apps/api";
-import style from "./style.css";
 
 import EditOBSCondition from "./obscondition";
 import EditVTSCondition from "./vtscondition";
-import { Action, Condition, QueryPluginType } from "./types";
+import { Action, ActionContent, Condition, QueryPluginType } from "./types";
 import { generateSelectOptions } from "./common";
 
 interface EditConditionActionProps {
@@ -113,19 +112,64 @@ class EditConditionAction extends Component<
       return undefined;
     }
 
+    if (this.state.thenActionId === "none") {
+      this.props.msgFunc(
+        "Please select an action to perform if the condition is true"
+      );
+      return undefined;
+    }
+
     if (!this.conditionRef.current) {
       return undefined;
     }
 
-    const content: Condition | undefined =
+    const cond: Condition | undefined =
       await this.conditionRef.current.getConditionData();
 
     // if undefined here means error message already shown
-    if (!content) {
+    if (!cond) {
       return undefined;
     }
 
-    // return [Condition, Action, Action?]
+    let thenAction: Action | undefined;
+    let elseAction: Action | undefined;
+
+    // Get the initial actions if that is what is required
+    if (this.props.data) {
+      if (this.state.thenActionId === "current") {
+        thenAction = this.props.data[1];
+      }
+      if (this.state.elseActionId === "current") {
+        elseAction = this.props.data[2];
+      }
+    }
+
+    // Try-catch in case the invokes fail
+    try {
+      // If thenActionId is neither none nor current
+      if (thenAction === undefined) {
+        thenAction = (await invoke("load_action_details", {
+          id: this.state.thenActionId.substring(2),
+        })) as Action;
+      }
+
+      // If elseActionId is neither none nor current
+      if (
+        this.state.elseActionId !== "current" &&
+        this.state.elseActionId !== "none"
+      ) {
+        elseAction = (await invoke("load_action_details", {
+          id: this.state.elseActionId.substring(2),
+        })) as Action;
+      }
+
+      return [cond, thenAction, elseAction] as ActionContent;
+    } catch (err) {
+      if (typeof err === "string") {
+        this.props.msgFunc(`Error occurred: ${err}`);
+      }
+      return undefined;
+    }
   };
 
   showSelectedPluginDetails = () => {

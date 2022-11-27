@@ -98,15 +98,14 @@ const EditAction = ({
   /*
    * Saving related code
    */
-  const singleActionRef = createRef<EditSingleAction>();
-  const conditionActionRef = createRef<EditConditionAction>();
+  const actionRef = createRef<EditSingleAction | EditConditionAction>();
 
   const renderActionDetailsEditor = () => {
     switch (actionType) {
       case ActionType.Single:
         return (
           <EditSingleAction
-            ref={singleActionRef}
+            ref={actionRef}
             data={actionData as SingleAction | undefined}
             msgFunc={msgFunc}
           />
@@ -116,7 +115,7 @@ const EditAction = ({
       case ActionType.If:
         return (
           <EditConditionAction
-            ref={conditionActionRef}
+            ref={actionRef}
             data={actionData as [Condition, Action, Action?] | undefined}
             msgFunc={msgFunc}
           />
@@ -126,12 +125,12 @@ const EditAction = ({
     }
   };
 
-  const getSingleActionData = async () => {
-    if (!singleActionRef.current) {
+  const getActionData = async () => {
+    if (!actionRef.current || actionType === ActionType.None) {
       return undefined;
     }
 
-    const content = await singleActionRef.current.getActionData();
+    const content = await actionRef.current.getActionData();
 
     // if undefined here means error message already shown
     if (!content) {
@@ -139,7 +138,7 @@ const EditAction = ({
     }
 
     return {
-      tag: "Single",
+      tag: ActionType[actionType],
       content,
     } as Action;
   };
@@ -154,21 +153,22 @@ const EditAction = ({
     const allowOverwrite =
       actionProp !== "new" && actionId === actionProp.substring(2);
 
-    let singleActionData: Action | undefined;
+    let actionData: Action | undefined;
 
     switch (actionType) {
       case ActionType.None:
         msgFunc("Please select an action type");
         break;
       case ActionType.Single:
-        singleActionData = await getSingleActionData();
-        if (!singleActionData) {
+      case ActionType.If:
+        actionData = await getActionData();
+        if (!actionData) {
           return;
         }
 
         invoke("add_new_action", {
           id: actionId,
-          action: singleActionData,
+          action: actionData,
           overwrite: allowOverwrite,
         })
           .then(onSaveDeleteCallback)

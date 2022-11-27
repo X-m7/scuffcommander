@@ -4,6 +4,7 @@ import EditOBSAction from "./obsaction";
 import EditVTSAction from "./vtsaction";
 import EditGeneralAction from "./generalaction";
 import {
+  ActionContent,
   SingleAction,
   PluginType,
   PluginAction,
@@ -123,7 +124,7 @@ class EditSingleAction extends Component<
     return {
       tag: PluginType[this.state.pluginType],
       content,
-    } as SingleAction;
+    } as ActionContent;
   };
 
   render() {
