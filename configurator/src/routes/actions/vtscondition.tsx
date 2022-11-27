@@ -56,7 +56,6 @@ class EditVTSCondition extends Component<
         invoke("get_vts_model_names")
           .then((list) => {
             this.setState({
-              ...this.state,
               queryType: newQueryType,
               queryInputList: list as string[],
               showQueryInput: true,
@@ -72,7 +71,6 @@ class EditVTSCondition extends Component<
               })
                 .then((nameRaw) => {
                   this.setState({
-                    ...this.state,
                     queryInput: `x-${nameRaw as string}`,
                   });
                 })
@@ -87,7 +85,6 @@ class EditVTSCondition extends Component<
         break;
       case VTSQueryType.None:
         this.setState({
-          ...this.state,
           queryType: newQueryType,
           showQueryInput: false,
           queryInput: "none",
@@ -115,7 +112,6 @@ class EditVTSCondition extends Component<
     }
 
     this.setState({
-      ...this.state,
       queryInput: (e.target as HTMLInputElement).value,
     });
   };

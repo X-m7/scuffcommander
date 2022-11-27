@@ -52,7 +52,6 @@ class EditOBSAction extends Component<EditOBSActionProps, EditOBSActionState> {
         invoke("get_obs_scenes")
           .then((list) => {
             this.setState({
-              ...this.state,
               actionType: newActionType,
               actionInputList: list as string[],
               showActionInput: true,
@@ -66,7 +65,6 @@ class EditOBSAction extends Component<EditOBSActionProps, EditOBSActionState> {
         break;
       case OBSActionType.None:
         this.setState({
-          ...this.state,
           actionType: newActionType,
           showActionInput: false,
           actionInput: "none",
@@ -94,7 +92,6 @@ class EditOBSAction extends Component<EditOBSActionProps, EditOBSActionState> {
     }
 
     this.setState({
-      ...this.state,
       actionInput: (e.target as HTMLInputElement).value,
     });
   };

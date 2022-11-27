@@ -51,14 +51,12 @@ class EditGeneralAction extends Component<
     switch (actionType) {
       case GeneralActionType.None:
         this.setState({
-          ...this.state,
           actionType,
           showActionInput: false,
         });
         break;
       case GeneralActionType.Delay:
         this.setState({
-          ...this.state,
           actionType,
           showActionInput: true,
         });
@@ -72,7 +70,6 @@ class EditGeneralAction extends Component<
     }
 
     this.setState({
-      ...this.state,
       actionInput: (e.target as HTMLInputElement).value,
     });
   };

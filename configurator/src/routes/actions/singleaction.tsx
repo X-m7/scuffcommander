@@ -48,7 +48,6 @@ class EditSingleAction extends Component<
   onPluginTypeChange = (e: Event) => {
     if (e.target) {
       this.setState({
-        ...this.state,
         pluginType: parseInt(
           (e.target as HTMLInputElement).value,
           10

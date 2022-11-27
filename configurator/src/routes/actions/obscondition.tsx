@@ -56,7 +56,6 @@ class EditOBSCondition extends Component<
         invoke("get_obs_scenes")
           .then((list) => {
             this.setState({
-              ...this.state,
               queryType: newQueryType,
               queryInputList: list as string[],
               showQueryInput: true,
@@ -70,7 +69,6 @@ class EditOBSCondition extends Component<
         break;
       case OBSQueryType.None:
         this.setState({
-          ...this.state,
           queryType: newQueryType,
           showQueryInput: false,
           queryInput: "none",
@@ -98,7 +96,6 @@ class EditOBSCondition extends Component<
     }
 
     this.setState({
-      ...this.state,
       queryInput: (e.target as HTMLInputElement).value,
     });
   };

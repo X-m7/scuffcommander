@@ -8,14 +8,14 @@
   display: none;
 }
 
-.vtsModelPosForm {
+.tableDisp {
   display: table;
 }
 
-.vtsModelPosRow {
+.rowDisp {
   display: table-row;
 }
 
-.vtsModelPosCell {
+.cellDisp {
   display: table-cell;
 }
