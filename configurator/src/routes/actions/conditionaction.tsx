@@ -1,6 +1,7 @@
 import { h, Fragment, Component, createRef } from "preact";
 
 import EditOBSCondition from "./obscondition";
+import EditVTSCondition from "./vtscondition";
 import { Action, Condition, QueryPluginType } from "./types";
 
 interface EditConditionActionProps {
@@ -71,7 +72,12 @@ class EditConditionAction extends Component<
           />
         );
       case QueryPluginType.VTS:
-        return <p>VTS</p>;
+        return (
+          <EditVTSCondition
+            data={this.state.loadedCondition}
+            msgFunc={this.props.msgFunc}
+          />
+        );
     }
   };
 

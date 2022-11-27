@@ -48,6 +48,12 @@ export enum OBSQueryType {
   Version,
 }
 
+export enum VTSQueryType {
+  None,
+  ActiveModelId,
+  Version,
+}
+
 /*
  * Exact representation of the Action type coming from the Rust side
  */

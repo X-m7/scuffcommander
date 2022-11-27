@@ -70,10 +70,12 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
           selectInputOptions: listRaw as string[],
           showSelectInput: true,
           showModelPosInput: false,
+          // Reset the selected input in most cases (on manual change)
           selectInputValue: "none",
         });
 
-        // On initialisation also convert the loaded ID to the name
+        // Unless init is true, in which case we get the loaded ID
+        // and convert it to the name
         if (init && this.props.data && this.props.data.content) {
           invoke(invokeArgInner, {
             id: this.props.data.content,
