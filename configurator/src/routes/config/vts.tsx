@@ -1,4 +1,5 @@
 import { h, Fragment } from "preact";
+import { invoke } from "@tauri-apps/api";
 
 import { VTSConfigData } from "./types";
 
@@ -9,6 +10,7 @@ import { VTSConfigData } from "./types";
 interface VTSFormProps {
   conf?: VTSConfigData;
   onChange: (newConf: VTSConfigData) => void;
+  msgFunc: (msg: string) => void;
 }
 
 const VTSForm = (props: VTSFormProps) => {
@@ -32,6 +34,15 @@ const VTSForm = (props: VTSFormProps) => {
     }
   };
 
+  const testConnection = () => {
+    invoke("test_vts_connection", { conf }).then((res) => {
+      const result = res as boolean;
+      props.msgFunc(
+        `VTube Studio connection test ${result ? "successful" : "failed"}`
+      );
+    });
+  };
+
   return (
     <Fragment>
       <h2>VTube Studio</h2>
@@ -45,6 +56,9 @@ const VTSForm = (props: VTSFormProps) => {
         <input type="text" value={conf.token_file} onInput={tokenFileInput} />
       </label>
       <br />
+      <button type="button" onClick={testConnection}>
+        Test connection
+      </button>
     </Fragment>
   );
 };

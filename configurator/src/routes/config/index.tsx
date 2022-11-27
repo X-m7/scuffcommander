@@ -105,6 +105,7 @@ const Config = () => {
       <h1>General Configuration</h1>
 
       <form onSubmit={saveConfig}>
+        <button type="submit">Save</button>
         <p>
           {statusState}
           {statusState.length > 0 && (
@@ -114,9 +115,16 @@ const Config = () => {
           )}
         </p>
         <ServerForm conf={serverConfig} onChange={onServerConfChange} />
-        <OBSForm conf={obsConfig} onChange={onObsConfChange} />
-        <VTSForm conf={vtsConfig} onChange={onVtsConfChange} />
-        <button type="submit">Save</button>
+        <OBSForm
+          conf={obsConfig}
+          onChange={onObsConfChange}
+          msgFunc={setStatusState}
+        />
+        <VTSForm
+          conf={vtsConfig}
+          onChange={onVtsConfChange}
+          msgFunc={setStatusState}
+        />
       </form>
     </div>
   );

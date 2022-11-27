@@ -1,4 +1,5 @@
 import { h, Fragment } from "preact";
+import { invoke } from "@tauri-apps/api";
 
 import { OBSConfigData } from "./types";
 
@@ -9,6 +10,7 @@ import { OBSConfigData } from "./types";
 interface OBSFormProps {
   conf?: OBSConfigData;
   onChange: (newConf: OBSConfigData) => void;
+  msgFunc: (msg: string) => void;
 }
 
 const OBSForm = (props: OBSFormProps) => {
@@ -38,6 +40,15 @@ const OBSForm = (props: OBSFormProps) => {
     }
   };
 
+  const testConnection = () => {
+    invoke("test_obs_connection", { conf }).then((res) => {
+      const result = res as boolean;
+      props.msgFunc(
+        `OBS Studio connection test ${result ? "successful" : "failed"}`
+      );
+    });
+  };
+
   return (
     <Fragment>
       <h2>OBS Studio</h2>
@@ -55,6 +66,9 @@ const OBSForm = (props: OBSFormProps) => {
         Password: <input type="text" value={conf.password} onInput={pwInput} />
       </label>
       <br />
+      <button type="button" onClick={testConnection}>
+        Test connection
+      </button>
     </Fragment>
   );
 };
