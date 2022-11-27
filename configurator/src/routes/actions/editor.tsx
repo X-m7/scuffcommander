@@ -10,6 +10,7 @@ import {
   Condition,
 } from "./types";
 import EditSingleAction from "./singleaction";
+import EditChainAction from "./chainaction";
 import EditConditionAction from "./conditionaction";
 
 interface EditActionProps {
@@ -111,7 +112,12 @@ const EditAction = ({
           />
         );
       case ActionType.Chain:
-        return <p>Chain</p>;
+        return (
+          <EditChainAction
+            data={actionData as Action[] | undefined}
+            msgFunc={msgFunc}
+          />
+        );
       case ActionType.If:
         return (
           <EditConditionAction
