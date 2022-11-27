@@ -42,6 +42,12 @@ export enum QueryPluginType {
   VTS,
 }
 
+export enum OBSQueryType {
+  None,
+  CurrentProgramScene,
+  Version,
+}
+
 /*
  * Exact representation of the Action type coming from the Rust side
  */

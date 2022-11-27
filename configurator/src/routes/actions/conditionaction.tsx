@@ -1,5 +1,6 @@
-import { h, Fragment, Component } from "preact";
+import { h, Fragment, Component, createRef } from "preact";
 
+import EditOBSCondition from "./obscondition";
 import { Action, Condition, QueryPluginType } from "./types";
 
 interface EditConditionActionProps {
@@ -36,12 +37,39 @@ class EditConditionAction extends Component<
     };
   }
 
+  conditionRef = createRef<EditOBSCondition>();
+
+  getActionData = async () => {
+    if (this.state.queryPluginType === QueryPluginType.None) {
+      this.props.msgFunc("Please select a query plugin type");
+      return undefined;
+    }
+
+    if (!this.conditionRef.current) {
+      return undefined;
+    }
+
+    const content = await this.conditionRef.current.getConditionData();
+
+    // if undefined here means error message already shown
+    if (!content) {
+      return undefined;
+    }
+
+    // return [Condition, Action, Action?]
+  };
+
   showSelectedPluginDetails = () => {
     switch (this.state.queryPluginType) {
       case QueryPluginType.None:
         return <Fragment />;
       case QueryPluginType.OBS:
-        return <p>OBS</p>;
+        return (
+          <EditOBSCondition
+            data={this.state.loadedCondition}
+            msgFunc={this.props.msgFunc}
+          />
+        );
       case QueryPluginType.VTS:
         return <p>VTS</p>;
     }

@@ -111,7 +111,6 @@ class EditSingleAction extends Component<
     }
 
     if (!this.actionRef.current) {
-      console.log("Component reference not ready");
       return undefined;
     }
 

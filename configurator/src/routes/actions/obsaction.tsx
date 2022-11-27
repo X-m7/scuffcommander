@@ -11,7 +11,7 @@ interface EditOBSActionProps {
 
 interface EditOBSActionState {
   actionType: OBSActionType;
-  programSceneList: string[];
+  actionInputList: string[];
   actionInput: string;
   showActionInput: boolean;
 }
@@ -28,14 +28,14 @@ class EditOBSAction extends Component<EditOBSActionProps, EditOBSActionState> {
       actionType = OBSActionType[props.data.tag as keyof typeof OBSActionType];
       actionInput = `x-${props.data.content}` ?? "none";
 
-      if (actionInput.length != 0) {
+      if (actionInput !== "none") {
         showActionInput = true;
       }
     }
 
     this.state = {
       actionType,
-      programSceneList: [],
+      actionInputList: [],
       actionInput,
       showActionInput,
     };
@@ -54,7 +54,7 @@ class EditOBSAction extends Component<EditOBSActionProps, EditOBSActionState> {
             this.setState({
               ...this.state,
               actionType: newActionType,
-              programSceneList: list as string[],
+              actionInputList: list as string[],
               showActionInput: true,
               // if called on init leave actionInput alone, otherwise reset
               actionInput: init ? this.state.actionInput : "none",
@@ -143,7 +143,7 @@ class EditOBSAction extends Component<EditOBSActionProps, EditOBSActionState> {
             onChange={this.onActionParamSelect}
           >
             <option value="none">Select an option</option>
-            {generateSelectOptions(this.state.programSceneList)}
+            {generateSelectOptions(this.state.actionInputList)}
           </select>
         </label>
       </Fragment>
