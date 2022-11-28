@@ -2,7 +2,7 @@ import { h, Fragment, Component } from "preact";
 import { invoke } from "@tauri-apps/api";
 
 import { Condition, VTSQueryType } from "./types";
-import { generateSelectOptions } from "./common";
+import SelectOptsGen from "/components/selectoptsgen";
 
 interface EditVTSConditionProps {
   data?: Condition;
@@ -186,7 +186,7 @@ class EditVTSCondition extends Component<
             onChange={this.onQueryParamSelect}
           >
             <option value="none">Select an option</option>
-            {generateSelectOptions(this.state.queryInputList)}
+            <SelectOptsGen opts={this.state.queryInputList} />
           </select>
         </label>
       </Fragment>

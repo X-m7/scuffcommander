@@ -6,7 +6,11 @@ import style from "./style.css";
 import EditSingleAction from "./singleaction";
 import EditConditionAction from "./conditionaction";
 import { Action, ActionContent } from "./types";
-import { generateSelectOptions } from "./common";
+import SelectOptsGen from "/components/selectoptsgen";
+
+/*
+ * TODO: turn ChainElement into generic draggable list element
+ */
 
 interface ChainElementProps {
   pos: number;
@@ -157,7 +161,7 @@ class CopyAction extends Component<CopyActionProps, CopyActionState> {
           onChange={this.onSelectedActionChange}
         >
           <option value="none">Select an option</option>
-          {generateSelectOptions(this.state.actionsList)}
+          <SelectOptsGen opts={this.state.actionsList} />
         </select>
       </label>
     );

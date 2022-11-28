@@ -1,10 +1,10 @@
 import { h } from "preact";
 import { useEffect, useState } from "preact/hooks";
-import style from "./style.css";
 import { invoke } from "@tauri-apps/api";
 
+import style from "./style.css";
 import EditAction from "./editor";
-import { generateSelectOptions } from "./common";
+import SelectOptsGen from "/components/selectoptsgen";
 
 const Actions = () => {
   const [statusState, setStatusState] = useState<string>("");
@@ -75,7 +75,7 @@ const Actions = () => {
           <select value={selectedAction} onChange={onSelectedActionChange}>
             <option value="none">Select an option</option>
             <option value="new">Create a new action</option>
-            {generateSelectOptions(actionsList)}
+            <SelectOptsGen opts={actionsList} />
           </select>
         </label>
         <button type="submit">Save Actions</button>

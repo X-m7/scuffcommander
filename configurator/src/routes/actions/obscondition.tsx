@@ -2,7 +2,7 @@ import { h, Fragment, Component } from "preact";
 import { invoke } from "@tauri-apps/api";
 
 import { Condition, OBSQueryType } from "./types";
-import { generateSelectOptions } from "./common";
+import SelectOptsGen from "/components/selectoptsgen";
 
 interface EditOBSConditionProps {
   data?: Condition;
@@ -156,7 +156,7 @@ class EditOBSCondition extends Component<
             onChange={this.onQueryParamSelect}
           >
             <option value="none">Select an option</option>
-            {generateSelectOptions(this.state.queryInputList)}
+            <SelectOptsGen opts={this.state.queryInputList} />
           </select>
         </label>
       </Fragment>

@@ -2,7 +2,7 @@ import { h, Fragment, Component } from "preact";
 import { invoke } from "@tauri-apps/api";
 
 import { OBSActionType, OBSAction } from "./types";
-import { generateSelectOptions } from "./common";
+import SelectOptsGen from "/components/selectoptsgen";
 
 interface EditOBSActionProps {
   data?: OBSAction;
@@ -140,7 +140,7 @@ class EditOBSAction extends Component<EditOBSActionProps, EditOBSActionState> {
             onChange={this.onActionParamSelect}
           >
             <option value="none">Select an option</option>
-            {generateSelectOptions(this.state.actionInputList)}
+            <SelectOptsGen opts={this.state.actionInputList} />
           </select>
         </label>
       </Fragment>

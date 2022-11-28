@@ -4,7 +4,7 @@ import { invoke } from "@tauri-apps/api";
 import EditOBSCondition from "./obscondition";
 import EditVTSCondition from "./vtscondition";
 import { Action, ActionContent, Condition, QueryPluginType } from "./types";
-import { generateSelectOptions } from "./common";
+import SelectOptsGen from "/components/selectoptsgen";
 
 interface EditConditionActionProps {
   data?: [Condition, Action, Action?];
@@ -256,7 +256,7 @@ class EditConditionAction extends Component<
             {this.props.data && (
               <option value="current">Keep original action</option>
             )}
-            {generateSelectOptions(this.state.actionsList)}
+            <SelectOptsGen opts={this.state.actionsList} />
           </select>
         </label>
         <br />
@@ -270,7 +270,7 @@ class EditConditionAction extends Component<
             {this.props.data && (
               <option value="current">Keep original action</option>
             )}
-            {generateSelectOptions(this.state.actionsList)}
+            <SelectOptsGen opts={this.state.actionsList} />
           </select>
         </label>
       </Fragment>

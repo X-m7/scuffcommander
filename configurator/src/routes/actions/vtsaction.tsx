@@ -1,9 +1,9 @@
 import { h, Fragment, Component } from "preact";
 import { invoke } from "@tauri-apps/api";
-import style from "./style.css";
 
+import style from "./style.css";
 import { VTSActionType, VTSAction, VTSMoveModelData } from "./types";
-import { generateSelectOptions } from "./common";
+import SelectOptsGen from "/components/selectoptsgen";
 
 interface EditVTSActionProps {
   data?: VTSAction;
@@ -342,7 +342,7 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
             onChange={this.onSelectInputChange}
           >
             <option value="none">Select an option</option>
-            {generateSelectOptions(this.state.selectInputOptions)}
+            <SelectOptsGen opts={this.state.selectInputOptions} />
           </select>
         </label>
         <div

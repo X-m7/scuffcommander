@@ -1,6 +1,10 @@
 import { h, Fragment } from "preact";
 
-export const generateSelectOptions = (opts: string[]) => {
+interface SelectOptsGenProps {
+  opts: string[];
+}
+
+const SelectOptsGen = ({ opts }: SelectOptsGenProps) => {
   return (
     <Fragment>
       {opts.map((opt) => {
@@ -13,3 +17,5 @@ export const generateSelectOptions = (opts: string[]) => {
     </Fragment>
   );
 };
+
+export default SelectOptsGen;
