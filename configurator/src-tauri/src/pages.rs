@@ -69,7 +69,8 @@ pub async fn delete_page(
     Ok(())
 }
 
-async fn move_button_to_index(
+#[tauri::command]
+pub async fn move_button_to_index(
     id: String,
     index_initial: usize,
     index_target: usize,
@@ -96,24 +97,6 @@ async fn move_button_to_index(
     buttons.insert(index_target, button);
 
     Ok(())
-}
-
-#[tauri::command]
-pub async fn move_button_up_in_page(
-    id: String,
-    index: usize,
-    ui_state: tauri::State<'_, UIConfigState>,
-) -> Result<(), String> {
-    move_button_to_index(id, index, index - 1, ui_state).await
-}
-
-#[tauri::command]
-pub async fn move_button_down_in_page(
-    id: String,
-    index: usize,
-    ui_state: tauri::State<'_, UIConfigState>,
-) -> Result<(), String> {
-    move_button_to_index(id, index, index + 1, ui_state).await
 }
 
 #[tauri::command]

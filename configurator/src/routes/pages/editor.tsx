@@ -1,5 +1,5 @@
 import { h, Fragment } from "preact";
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useState, useCallback } from "preact/hooks";
 import { invoke } from "@tauri-apps/api";
 
 import DraggableListItem from "/components/draggablelistitem";
@@ -18,6 +18,14 @@ const EditPage = ({
   const [pageId, setPageId] = useState<string>("");
   const [buttonsList, setButtonsList] = useState<string[]>([]);
 
+  const updatePageButtons = useCallback(() => {
+    invoke("get_page_buttons_info", { id: pageProp.substring(2) }).then(
+      (buttonsRaw) => {
+        setButtonsList(buttonsRaw as string[]);
+      }
+    );
+  }, [pageProp]);
+
   useEffect(() => {
     if (pageProp === "none" || pageProp === "new") {
       setPageId("");
@@ -25,15 +33,9 @@ const EditPage = ({
       return;
     }
 
-    const newPageId = pageProp.substring(2);
-
-    invoke("get_page_buttons_info", { id: newPageId }).then((buttonsRaw) => {
-      const buttons = buttonsRaw as string[];
-
-      setButtonsList(buttons);
-      setPageId(newPageId);
-    });
-  }, [pageProp]);
+    setPageId(pageProp.substring(2));
+    updatePageButtons();
+  }, [pageProp, updatePageButtons]);
 
   const onPageIdInput = (e: Event) => {
     if (e.target) {
@@ -83,7 +85,13 @@ const EditPage = ({
     return page;
   };
 
-  const movePageInList = (draggedIndex: number, targetIndex: number) => {};
+  const movePageInList = (draggedIndex: number, targetIndex: number) => {
+    invoke("move_button_to_index", {
+      id: pageProp.substring(2),
+      indexInitial: draggedIndex,
+      indexTarget: targetIndex,
+    }).then(updatePageButtons);
+  };
 
   const deleteButtonFromPage = (index: number) => {
     invoke("delete_button_from_page", { id: pageProp.substring(2), index })

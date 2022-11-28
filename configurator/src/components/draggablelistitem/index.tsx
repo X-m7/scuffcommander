@@ -64,13 +64,22 @@ function DraggableListItem<T>({
   };
 
   const onDrop = (e: DragEvent) => {
+    setDragged(false);
+    setDraggedOver(false);
+
     if (e.dataTransfer === null) {
       return;
     }
-    moveCallback(parseInt(e.dataTransfer.getData("index"), 10), pos);
 
-    setDragged(false);
-    setDraggedOver(false);
+    const initialIndexStr = e.dataTransfer.getData("index");
+
+    // sometimes the order of events can get mixed up somehow,
+    // if that is the case don't bother with the callback
+    if (initialIndexStr.length === 0) {
+      return;
+    }
+
+    moveCallback(parseInt(initialIndexStr, 10), pos);
   };
 
   if (dataStr === undefined) {
