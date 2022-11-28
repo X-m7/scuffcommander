@@ -3,7 +3,7 @@ import { useEffect, useState } from "preact/hooks";
 import { invoke } from "@tauri-apps/api";
 
 import style from "./style.css";
-import { Action } from "./types";
+import { Action, ActionContent } from "./types";
 
 interface ChainElementProps {
   pos: number;
@@ -135,6 +135,11 @@ class EditChainAction extends Component<
 
   deleteActionInChain = (index: number) => {
     this.setState({ chain: this.state.chain.filter((elem, i) => index != i) });
+  };
+
+  // This is very simple since there is no plugin specific logic to be concerned about here
+  getActionData = async () => {
+    return this.state.chain as ActionContent;
   };
 
   render() {

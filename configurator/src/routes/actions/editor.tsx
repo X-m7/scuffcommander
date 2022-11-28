@@ -99,7 +99,9 @@ const EditAction = ({
   /*
    * Saving related code
    */
-  const actionRef = createRef<EditSingleAction | EditConditionAction>();
+  const actionRef = createRef<
+    EditSingleAction | EditChainAction | EditConditionAction
+  >();
 
   const renderActionDetailsEditor = () => {
     switch (actionType) {
@@ -114,6 +116,7 @@ const EditAction = ({
       case ActionType.Chain:
         return (
           <EditChainAction
+            ref={actionRef}
             data={actionData as Action[] | undefined}
             msgFunc={msgFunc}
           />
@@ -155,37 +158,30 @@ const EditAction = ({
       return;
     }
 
+    if (actionType === ActionType.None) {
+      msgFunc("Please select an action type;");
+      return;
+    }
+
     // allow overwrites only when editing an action without changing its ID
     const allowOverwrite =
       actionProp !== "new" && actionId === actionProp.substring(2);
 
-    let actionData: Action | undefined;
+    let actionData = await getActionData();
 
-    switch (actionType) {
-      case ActionType.None:
-        msgFunc("Please select an action type");
-        break;
-      case ActionType.Single:
-      case ActionType.If:
-        actionData = await getActionData();
-        if (!actionData) {
-          return;
-        }
-
-        invoke("add_new_action", {
-          id: actionId,
-          action: actionData,
-          overwrite: allowOverwrite,
-        })
-          .then(onSaveDeleteCallback)
-          .catch((err) => {
-            msgFunc(`Error occurred: ${err.toString()}`);
-          });
-        break;
-      default:
-        msgFunc("Saving given action type not implemented yet");
-        break;
+    if (!actionData) {
+      return;
     }
+
+    invoke("add_new_action", {
+      id: actionId,
+      action: actionData,
+      overwrite: allowOverwrite,
+    })
+      .then(onSaveDeleteCallback)
+      .catch((err) => {
+        msgFunc(`Error occurred: ${err.toString()}`);
+      });
   };
 
   // hide on none
