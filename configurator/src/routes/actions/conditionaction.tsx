@@ -57,15 +57,11 @@ class EditConditionAction extends Component<
 
   componentDidMount() {
     // Populate the then/else action selectors
-    invoke("get_actions")
-      .then((actsList) => {
-        this.setState({
-          actionsList: actsList as string[],
-        });
-      })
-      .catch((err) => {
-        this.props.msgFunc(`Error occurred: ${err.toString()}`);
+    invoke("get_actions").then((actsList) => {
+      this.setState({
+        actionsList: actsList as string[],
       });
+    });
 
     this.loadOriginalThenElseActionDisplay();
   }

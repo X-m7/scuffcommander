@@ -6,6 +6,7 @@ import style from "./style.css";
 import EditSingleAction from "./singleaction";
 import EditConditionAction from "./conditionaction";
 import { Action, ActionContent } from "./types";
+import { generateSelectOptions } from "./common";
 
 interface ChainElementProps {
   pos: number;
@@ -99,6 +100,70 @@ const ChainElement = ({
   );
 };
 
+interface CopyActionState {
+  selectedActionId: string;
+  actionsList: string[];
+}
+
+interface CopyActionProps {
+  msgFunc: (msg: string) => void;
+}
+
+class CopyAction extends Component<CopyActionProps, CopyActionState> {
+  constructor(props: CopyActionProps) {
+    super(props);
+
+    this.state = {
+      selectedActionId: "none",
+      actionsList: [],
+    };
+  }
+
+  componentDidMount() {
+    invoke("get_actions").then((actsList) => {
+      this.setState({
+        actionsList: actsList as string[],
+      });
+    });
+  }
+
+  getActionData = async () => {
+    if (this.state.selectedActionId === "none") {
+      this.props.msgFunc("Please select an action to copy");
+      return undefined;
+    }
+
+    return (await invoke("load_action_details", {
+      id: this.state.selectedActionId.substring(2),
+    })) as Action;
+  };
+
+  onSelectedActionChange = (e: Event) => {
+    if (!e.target) {
+      return;
+    }
+
+    this.setState({
+      selectedActionId: (e.target as HTMLInputElement).value,
+    });
+  };
+
+  render() {
+    return (
+      <label>
+        Action to copy:
+        <select
+          value={this.state.selectedActionId}
+          onChange={this.onSelectedActionChange}
+        >
+          <option value="none">Select an option</option>
+          {generateSelectOptions(this.state.actionsList)}
+        </select>
+      </label>
+    );
+  }
+}
+
 enum NewActionType {
   None,
   Single,
@@ -169,7 +234,7 @@ class EditChainAction extends Component<
     });
   };
 
-  actionRef = createRef<EditSingleAction | EditConditionAction>();
+  actionRef = createRef<EditSingleAction | EditConditionAction | CopyAction>();
 
   renderNewActionDetailsEditor = () => {
     switch (this.state.newActionType) {
@@ -190,7 +255,7 @@ class EditChainAction extends Component<
           />
         );
       case NewActionType.Copy:
-        return <p>Copy</p>;
+        return <CopyAction ref={this.actionRef} msgFunc={this.props.msgFunc} />;
       default:
         return <Fragment />;
     }
@@ -211,9 +276,14 @@ class EditChainAction extends Component<
       return undefined;
     }
 
+    // in copy mode the whole action is returned
+    if (this.state.newActionType === NewActionType.Copy) {
+      return content as Action;
+    }
+
     return {
       tag: NewActionType[this.state.newActionType],
-      content,
+      content: content as ActionContent,
     } as Action;
   };
 
