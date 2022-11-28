@@ -1,0 +1,7 @@
+.dragged {
+  color: #cccccc;
+}
+
+.draggedOver {
+  background-color: #cccccc;
+}
