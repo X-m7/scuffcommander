@@ -89,8 +89,12 @@ const EditAction = ({
   };
 
   const deleteCurrentAction = () => {
-    invoke("delete_action", { id: actionProp.substring(2) })
-      .then(onSaveDeleteCallback)
+    const id = actionProp.substring(2);
+    invoke("delete_action", { id })
+      .then(() => {
+        msgFunc(`Action with ID "${id}" deleted`);
+        onSaveDeleteCallback();
+      })
       .catch((err) => {
         msgFunc(`Error occurred: ${err.toString()}`);
       });

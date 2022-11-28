@@ -1,0 +1,21 @@
+.pages {
+  padding: 56px 20px;
+  min-height: 100%;
+  width: 100%;
+}
+
+.hidden {
+  display: none;
+}
+
+.tableDisp {
+  display: table;
+}
+
+.rowDisp {
+  display: table-row;
+}
+
+.cellDisp {
+  display: table-cell;
+}
