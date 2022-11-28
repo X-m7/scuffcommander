@@ -243,36 +243,38 @@ class EditConditionAction extends Component<
         </label>
         <hr />
         {this.showSelectedPluginDetails()}
-        <hr />
-        <p>Original then action: {this.state.originalThenAction}</p>
-        <p>Original else action: {this.state.originalElseAction}</p>
-        <label>
-          Then:
-          <select
-            value={this.state.thenActionId}
-            onChange={this.onThenActionChange}
-          >
-            <option value="none">Select an option</option>
-            {this.props.data && (
-              <option value="current">Keep original action</option>
-            )}
-            <SelectOptsGen opts={this.state.actionsList} />
-          </select>
-        </label>
-        <br />
-        <label>
-          Else:
-          <select
-            value={this.state.elseActionId}
-            onChange={this.onElseActionChange}
-          >
-            <option value="none">Do nothing</option>
-            {this.props.data && (
-              <option value="current">Keep original action</option>
-            )}
-            <SelectOptsGen opts={this.state.actionsList} />
-          </select>
-        </label>
+        <div hidden={this.state.queryPluginType === QueryPluginType.None}>
+          <hr />
+          <p>Original then action: {this.state.originalThenAction}</p>
+          <p>Original else action: {this.state.originalElseAction}</p>
+          <label>
+            Then:
+            <select
+              value={this.state.thenActionId}
+              onChange={this.onThenActionChange}
+            >
+              <option value="none">Select an option</option>
+              {this.props.data && (
+                <option value="current">Keep original action</option>
+              )}
+              <SelectOptsGen opts={this.state.actionsList} />
+            </select>
+          </label>
+          <br />
+          <label>
+            Else:
+            <select
+              value={this.state.elseActionId}
+              onChange={this.onElseActionChange}
+            >
+              <option value="none">Do nothing</option>
+              {this.props.data && (
+                <option value="current">Keep original action</option>
+              )}
+              <SelectOptsGen opts={this.state.actionsList} />
+            </select>
+          </label>
+        </div>
       </Fragment>
     );
   }

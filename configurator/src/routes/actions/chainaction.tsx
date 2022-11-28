@@ -258,7 +258,11 @@ class EditChainAction extends Component<
             <option value={NewActionType.Copy}>Copy existing action</option>
           </select>
         </label>
-        <button type="button" onClick={this.addActionToChain}>
+        <button
+          type="button"
+          hidden={this.state.newActionType === NewActionType.None}
+          onClick={this.addActionToChain}
+        >
           Add action to chain
         </button>
         <br />
