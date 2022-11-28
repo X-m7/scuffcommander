@@ -1,4 +1,4 @@
-import { h, Fragment, Component } from "preact";
+import { h, Fragment, Component, ComponentChildren } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { invoke } from "@tauri-apps/api";
 
@@ -10,6 +10,7 @@ interface ChainElementProps {
   data: Action;
   msgFunc: (msg: string) => void;
   moveCallback: (start: number, end: number) => void;
+  children: ComponentChildren;
 }
 
 const ChainElement = ({
@@ -17,6 +18,7 @@ const ChainElement = ({
   data,
   msgFunc,
   moveCallback,
+  children,
 }: ChainElementProps) => {
   const [actionStr, setActionStr] = useState<string | undefined>(undefined);
   const [dragged, setDragged] = useState<boolean>(false);
@@ -40,6 +42,23 @@ const ChainElement = ({
     setDragged(true);
   };
 
+  const onDragOver = (e: DragEvent) => {
+    // default is to disable drop so stop that
+    e.preventDefault();
+  };
+
+  const onDragEnter = () => {
+    setDraggedOver(true);
+  };
+
+  const onDragLeave = () => {
+    setDraggedOver(false);
+  };
+
+  /*
+   * onDragEnd and onDrop both signal that the drag and drop is done,
+   * so reset both drag attributes in both functions
+   */
   const onDragEnd = () => {
     setDragged(false);
     setDraggedOver(false);
@@ -52,19 +71,6 @@ const ChainElement = ({
     moveCallback(parseInt(e.dataTransfer.getData("index"), 10), pos);
 
     setDragged(false);
-    setDraggedOver(false);
-  };
-
-  const onDragOver = (e: DragEvent) => {
-    // default is to disable drop so stop that
-    e.preventDefault();
-  };
-
-  const onDragEnter = () => {
-    setDraggedOver(true);
-  };
-
-  const onDragLeave = () => {
     setDraggedOver(false);
   };
 
@@ -86,6 +92,7 @@ const ChainElement = ({
       onDrop={onDrop}
     >
       {actionStr}
+      {children}
     </li>
   );
 };
@@ -113,7 +120,7 @@ class EditChainAction extends Component<
     };
   }
 
-  moveItemInChain = (draggedIndex: number, targetIndex: number) => {
+  moveActionInChain = (draggedIndex: number, targetIndex: number) => {
     if (draggedIndex === targetIndex) {
       return;
     }
@@ -124,6 +131,10 @@ class EditChainAction extends Component<
     chain.splice(targetIndex, 0, draggedAction);
 
     this.setState({ chain });
+  };
+
+  deleteActionInChain = (index: number) => {
+    this.setState({ chain: this.state.chain.filter((elem, i) => index != i) });
   };
 
   render() {
@@ -137,8 +148,15 @@ class EditChainAction extends Component<
                 pos={index}
                 data={act}
                 msgFunc={this.props.msgFunc}
-                moveCallback={this.moveItemInChain}
-              />
+                moveCallback={this.moveActionInChain}
+              >
+                <button
+                  type="button"
+                  onClick={() => this.deleteActionInChain(index)}
+                >
+                  Delete
+                </button>
+              </ChainElement>
             );
           })}
         </ol>
