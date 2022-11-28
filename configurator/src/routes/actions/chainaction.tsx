@@ -1,8 +1,10 @@
-import { h, Fragment, Component, ComponentChildren } from "preact";
+import { h, Fragment, Component, ComponentChildren, createRef } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { invoke } from "@tauri-apps/api";
 
 import style from "./style.css";
+import EditSingleAction from "./singleaction";
+import EditConditionAction from "./conditionaction";
 import { Action, ActionContent } from "./types";
 
 interface ChainElementProps {
@@ -97,6 +99,13 @@ const ChainElement = ({
   );
 };
 
+enum NewActionType {
+  None,
+  Single,
+  If,
+  Copy,
+}
+
 interface EditChainActionProps {
   data?: Action[];
   msgFunc: (msg: string) => void;
@@ -104,6 +113,7 @@ interface EditChainActionProps {
 
 interface EditChainActionState {
   chain: Action[];
+  newActionType: NewActionType;
 }
 
 class EditChainAction extends Component<
@@ -117,6 +127,7 @@ class EditChainAction extends Component<
 
     this.state = {
       chain,
+      newActionType: NewActionType.None,
     };
   }
 
@@ -142,6 +153,85 @@ class EditChainAction extends Component<
     return this.state.chain as ActionContent;
   };
 
+  /*
+   * Adding action to chain related code
+   */
+  onActionTypeToAddChange = (e: Event) => {
+    if (!e.target) {
+      return;
+    }
+
+    this.setState({
+      newActionType: parseInt(
+        (e.target as HTMLInputElement).value,
+        10
+      ) as NewActionType,
+    });
+  };
+
+  actionRef = createRef<EditSingleAction | EditConditionAction>();
+
+  renderNewActionDetailsEditor = () => {
+    switch (this.state.newActionType) {
+      case NewActionType.Single:
+        return (
+          <EditSingleAction
+            ref={this.actionRef}
+            data={undefined}
+            msgFunc={this.props.msgFunc}
+          />
+        );
+      case NewActionType.If:
+        return (
+          <EditConditionAction
+            ref={this.actionRef}
+            data={undefined}
+            msgFunc={this.props.msgFunc}
+          />
+        );
+      case NewActionType.Copy:
+        return <p>Copy</p>;
+      default:
+        return <Fragment />;
+    }
+  };
+
+  getNewActionData = async () => {
+    if (
+      !this.actionRef.current ||
+      this.state.newActionType === NewActionType.None
+    ) {
+      return undefined;
+    }
+
+    const content = await this.actionRef.current.getActionData();
+
+    // if undefined here means error message already shown
+    if (!content) {
+      return undefined;
+    }
+
+    return {
+      tag: NewActionType[this.state.newActionType],
+      content,
+    } as Action;
+  };
+
+  addActionToChain = async () => {
+    if (this.state.newActionType === NewActionType.None) {
+      this.props.msgFunc("Please select an action type");
+      return;
+    }
+
+    const newActionData = await this.getNewActionData();
+
+    if (!newActionData) {
+      return;
+    }
+
+    this.setState({ chain: this.state.chain.concat([newActionData]) });
+  };
+
   render() {
     return (
       <Fragment>
@@ -165,6 +255,24 @@ class EditChainAction extends Component<
             );
           })}
         </ol>
+        <hr />
+        <label>
+          Action type to add to chain:
+          <select
+            value={this.state.newActionType}
+            onChange={this.onActionTypeToAddChange}
+          >
+            <option value={NewActionType.None}>Select an option</option>
+            <option value={NewActionType.Single}>Single</option>
+            <option value={NewActionType.If}>Condition</option>
+            <option value={NewActionType.Copy}>Copy existing action</option>
+          </select>
+        </label>
+        <button type="button" onClick={this.addActionToChain}>
+          Add action to chain
+        </button>
+        <br />
+        {this.renderNewActionDetailsEditor()}
       </Fragment>
     );
   }

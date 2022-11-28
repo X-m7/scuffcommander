@@ -159,7 +159,7 @@ const EditAction = ({
     }
 
     if (actionType === ActionType.None) {
-      msgFunc("Please select an action type;");
+      msgFunc("Please select an action type");
       return;
     }
 
@@ -167,7 +167,7 @@ const EditAction = ({
     const allowOverwrite =
       actionProp !== "new" && actionId === actionProp.substring(2);
 
-    let actionData = await getActionData();
+    const actionData = await getActionData();
 
     if (!actionData) {
       return;
