@@ -1,7 +1,6 @@
 use obws::responses::scenes::Scene;
 use obws::Client;
 use serde::{Deserialize, Serialize};
-use serde_json::value::Value;
 use std::fmt::{Display, Formatter};
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -16,15 +15,6 @@ impl OBSQuery {
             OBSQuery::CurrentProgramScene => conn.get_current_program_scene().await,
             OBSQuery::Version => conn.get_obs_version().await,
         }
-    }
-
-    // Analogous to the VTSQuery version, although here it does not do much (left like this in case
-    // it is necessary for future query types)
-    pub fn from_strings(query_type: &str, target: &str) -> Result<(OBSQuery, String), String> {
-        Ok((
-            serde_json::from_str(&format!("\"{}\"", query_type)).map_err(|e| e.to_string())?,
-            target.to_string(),
-        ))
     }
 }
 
@@ -61,28 +51,6 @@ impl OBSAction {
             OBSAction::ProgramSceneChange(scene) => conn.change_current_program_scene(scene).await,
             OBSAction::CheckConnection => conn.get_obs_version().await.map(|_| ()),
         }
-    }
-
-    pub fn from_json(data: Value) -> Result<OBSAction, String> {
-        if !data.is_object() {
-            return Err("Invalid data input for OBS action".to_string());
-        }
-
-        let output = match data["type"]
-            .as_str()
-            .ok_or_else(|| "OBS action type must be a string".to_string())?
-        {
-            "ProgramSceneChange" => OBSAction::ProgramSceneChange(
-                data["param"]
-                    .as_str()
-                    .ok_or_else(|| "OBS action parameter must be a string".to_string())?
-                    .to_string(),
-            ),
-            "CheckConnection" => OBSAction::CheckConnection,
-            _ => return Err("Unsupported OBS action type".to_string()),
-        };
-
-        Ok(output)
     }
 }
 

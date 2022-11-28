@@ -2,10 +2,8 @@ pub mod general;
 pub mod obs;
 pub mod vts;
 
-use crate::action::Condition;
 use derive_more::Display;
 use serde::{Deserialize, Serialize};
-use serde_json::value::Value;
 use std::collections::HashMap;
 use std::fmt::{Display, Formatter};
 use tokio::sync::Mutex;
@@ -98,20 +96,6 @@ impl PluginAction {
             PluginAction::General(_) => PluginType::General,
         }
     }
-
-    // Helper method to make creating actions from frontend simpler
-    // PluginInstance is required to convert certain UI friendly inputs to the required format (for
-    // example VTS model name to model id)
-    pub async fn from_json(
-        plugin: &mut PluginInstance,
-        data: Value,
-    ) -> Result<PluginAction, String> {
-        Ok(match plugin {
-            PluginInstance::OBS(_) => PluginAction::OBS(OBSAction::from_json(data)?),
-            PluginInstance::VTS(conn) => PluginAction::VTS(VTSAction::from_json(data, conn).await?),
-            PluginInstance::General => PluginAction::General(GeneralAction::from_json(data)?),
-        })
-    }
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -159,42 +143,5 @@ impl PluginStates {
         PluginStates {
             plugins: Mutex::new(plugins),
         }
-    }
-}
-
-impl Condition {
-    // Helper method to make creating conditions from frontend simpler
-    // PluginInstance is required to convert certain UI friendly inputs to the required format (for
-    // example VTS model name to model id)
-    pub async fn from_json(
-        plugin: &mut PluginInstance,
-        data: serde_json::Value,
-    ) -> Result<Condition, String> {
-        if !data.is_object() {
-            return Err("Invalid data input for condition".to_string());
-        }
-
-        let (Some(plugin_specific_type), Some(target)) = (&data["type"].as_str(), &data["param"].as_str()) else {
-            return Err("Invalid data input for condition".to_string());
-        };
-
-        let (query, target) = match plugin {
-            PluginInstance::OBS(_) => {
-                let (obs_query, target) = OBSQuery::from_strings(plugin_specific_type, target)?;
-
-                (PluginQuery::OBS(obs_query), target)
-            }
-            PluginInstance::VTS(conn) => {
-                let (vts_query, target) =
-                    VTSQuery::from_strings(plugin_specific_type, target, conn).await?;
-
-                (PluginQuery::VTS(vts_query), target)
-            }
-            PluginInstance::General => {
-                return Err("No query types implemented for this plugin".to_string())
-            }
-        };
-
-        Ok(Condition { query, target })
     }
 }

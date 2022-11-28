@@ -41,9 +41,6 @@ async fn main() {
                 .display()
                 .to_string(),
         ))
-        .manage(app_mod::actions::chain::TemporaryChain(Mutex::new(
-            Vec::new(),
-        )))
         .invoke_handler(tauri::generate_handler![
             app_mod::plugins::obs::get_obs_scenes,
             app_mod::plugins::obs::test_obs_connection,
@@ -81,14 +78,6 @@ async fn main() {
             app_mod::actions::save_actions,
             app_mod::actions::delete_action,
             app_mod::actions::convert_action_to_string,
-            app_mod::actions::chain::clear_temp_chain,
-            app_mod::actions::chain::store_temp_chain,
-            app_mod::actions::chain::copy_action_to_temp_chain,
-            app_mod::actions::chain::add_new_single_action_to_temp_chain,
-            app_mod::actions::chain::add_new_condition_action_to_temp_chain,
-            app_mod::actions::chain::delete_entry_from_temp_chain,
-            app_mod::actions::chain::get_temp_chain_display,
-            app_mod::actions::condition::add_new_condition_action,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
