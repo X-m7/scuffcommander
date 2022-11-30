@@ -1,9 +1,11 @@
-import { h, Fragment } from "preact";
+import { h, Fragment, createRef } from "preact";
 import { useEffect, useState, useCallback } from "preact/hooks";
 import { invoke } from "@tauri-apps/api";
 
 import DraggableListItem from "/components/draggablelistitem";
 import SelectOptsGen from "/components/selectoptsgen";
+import EditButtonStyle from "/components/editbuttonstyle";
+import { ButtonStyle } from "/components/editbuttonstyle/types";
 import { UIButton, ButtonData, ExecuteAction, OpenPage } from "./types";
 
 interface EditPageProps {
@@ -24,11 +26,36 @@ const EditPage = ({
   const [editButtonIndex, setEditButtonIndex] = useState<number>(-1);
   const [editButtonType, setEditButtonType] = useState<string>("none");
   const [editButtonTargetId, setEditButtonTargetId] = useState<string>("none");
+  const [editButtonEnableStyle, setEditButtonEnableStyle] =
+    useState<boolean>(false);
   const [editButtonLoadedTargetId, setEditButtonLoadedTargetId] =
     useState<string>("");
+  const [editButtonLoadedStyle, setEditButtonLoadedStyle] = useState<
+    ButtonStyle | undefined
+  >(undefined);
   const [editButtonTargetList, setEditButtonTargetList] = useState<string[]>(
     []
   );
+
+  const updatePageButtons = useCallback(() => {
+    invoke("get_page_buttons_info", { id: pageProp.substring(2) }).then(
+      (buttonsRaw) => {
+        setButtonsList(buttonsRaw as string[]);
+      }
+    );
+  }, [pageProp]);
+
+  // effectively the constructor
+  useEffect(() => {
+    if (pageProp === "none" || pageProp === "new") {
+      setPageId("");
+      setButtonsList([]);
+      return;
+    }
+
+    setPageId(pageProp.substring(2));
+    updatePageButtons();
+  }, [pageProp, updatePageButtons]);
 
   useEffect(() => {
     if (editButtonType === "none") {
@@ -58,26 +85,6 @@ const EditPage = ({
       setEditButtonTargetList(list);
     });
   }, [editButtonType, editButtonLoadedTargetId, pageProp]);
-
-  const updatePageButtons = useCallback(() => {
-    invoke("get_page_buttons_info", { id: pageProp.substring(2) }).then(
-      (buttonsRaw) => {
-        setButtonsList(buttonsRaw as string[]);
-      }
-    );
-  }, [pageProp]);
-
-  // effectively the constructor
-  useEffect(() => {
-    if (pageProp === "none" || pageProp === "new") {
-      setPageId("");
-      setButtonsList([]);
-      return;
-    }
-
-    setPageId(pageProp.substring(2));
-    updatePageButtons();
-  }, [pageProp, updatePageButtons]);
 
   const onPageIdInput = (e: Event) => {
     if (e.target) {
@@ -131,7 +138,9 @@ const EditPage = ({
     setEditingButton(false);
     setEditButtonType("none");
     setEditButtonTargetId("none");
+    setEditButtonEnableStyle(false);
     setEditButtonLoadedTargetId("");
+    setEditButtonLoadedStyle(undefined);
   };
 
   const movePageInList = (draggedIndex: number, targetIndex: number) => {
@@ -170,12 +179,16 @@ const EditPage = ({
         return;
       }
 
+      console.log(data.style_override);
+
       setEditButtonLoadedTargetId(data.target_id);
+      setEditButtonEnableStyle(data.style_override !== null);
+      setEditButtonLoadedStyle(data.style_override);
       setEditButtonIndex(index);
       setEditingButton(true);
     });
 
-    // TODO: load button style, img
+    // TODO: load img
   };
 
   const deleteButtonFromPage = (index: number) => {
@@ -188,8 +201,10 @@ const EditPage = ({
       });
   };
 
+  const buttonStyleRef = createRef<EditButtonStyle>();
+
   const getButtonData = () => {
-    // TODO: buttonstyle, img
+    // TODO: img
     // for img if already exist and no change send empty data and format as "keeporiginal"
     // otherwise leave format black and store the file location in data
 
@@ -198,9 +213,15 @@ const EditPage = ({
       return undefined;
     }
 
+    let style_override: ButtonStyle | undefined;
+
+    if (buttonStyleRef.current && editButtonEnableStyle) {
+      style_override = buttonStyleRef.current.getButtonStyleData();
+    }
+
     const buttonData = {
       target_id: editButtonTargetId.substring(2),
-      style_override: undefined,
+      style_override,
       img: undefined,
     } as ButtonData;
 
@@ -280,6 +301,10 @@ const EditPage = ({
     if (e.target) {
       setEditButtonTargetId((e.target as HTMLInputElement).value);
     }
+  };
+
+  const toggleEditButtonEnableStyle = () => {
+    setEditButtonEnableStyle(!editButtonEnableStyle);
   };
 
   // hide on none
@@ -363,6 +388,24 @@ const EditPage = ({
           <SelectOptsGen opts={editButtonTargetList} />
         </select>
       </label>
+      <br />
+      <label>
+        Enable style override:
+        <input
+          type="checkbox"
+          checked={editButtonEnableStyle}
+          onClick={toggleEditButtonEnableStyle}
+        />
+      </label>
+      {editButtonEnableStyle && (
+        <Fragment>
+          <br />
+          <EditButtonStyle
+            ref={buttonStyleRef}
+            initialData={editButtonLoadedStyle}
+          />
+        </Fragment>
+      )}
     </Fragment>
   );
 };

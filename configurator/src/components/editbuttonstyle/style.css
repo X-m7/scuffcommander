@@ -1,0 +1,11 @@
+.tableDisp {
+  display: table;
+}
+
+.rowDisp {
+  display: table-row;
+}
+
+.cellDisp {
+  display: table-cell;
+}

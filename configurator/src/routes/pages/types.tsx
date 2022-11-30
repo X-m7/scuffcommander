@@ -1,9 +1,4 @@
-export type ButtonStyle = {
-  width: string;
-  height: string;
-  bg_color: string;
-  fg_color: string;
-};
+import { ButtonStyle } from "/components/editbuttonstyle/types";
 
 export type Base64Image = {
   format: string;
