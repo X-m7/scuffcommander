@@ -43,11 +43,11 @@ impl Display for Condition {
 impl Condition {
     pub async fn check(
         &self,
-        plugins: &mut HashMap<PluginType, PluginInstance>,
+        plugins: &HashMap<PluginType, PluginInstance>,
     ) -> Result<bool, String> {
         let plugin_type = self.query.get_required_type();
 
-        let Some(plugin) = plugins.get_mut(&plugin_type) else {
+        let Some(plugin) = plugins.get(&plugin_type) else {
             return Err(format!("Plugin {} not configured", plugin_type));
         };
 
@@ -82,20 +82,17 @@ impl Display for Action {
 impl Action {
     async fn run_single(
         action: &PluginAction,
-        plugins: &mut HashMap<PluginType, PluginInstance>,
+        plugins: &HashMap<PluginType, PluginInstance>,
     ) -> Result<(), String> {
         let plugin_type = action.get_required_type();
-        match plugins.get_mut(&plugin_type) {
+        match plugins.get(&plugin_type) {
             Some(p) => action.run(p).await,
             None => Err(format!("Plugin {} not configured", plugin_type)),
         }
     }
 
     #[async_recursion]
-    pub async fn run(
-        &self,
-        plugins: &mut HashMap<PluginType, PluginInstance>,
-    ) -> Result<(), String> {
+    pub async fn run(&self, plugins: &HashMap<PluginType, PluginInstance>) -> Result<(), String> {
         match self {
             Action::Single(action) => Action::run_single(action, plugins).await,
             Action::Chain(actions) => {

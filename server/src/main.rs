@@ -44,7 +44,7 @@ async fn click(
         return format!("Action with ID {} not configured", button);
     };
 
-    if let Err(e) = action.run(&mut *data.plugins.lock().await).await {
+    if let Err(e) = action.run(&data.plugins).await {
         return e;
     }
 

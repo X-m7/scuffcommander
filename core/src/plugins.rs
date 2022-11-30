@@ -19,9 +19,10 @@ pub enum PluginType {
     General,
 }
 
+// Individual mutex per plugin so one taking its time won't block the rest
 pub enum PluginInstance {
-    OBS(OBSConnector),
-    VTS(VTSConnector),
+    OBS(Mutex<OBSConnector>),
+    VTS(Mutex<VTSConnector>),
     General,
 }
 
@@ -42,10 +43,14 @@ impl Display for PluginQuery {
 }
 
 impl PluginQuery {
-    pub async fn get(&self, plugin: &mut PluginInstance) -> Result<String, String> {
+    pub async fn get(&self, plugin: &PluginInstance) -> Result<String, String> {
         match (self, plugin) {
-            (PluginQuery::OBS(query), PluginInstance::OBS(conn)) => query.run(conn).await,
-            (PluginQuery::VTS(query), PluginInstance::VTS(conn)) => query.run(conn).await,
+            (PluginQuery::OBS(query), PluginInstance::OBS(conn)) => {
+                query.run(&mut *conn.lock().await).await
+            }
+            (PluginQuery::VTS(query), PluginInstance::VTS(conn)) => {
+                query.run(&mut *conn.lock().await).await
+            }
             _ => Err("Mismatched action and plugin instance".to_string()),
         }
     }
@@ -77,10 +82,14 @@ impl Display for PluginAction {
 }
 
 impl PluginAction {
-    pub async fn run(&self, plugin: &mut PluginInstance) -> Result<(), String> {
+    pub async fn run(&self, plugin: &PluginInstance) -> Result<(), String> {
         match (self, plugin) {
-            (PluginAction::OBS(action), PluginInstance::OBS(conn)) => action.run(conn).await,
-            (PluginAction::VTS(action), PluginInstance::VTS(conn)) => action.run(conn).await,
+            (PluginAction::OBS(action), PluginInstance::OBS(conn)) => {
+                action.run(&mut *conn.lock().await).await
+            }
+            (PluginAction::VTS(action), PluginInstance::VTS(conn)) => {
+                action.run(&mut *conn.lock().await).await
+            }
             (PluginAction::General(action), PluginInstance::General) => {
                 action.run().await;
                 Ok(())
@@ -111,10 +120,10 @@ impl PluginConfig {
     }
 }
 
-// Need mutex here because there can only be one of these
-// The server creates multiple threads, but there should be only one connection to OBS, VTS etc
+// There should only be one of these (so there is only one connection to OBS, VTS etc),
+// but it is both Send and Sync since the connectors have their own Mutex if they need one
 pub struct PluginStates {
-    pub plugins: Mutex<HashMap<PluginType, PluginInstance>>,
+    pub plugins: HashMap<PluginType, PluginInstance>,
 }
 
 impl PluginStates {
@@ -125,13 +134,13 @@ impl PluginStates {
                 PluginConfig::OBS(c) => {
                     plugins.insert(
                         PluginType::OBS,
-                        PluginInstance::OBS(OBSConnector::new(c).await),
+                        PluginInstance::OBS(Mutex::new(OBSConnector::new(c).await)),
                     );
                 }
                 PluginConfig::VTS(c) => {
                     plugins.insert(
                         PluginType::VTS,
-                        PluginInstance::VTS(VTSConnector::new(c).await),
+                        PluginInstance::VTS(Mutex::new(VTSConnector::new(c).await)),
                     );
                 }
                 PluginConfig::General => {
@@ -140,8 +149,6 @@ impl PluginStates {
             };
         }
 
-        PluginStates {
-            plugins: Mutex::new(plugins),
-        }
+        PluginStates { plugins }
     }
 }
