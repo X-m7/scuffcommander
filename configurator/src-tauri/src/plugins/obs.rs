@@ -5,13 +5,13 @@ use scuffcommander_core::plugins::{PluginInstance, PluginStates, PluginType};
 pub async fn get_obs_scenes(
     plugins_data: tauri::State<'_, PluginStates>,
 ) -> Result<Vec<String>, String> {
-    let mut plugins = plugins_data.plugins.lock().await;
+    let plugins = &plugins_data.plugins;
 
-    let Some(PluginInstance::OBS(obs)) = plugins.get_mut(&PluginType::OBS) else {
+    let Some(PluginInstance::OBS(obs)) = plugins.get(&PluginType::OBS) else {
         return Err("OBS plugin not configured".to_string());
     };
 
-    let scenes = obs.get_scene_list().await?;
+    let scenes = obs.lock().await.get_scene_list().await?;
 
     let mut scene_names = Vec::new();
     for scene in scenes {
