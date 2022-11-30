@@ -6,7 +6,13 @@ import DraggableListItem from "/components/draggablelistitem";
 import SelectOptsGen from "/components/selectoptsgen";
 import EditButtonStyle from "/components/editbuttonstyle";
 import { ButtonStyle } from "/components/editbuttonstyle/types";
-import { UIButton, ButtonData, ExecuteAction, OpenPage } from "./types";
+import {
+  UIButton,
+  ButtonData,
+  ExecuteAction,
+  OpenPage,
+  Base64Image,
+} from "./types";
 
 interface EditPageProps {
   page: string;
@@ -26,16 +32,21 @@ const EditPage = ({
   const [editButtonIndex, setEditButtonIndex] = useState<number>(-1);
   const [editButtonType, setEditButtonType] = useState<string>("none");
   const [editButtonTargetId, setEditButtonTargetId] = useState<string>("none");
+  const [editButtonEnableImage, setEditButtonEnableImage] =
+    useState<boolean>(false);
+  const [editButtonImageLocation, setEditButtonImageLocation] =
+    useState<string>("");
   const [editButtonEnableStyle, setEditButtonEnableStyle] =
     useState<boolean>(false);
+  const [editButtonTargetList, setEditButtonTargetList] = useState<string[]>(
+    []
+  );
+
   const [editButtonLoadedTargetId, setEditButtonLoadedTargetId] =
     useState<string>("");
   const [editButtonLoadedStyle, setEditButtonLoadedStyle] = useState<
     ButtonStyle | undefined
   >(undefined);
-  const [editButtonTargetList, setEditButtonTargetList] = useState<string[]>(
-    []
-  );
 
   const updatePageButtons = useCallback(() => {
     invoke("get_page_buttons_info", { id: pageProp.substring(2) }).then(
@@ -179,16 +190,14 @@ const EditPage = ({
         return;
       }
 
-      console.log(data.style_override);
-
       setEditButtonLoadedTargetId(data.target_id);
       setEditButtonEnableStyle(data.style_override !== null);
       setEditButtonLoadedStyle(data.style_override);
+      setEditButtonEnableImage(data.img !== null);
+      setEditButtonImageLocation(data.img ? "keeporiginal" : "");
       setEditButtonIndex(index);
       setEditingButton(true);
     });
-
-    // TODO: load img
   };
 
   const deleteButtonFromPage = (index: number) => {
@@ -204,10 +213,6 @@ const EditPage = ({
   const buttonStyleRef = createRef<EditButtonStyle>();
 
   const getButtonData = () => {
-    // TODO: img
-    // for img if already exist and no change send empty data and format as "keeporiginal"
-    // otherwise leave format black and store the file location in data
-
     if (editButtonTargetId === "none") {
       msgFunc("Please select an action/page to activate for the button");
       return undefined;
@@ -219,10 +224,26 @@ const EditPage = ({
       style_override = buttonStyleRef.current.getButtonStyleData();
     }
 
+    let img: Base64Image | undefined;
+
+    if (editButtonEnableImage) {
+      if (editButtonImageLocation === "keeporiginal") {
+        img = {
+          format: "keeporiginal",
+          data: "",
+        } as Base64Image;
+      } else {
+        img = {
+          format: "",
+          data: editButtonImageLocation,
+        } as Base64Image;
+      }
+    }
+
     const buttonData = {
       target_id: editButtonTargetId.substring(2),
       style_override,
-      img: undefined,
+      img,
     } as ButtonData;
 
     switch (editButtonType) {
@@ -307,6 +328,20 @@ const EditPage = ({
     setEditButtonEnableStyle(!editButtonEnableStyle);
   };
 
+  const toggleEditButtonEnableImage = () => {
+    setEditButtonEnableImage(!editButtonEnableImage);
+  };
+
+  const pickImageFile = () => {
+    invoke("pick_image_file")
+      .then((imgRaw) => {
+        setEditButtonImageLocation(imgRaw as string);
+      })
+      .catch((err) => {
+        msgFunc(`Error occurred: ${err.toString()}`);
+      });
+  };
+
   // hide on none
   if (pageProp === "none") {
     return <Fragment />;
@@ -388,6 +423,31 @@ const EditPage = ({
           <SelectOptsGen opts={editButtonTargetList} />
         </select>
       </label>
+      <br />
+      <label>
+        Show image instead of{" "}
+        {editButtonType === "ExecuteAction" ? "action" : "page"} ID:
+        <input
+          type="checkbox"
+          checked={editButtonEnableImage}
+          onClick={toggleEditButtonEnableImage}
+        />
+      </label>
+      <div hidden={!editButtonEnableImage}>
+        <p>
+          Warning: Make sure that the selected image is not overly large in
+          size.
+        </p>
+        <label>
+          <button type="button" onClick={pickImageFile}>
+            Select image file
+          </button>
+          Image location:{" "}
+          {editButtonImageLocation === "keeporiginal"
+            ? "<stored>"
+            : editButtonImageLocation}
+        </label>
+      </div>
       <br />
       <label>
         Enable style override:
