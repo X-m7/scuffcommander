@@ -8,6 +8,7 @@ import Home from "/routes/home";
 import Config from "/routes/config";
 import Actions from "/routes/actions";
 import Pages from "/routes/pages";
+import StyleConfig from "/routes/style";
 
 const App = () => (
   <div id="app">
@@ -17,6 +18,7 @@ const App = () => (
       <Route path="/config/" component={Config} />
       <Route path="/actions/" component={Actions} />
       <Route path="/pages/" component={Pages} />
+      <Route path="/style/" component={StyleConfig} />
     </Router>
   </div>
 );
