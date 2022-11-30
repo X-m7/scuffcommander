@@ -3,6 +3,8 @@ import { useEffect, useState, useCallback } from "preact/hooks";
 import { invoke } from "@tauri-apps/api";
 
 import DraggableListItem from "/components/draggablelistitem";
+import SelectOptsGen from "/components/selectoptsgen";
+import { UIButton, ButtonData, ExecuteAction, OpenPage } from "./types";
 
 interface EditPageProps {
   page: string;
@@ -18,6 +20,45 @@ const EditPage = ({
   const [pageId, setPageId] = useState<string>("");
   const [buttonsList, setButtonsList] = useState<string[]>([]);
 
+  const [editingButton, setEditingButton] = useState<boolean>(false);
+  const [editButtonIndex, setEditButtonIndex] = useState<number>(-1);
+  const [editButtonType, setEditButtonType] = useState<string>("none");
+  const [editButtonTargetId, setEditButtonTargetId] = useState<string>("none");
+  const [editButtonLoadedTargetId, setEditButtonLoadedTargetId] =
+    useState<string>("");
+  const [editButtonTargetList, setEditButtonTargetList] = useState<string[]>(
+    []
+  );
+
+  useEffect(() => {
+    if (editButtonType === "none") {
+      return;
+    }
+
+    let currentPageId: string | undefined;
+
+    if (pageProp !== "new") {
+      currentPageId = pageProp.substring(2);
+    }
+
+    invoke("get_page_or_action_name_list", {
+      pageId: currentPageId,
+      outputType: editButtonType,
+    }).then((listRaw) => {
+      const list = listRaw as string[];
+
+      // If this was triggered due to a button being loaded add it to the list
+      // since normally actions/pages that already have a button are filtered out
+      if (editButtonLoadedTargetId.length != 0) {
+        list.push(editButtonLoadedTargetId);
+        setEditButtonTargetId(`x-${editButtonLoadedTargetId}`);
+      } else {
+        setEditButtonTargetId("none");
+      }
+      setEditButtonTargetList(list);
+    });
+  }, [editButtonType, editButtonLoadedTargetId, pageProp]);
+
   const updatePageButtons = useCallback(() => {
     invoke("get_page_buttons_info", { id: pageProp.substring(2) }).then(
       (buttonsRaw) => {
@@ -26,6 +67,7 @@ const EditPage = ({
     );
   }, [pageProp]);
 
+  // effectively the constructor
   useEffect(() => {
     if (pageProp === "none" || pageProp === "new") {
       setPageId("");
@@ -85,12 +127,55 @@ const EditPage = ({
     return page;
   };
 
+  const resetEditButtonForm = () => {
+    setEditingButton(false);
+    setEditButtonType("none");
+    setEditButtonTargetId("none");
+    setEditButtonLoadedTargetId("");
+  };
+
   const movePageInList = (draggedIndex: number, targetIndex: number) => {
     invoke("move_button_to_index", {
       id: pageProp.substring(2),
       indexInitial: draggedIndex,
       indexTarget: targetIndex,
-    }).then(updatePageButtons);
+    }).then(() => {
+      updatePageButtons();
+      // if a button is being edited and the list of buttons change
+      // then the button being edited might have moved
+      if (editingButton) {
+        resetEditButtonForm();
+      }
+    });
+  };
+
+  const switchToEditingButton = (index: number) => {
+    invoke("get_page_button_data", {
+      id: pageProp.substring(2),
+      index,
+    }).then((buttonRaw) => {
+      const button = buttonRaw as UIButton;
+      let data: ButtonData | undefined;
+
+      if ((button as ExecuteAction).ExecuteAction) {
+        setEditButtonType("ExecuteAction");
+        data = (button as ExecuteAction).ExecuteAction;
+      } else if ((button as OpenPage).OpenPage) {
+        setEditButtonType("OpenPage");
+        data = (button as OpenPage).OpenPage;
+      }
+
+      if (data === undefined) {
+        msgFunc("Loaded button has an unsupported type");
+        return;
+      }
+
+      setEditButtonLoadedTargetId(data.target_id);
+      setEditButtonIndex(index);
+      setEditingButton(true);
+    });
+
+    // TODO: load button style, img
   };
 
   const deleteButtonFromPage = (index: number) => {
@@ -101,6 +186,100 @@ const EditPage = ({
       .catch((err) => {
         msgFunc(`Error occurred: ${err.toString()}`);
       });
+  };
+
+  const getButtonData = () => {
+    // TODO: buttonstyle, img
+    // for img if already exist and no change send empty data and format as "keeporiginal"
+    // otherwise leave format black and store the file location in data
+
+    if (editButtonTargetId === "none") {
+      msgFunc("Please select an action/page to activate for the button");
+      return undefined;
+    }
+
+    const buttonData = {
+      target_id: editButtonTargetId.substring(2),
+      style_override: undefined,
+      img: undefined,
+    } as ButtonData;
+
+    switch (editButtonType) {
+      case "none":
+        msgFunc("Please select a button type to add");
+        return undefined;
+      case "ExecuteAction":
+        return {
+          ExecuteAction: buttonData,
+        } as ExecuteAction;
+      case "OpenPage":
+        return {
+          OpenPage: buttonData,
+        } as OpenPage;
+    }
+  };
+
+  const saveButton = () => {
+    const data: UIButton | undefined = getButtonData();
+
+    if (data === undefined) {
+      return;
+    }
+
+    if (editingButton) {
+      // when editing a button the page ID will not be "new"
+      const targetPageId = pageProp.substring(2);
+      invoke("edit_button_in_page", {
+        id: targetPageId,
+        index: editButtonIndex,
+        data,
+      })
+        .then(() => {
+          msgFunc(
+            `Button at position ${
+              editButtonIndex + 1
+            } in page ${targetPageId} has been modified`
+          );
+          updatePageButtons();
+        })
+        .catch((err) => {
+          msgFunc(`Error occurred: ${err.toString()}`);
+        });
+    } else {
+      // when creating a new button in a new page use the ID from the input field,
+      // else use the one from the prop since that is the saved one
+      const targetPageId = pageProp === "new" ? pageId : pageProp.substring(2);
+      invoke("add_new_button_to_page", {
+        id: targetPageId,
+        data,
+      })
+        .then((newPage) => {
+          if (newPage) {
+            msgFunc(`New page with ID ${targetPageId} created`);
+            onSaveDeleteCallback();
+          } else {
+            msgFunc(`New button added to page ${targetPageId}`);
+            updatePageButtons();
+          }
+        })
+        .catch((err) => {
+          msgFunc(`Error occurred: ${err.toString()}`);
+        });
+    }
+  };
+
+  const onEditButtonTypeChange = (e: Event) => {
+    if (e.target) {
+      // If the edit button type changed then the loaded target ID is no longer valid
+      setEditButtonLoadedTargetId("");
+      setEditButtonType((e.target as HTMLInputElement).value);
+    }
+  };
+
+  const editButtonTargetIdChange = (e: Event) => {
+    if (e.target) {
+      setEditButtonTargetId((e.target as HTMLInputElement).value);
+    }
   };
 
   // hide on none
@@ -127,6 +306,7 @@ const EditPage = ({
           Delete currently selected page
         </button>
       </span>
+      <hr />
       <ol>
         {buttonsList.map((page, index) => {
           return (
@@ -137,6 +317,12 @@ const EditPage = ({
               dataConverter={dataConverter}
               moveCallback={movePageInList}
             >
+              <button
+                type="button"
+                onClick={() => switchToEditingButton(index)}
+              >
+                Edit
+              </button>
               <button type="button" onClick={() => deleteButtonFromPage(index)}>
                 Delete
               </button>
@@ -144,6 +330,39 @@ const EditPage = ({
           );
         })}
       </ol>
+      <hr />
+      <div>
+        {editingButton ? (
+          <Fragment>
+            {`Currently editing the button at position ${editButtonIndex + 1}`}
+            <button type="button" onClick={resetEditButtonForm}>
+              Create a new button instead
+            </button>
+          </Fragment>
+        ) : (
+          "Currently creating a new button"
+        )}
+        <button type="button" onClick={saveButton}>
+          Save button
+        </button>
+      </div>
+      <label>
+        Button type:
+        <select value={editButtonType} onChange={onEditButtonTypeChange}>
+          <option value="none">Select an option</option>
+          <option value="ExecuteAction">Execute an action</option>
+          <option value="OpenPage">Open another page</option>
+        </select>
+      </label>
+      <br />
+      <label hidden={editButtonType === "none"}>
+        ID of {editButtonType === "ExecuteAction" ? "action" : "page"} to
+        activate:
+        <select value={editButtonTargetId} onChange={editButtonTargetIdChange}>
+          <option value="none">Select an option</option>
+          <SelectOptsGen opts={editButtonTargetList} />
+        </select>
+      </label>
     </Fragment>
   );
 };
