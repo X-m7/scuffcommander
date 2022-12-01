@@ -71,7 +71,7 @@ async fn main() -> std::io::Result<()> {
     // Application Builder as an atomic reference-counted pointer.
     let mut handlebars = Handlebars::new();
     handlebars
-        .register_templates_directory(".html", "./templates")
+        .register_template_string("page", String::from_utf8_lossy(include_bytes!("page.html")))
         .expect("Unable to initialise Handlebars");
     let handlebars_ref = web::Data::new(handlebars);
 
