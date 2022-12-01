@@ -51,8 +51,15 @@ class EditVTSCondition extends Component<
   }
 
   queryTypeUpdate = (newQueryType: VTSQueryType, init: boolean) => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
     switch (newQueryType) {
       case VTSQueryType.ActiveModelId:
+        timer = setTimeout(() => {
+          this.props.msgFunc(
+            "Warning: A request to VTube Studio is taking an extended amount of time (there may be a pending authentication request that needs to be allowed)"
+          );
+        }, 1000);
         invoke("get_vts_model_names")
           .then((list) => {
             this.setState({
@@ -70,13 +77,18 @@ class EditVTSCondition extends Component<
                 id: this.props.data.target,
               })
                 .then((nameRaw) => {
+                  clearTimeout(timer);
                   this.setState({
                     queryInput: `x-${nameRaw as string}`,
                   });
                 })
                 .catch((err) => {
+                  clearTimeout(timer);
                   this.props.msgFunc(`Error occurred: ${err.toString()}`);
                 });
+            } else {
+              // Otherwise only one invoke is needed, so reset the timeout here
+              clearTimeout(timer);
             }
           })
           .catch((err) => {

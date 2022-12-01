@@ -92,6 +92,11 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
     invokeArgInner: string,
     init: boolean
   ) => {
+    const timer = setTimeout(() => {
+      this.props.msgFunc(
+        "Warning: A request to VTube Studio is taking an extended amount of time (there may be a pending authentication request that needs to be allowed)"
+      );
+    }, 1000);
     invoke(invokeArgOuter)
       .then((listRaw) => {
         this.setState({
@@ -110,14 +115,20 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
             id: this.props.data.content,
           })
             .then((actRaw) => {
+              // Reset the timer only after both invokes are done
+              clearTimeout(timer);
               const actionName = actRaw as string;
               this.setState({
                 selectInputValue: `x-${actionName}`,
               });
             })
             .catch((err) => {
+              clearTimeout(timer);
               this.props.msgFunc(`Error occurred: ${err.toString()}`);
             });
+        } else {
+          // Otherwise only one invoke is needed, so reset the timeout here
+          clearTimeout(timer);
         }
       })
       .catch((err) => {

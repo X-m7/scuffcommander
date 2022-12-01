@@ -41,7 +41,13 @@ const VTSForm = ({
   };
 
   const testConnection = () => {
+    const timer = setTimeout(() => {
+      msgFunc(
+        "Warning: A request to VTube Studio is taking an extended amount of time (there may be a pending authentication request that needs to be allowed)"
+      );
+    }, 1000);
     invoke("test_vts_connection", { conf }).then((res) => {
+      clearTimeout(timer);
       const result = res as boolean;
       msgFunc(
         `VTube Studio connection test ${result ? "successful" : "failed"}`
