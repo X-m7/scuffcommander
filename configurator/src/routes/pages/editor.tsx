@@ -5,14 +5,14 @@ import { invoke } from "@tauri-apps/api";
 import DraggableListItem from "/components/draggablelistitem";
 import SelectOptsGen from "/components/selectoptsgen";
 import EditButtonStyle from "/components/editbuttonstyle";
-import { ButtonStyle } from "/components/editbuttonstyle/types";
 import {
   UIButton,
   ButtonData,
   ExecuteAction,
   OpenPage,
   Base64Image,
-} from "./types";
+  ButtonStyle,
+} from "/types";
 
 interface EditPageProps {
   page: string;

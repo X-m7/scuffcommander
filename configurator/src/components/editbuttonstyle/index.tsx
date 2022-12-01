@@ -1,7 +1,7 @@
 import { h, Component } from "preact";
 
 import style from "./style.css";
-import { ButtonStyle } from "./types";
+import { ButtonStyle } from "/types";
 
 interface EditButtonStyleProps {
   initialData?: ButtonStyle;

@@ -3,9 +3,8 @@ import { useEffect, useState } from "preact/hooks";
 import { invoke } from "@tauri-apps/api";
 
 import style from "./style.css";
-import { UIStyle } from "./types";
 import EditButtonStyle from "/components/editbuttonstyle";
-import { ButtonStyle } from "/components/editbuttonstyle/types";
+import { ButtonStyle, UIStyle } from "/types";
 
 const StyleConfig = () => {
   const [statusState, setStatusState] = useState<string>("");
