@@ -24,7 +24,6 @@ function DraggableListItem<T>({
   children,
 }: DraggableListItemProps<T>) {
   const [dataStr, setDataStr] = useState<string | undefined>(undefined);
-  const [dragged, setDragged] = useState<boolean>(false);
   const [draggedOver, setDraggedOver] = useState<boolean>(false);
 
   useEffect(() => {
@@ -38,7 +37,6 @@ function DraggableListItem<T>({
       return;
     }
     e.dataTransfer.setData("index", pos.toString());
-    setDragged(true);
   };
 
   const onDragOver = (e: DragEvent) => {
@@ -54,17 +52,11 @@ function DraggableListItem<T>({
     setDraggedOver(false);
   };
 
-  /*
-   * onDragEnd and onDrop both signal that the drag and drop is done,
-   * so reset both drag attributes in both functions
-   */
   const onDragEnd = () => {
-    setDragged(false);
     setDraggedOver(false);
   };
 
   const onDrop = (e: DragEvent) => {
-    setDragged(false);
     setDraggedOver(false);
 
     if (e.dataTransfer === null) {
@@ -88,9 +80,7 @@ function DraggableListItem<T>({
 
   return (
     <li
-      class={`${dragged ? style.dragged : ""} ${
-        draggedOver ? style.draggedOver : ""
-      }`}
+      class={`${style.draggable} ${draggedOver ? style.draggedOver : ""}`}
       draggable
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}

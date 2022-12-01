@@ -1,5 +1,9 @@
-.dragged {
-  color: #cccccc;
+.draggable:active {
+  color: #888888;
+}
+
+.draggable:hover {
+  cursor: grab;
 }
 
 .draggedOver {
