@@ -9,6 +9,7 @@ edition = "2021"
 actix-web = "4"
 serde_json = "1.0"
 handlebars = { version = "4.3.5" }
+directories = "4.0"
 scuffcommander-core = { path = "../core" }
 
 [profile.dev]

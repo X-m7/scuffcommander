@@ -1,4 +1,5 @@
 use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
+use directories::ProjectDirs;
 use handlebars::Handlebars;
 
 use scuffcommander_core::action::ActionConfig;
@@ -54,17 +55,32 @@ async fn click(
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let args: Vec<String> = std::env::args().collect();
+    let dirs = ProjectDirs::from("", "", "scuffcommander");
 
-    if args.len() == 1 {
+    let config_dir_path;
+
+    if args.len() > 1 {
+        let mut path = std::path::PathBuf::new();
+        path.push(&args[1]);
+        config_dir_path = path;
+    } else if let Some(dirs) = dirs {
+        config_dir_path = dirs.config_dir().to_path_buf()
+    } else {
         println!("Configuration folder required");
         return Ok(());
-    };
+    }
 
-    // cd to config directory so relative paths (for example for the VTS token file) goes there
-    std::env::set_current_dir(&args[1]).expect("Unable to open the given config directory");
+    // to_string_lossy does not in fact return a String
+    let config_dir = config_dir_path.to_string_lossy().to_string();
 
-    let conf = AppConfig::from_file("config.json");
+    std::fs::create_dir_all(&config_dir_path).expect("Unable to create config directory");
+
+    println!("Using {config_dir} as the config folder");
+
+    let conf = AppConfig::from_file(&format!("{config_dir}/config.json"));
     let state = web::Data::new(PluginStates::init(conf.plugins).await);
+
+    println!("Starting the server at address http://{}:{}", conf.addr, conf.port);
 
     // Handlebars uses a repository for the compiled templates. This object must be
     // shared between the application threads, and is therefore passed to the
@@ -82,8 +98,8 @@ async fn main() -> std::io::Result<()> {
             .service(page)
             .app_data(state.clone())
             .app_data(handlebars_ref.clone())
-            .app_data(web::Data::new(ActionConfig::from_file("actions.json")))
-            .app_data(web::Data::new(UIConfig::from_file("ui.json")))
+            .app_data(web::Data::new(ActionConfig::from_file(&format!("{config_dir}/actions.json"))))
+            .app_data(web::Data::new(UIConfig::from_file(&format!("{config_dir}/ui.json"))))
     })
     .bind((conf.addr, conf.port))?
     .run()
