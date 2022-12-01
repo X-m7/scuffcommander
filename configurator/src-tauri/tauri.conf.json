@@ -56,10 +56,13 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 600,
+        "height": 640,
+        "minHeight": 640,
         "resizable": true,
         "title": "ScuffCommander Configuration",
-        "width": 800
+        "width": 800,
+        "minWidth": 800,
+        "fileDropEnabled": false
       }
     ]
   }
