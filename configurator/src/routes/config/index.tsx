@@ -92,9 +92,7 @@ const Config = () => {
     setStatusState("");
   };
 
-  const saveConfig = (e: Event) => {
-    e.preventDefault();
-
+  const saveConfig = () => {
     if (
       typeof serverConfig === "undefined" ||
       typeof obsConfig === "undefined" ||
@@ -127,8 +125,10 @@ const Config = () => {
     <div class={style.config}>
       <h1>General Configuration</h1>
 
-      <form onSubmit={saveConfig}>
-        <button type="submit">Save</button>
+      <form>
+        <button type="button" onClick={saveConfig}>
+          Save
+        </button>
         <p>
           {statusState}
           {statusState.length > 0 && (

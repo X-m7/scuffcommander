@@ -11,9 +11,7 @@ const Pages = () => {
   const [selectedPage, setSelectedPage] = useState<string>("none");
   const [pagesList, setPagesList] = useState<string[]>([]);
 
-  const savePages = (e: Event) => {
-    e.preventDefault();
-
+  const savePages = () => {
     invoke("save_ui_config")
       .then(() => {
         setStatusState("Pages saved");
@@ -61,7 +59,7 @@ const Pages = () => {
     <div class={style.pages}>
       <h1>Pages Configuration</h1>
 
-      <form onSubmit={savePages}>
+      <form>
         <p>
           {statusState}
           {statusState.length > 0 && (
@@ -78,7 +76,9 @@ const Pages = () => {
             <SelectOptsGen opts={pagesList} />
           </select>
         </label>
-        <button type="submit">Save Pages</button>
+        <button type="button" onClick={savePages}>
+          Save Pages
+        </button>
         <br />
         <EditPage
           key={selectedPage}

@@ -11,9 +11,7 @@ const Actions = () => {
   const [selectedAction, setSelectedAction] = useState<string>("none");
   const [actionsList, setActionsList] = useState<string[]>([]);
 
-  const saveActions = (e: Event) => {
-    e.preventDefault();
-
+  const saveActions = () => {
     invoke("save_actions")
       .then(() => {
         setStatusState("Actions saved");
@@ -61,7 +59,7 @@ const Actions = () => {
     <div class={style.actions}>
       <h1>Actions Configuration</h1>
 
-      <form onSubmit={saveActions}>
+      <form>
         <p>
           {statusState}
           {statusState.length > 0 && (
@@ -78,7 +76,9 @@ const Actions = () => {
             <SelectOptsGen opts={actionsList} />
           </select>
         </label>
-        <button type="submit">Save Actions</button>
+        <button type="button" onClick={saveActions}>
+          Save Actions
+        </button>
         <br />
         <EditAction
           key={selectedAction}
