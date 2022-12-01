@@ -49,11 +49,13 @@ const EditPage = ({
   >(undefined);
 
   const updatePageButtons = useCallback(() => {
-    invoke("get_page_buttons_info", { id: pageProp.substring(2) }).then(
-      (buttonsRaw) => {
+    invoke("get_page_buttons_info", { id: pageProp.substring(2) })
+      .then((buttonsRaw) => {
         setButtonsList(buttonsRaw as string[]);
-      }
-    );
+      })
+      .catch((err) => {
+        msgFunc(`Error occurred: ${err.toString()}`);
+      });
   }, [pageProp]);
 
   // effectively the constructor
@@ -82,19 +84,23 @@ const EditPage = ({
     invoke("get_page_or_action_name_list", {
       pageId: currentPageId,
       outputType: editButtonType,
-    }).then((listRaw) => {
-      const list = listRaw as string[];
+    })
+      .then((listRaw) => {
+        const list = listRaw as string[];
 
-      // If this was triggered due to a button being loaded add it to the list
-      // since normally actions/pages that already have a button are filtered out
-      if (editButtonLoadedTargetId.length != 0) {
-        list.push(editButtonLoadedTargetId);
-        setEditButtonTargetId(`x-${editButtonLoadedTargetId}`);
-      } else {
-        setEditButtonTargetId("none");
-      }
-      setEditButtonTargetList(list);
-    });
+        // If this was triggered due to a button being loaded add it to the list
+        // since normally actions/pages that already have a button are filtered out
+        if (editButtonLoadedTargetId.length != 0) {
+          list.push(editButtonLoadedTargetId);
+          setEditButtonTargetId(`x-${editButtonLoadedTargetId}`);
+        } else {
+          setEditButtonTargetId("none");
+        }
+        setEditButtonTargetList(list);
+      })
+      .catch((err) => {
+        msgFunc(`Error occurred: ${err.toString()}`);
+      });
   }, [editButtonType, editButtonLoadedTargetId, pageProp]);
 
   const onPageIdInput = (e: Event) => {
@@ -159,45 +165,53 @@ const EditPage = ({
       id: pageProp.substring(2),
       indexInitial: draggedIndex,
       indexTarget: targetIndex,
-    }).then(() => {
-      updatePageButtons();
-      // if a button is being edited and the list of buttons change
-      // then the button being edited might have moved
-      if (editingButton) {
-        resetEditButtonForm();
-      }
-    });
+    })
+      .then(() => {
+        updatePageButtons();
+        // if a button is being edited and the list of buttons change
+        // then the button being edited might have moved
+        if (editingButton) {
+          resetEditButtonForm();
+        }
+      })
+      .catch((err) => {
+        msgFunc(`Error occurred: ${err.toString()}`);
+      });
   };
 
   const switchToEditingButton = (index: number) => {
     invoke("get_page_button_data", {
       id: pageProp.substring(2),
       index,
-    }).then((buttonRaw) => {
-      const button = buttonRaw as UIButton;
-      let data: ButtonData | undefined;
+    })
+      .then((buttonRaw) => {
+        const button = buttonRaw as UIButton;
+        let data: ButtonData | undefined;
 
-      if ((button as ExecuteAction).ExecuteAction) {
-        setEditButtonType("ExecuteAction");
-        data = (button as ExecuteAction).ExecuteAction;
-      } else if ((button as OpenPage).OpenPage) {
-        setEditButtonType("OpenPage");
-        data = (button as OpenPage).OpenPage;
-      }
+        if ((button as ExecuteAction).ExecuteAction) {
+          setEditButtonType("ExecuteAction");
+          data = (button as ExecuteAction).ExecuteAction;
+        } else if ((button as OpenPage).OpenPage) {
+          setEditButtonType("OpenPage");
+          data = (button as OpenPage).OpenPage;
+        }
 
-      if (data === undefined) {
-        msgFunc("Loaded button has an unsupported type");
-        return;
-      }
+        if (data === undefined) {
+          msgFunc("Loaded button has an unsupported type");
+          return;
+        }
 
-      setEditButtonLoadedTargetId(data.target_id);
-      setEditButtonEnableStyle(data.style_override !== null);
-      setEditButtonLoadedStyle(data.style_override);
-      setEditButtonEnableImage(data.img !== null);
-      setEditButtonImageLocation(data.img ? "keeporiginal" : "");
-      setEditButtonIndex(index);
-      setEditingButton(true);
-    });
+        setEditButtonLoadedTargetId(data.target_id);
+        setEditButtonEnableStyle(data.style_override !== null);
+        setEditButtonLoadedStyle(data.style_override);
+        setEditButtonEnableImage(data.img !== null);
+        setEditButtonImageLocation(data.img ? "keeporiginal" : "");
+        setEditButtonIndex(index);
+        setEditingButton(true);
+      })
+      .catch((err) => {
+        msgFunc(`Error occurred: ${err.toString()}`);
+      });
   };
 
   const deleteButtonFromPage = (index: number) => {

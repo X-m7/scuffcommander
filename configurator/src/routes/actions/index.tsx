@@ -32,14 +32,10 @@ const Actions = () => {
   };
 
   const refreshActions = (init: boolean) => {
-    invoke("get_actions")
-      .then((actsList) => {
-        const actions = actsList as string[];
-        setActionsList(actions);
-      })
-      .catch((err) => {
-        setStatusState(`Error occurred: ${err.toString()}`);
-      });
+    invoke("get_actions").then((actsList) => {
+      const actions = actsList as string[];
+      setActionsList(actions);
+    });
 
     // reset selected action since it could have been renamed/deleted
     if (!init) {

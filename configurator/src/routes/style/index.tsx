@@ -60,7 +60,14 @@ const StyleConfig = () => {
 
   const saveUiConfig = async () => {
     await invoke("store_ui_style", { style: getUiStyleData() });
-    await invoke("save_ui_config");
+    try {
+      await invoke("save_ui_config");
+    } catch (err) {
+      if (typeof err === "string") {
+        setStatusState(`Error occurred: ${err}`);
+      }
+      return;
+    }
     setStatusState("Style configuration saved");
   };
 
