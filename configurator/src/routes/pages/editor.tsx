@@ -56,7 +56,7 @@ const EditPage = ({
       .catch((err) => {
         msgFunc(`Error occurred: ${err.toString()}`);
       });
-  }, [pageProp]);
+  }, [pageProp, msgFunc]);
 
   // effectively the constructor
   useEffect(() => {
@@ -101,7 +101,7 @@ const EditPage = ({
       .catch((err) => {
         msgFunc(`Error occurred: ${err.toString()}`);
       });
-  }, [editButtonType, editButtonLoadedTargetId, pageProp]);
+  }, [editButtonType, editButtonLoadedTargetId, pageProp, msgFunc]);
 
   const onPageIdInput = (e: Event) => {
     if (e.target) {
