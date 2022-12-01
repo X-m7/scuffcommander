@@ -105,7 +105,7 @@ pub async fn get_page_button_data(
     index: usize,
     ui_state: tauri::State<'_, UIConfigState>,
 ) -> Result<UIButton, String> {
-    let pages = &mut ui_state.0.lock().await.pages;
+    let pages = &ui_state.0.lock().await.pages;
 
     let Some(page) = pages.get(&id) else {
         return Err("Page with given ID not found".to_string());
@@ -120,6 +120,20 @@ pub async fn get_page_button_data(
     Ok(buttons[index].clone())
 }
 
+#[tauri::command]
+pub async fn get_page_buttons(
+    id: String,
+    ui_state: tauri::State<'_, UIConfigState>,
+) -> Result<Vec<UIButton>, String> {
+    let pages = &ui_state.0.lock().await.pages;
+
+    let Some(page) = pages.get(&id) else {
+        return Err("Page with given ID not found".to_string());
+    };
+
+    Ok(page.buttons.clone())
+}
+
 async fn get_action_name_list_filtered(
     id: Option<String>,
     ui_state: tauri::State<'_, UIConfigState>,
@@ -131,7 +145,7 @@ async fn get_action_name_list_filtered(
     // if ID is given get the list of actions already targeted and skip them
     if let Some(id) = id {
         let mut existing_actions = HashSet::new();
-        let pages = &mut ui_state.0.lock().await.pages;
+        let pages = &ui_state.0.lock().await.pages;
 
         let Some(page) = pages.get(&id) else {
             return Err("Page with given ID not found".to_string());
@@ -164,7 +178,7 @@ async fn get_page_name_list_filtered(
     ui_state: tauri::State<'_, UIConfigState>,
 ) -> Result<Vec<String>, String> {
     let mut out = Vec::new();
-    let pages = &mut ui_state.0.lock().await.pages;
+    let pages = &ui_state.0.lock().await.pages;
 
     // if ID is given get the list of actions already targeted and skip them
     if let Some(id) = id {

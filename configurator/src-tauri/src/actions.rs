@@ -1,4 +1,5 @@
 use scuffcommander_core::action::{Action, ActionConfig};
+use scuffcommander_core::plugins::PluginStates;
 use tokio::fs::write;
 use tokio::sync::Mutex;
 
@@ -82,6 +83,16 @@ pub async fn load_action_details(
     };
 
     Ok(action.clone())
+}
+
+#[tauri::command]
+pub async fn run_action(
+    action: Action,
+    plugins_data: tauri::State<'_, PluginStates>,
+) -> Result<(), String> {
+    action.run(&plugins_data.plugins).await?;
+
+    Ok(())
 }
 
 #[tauri::command]
