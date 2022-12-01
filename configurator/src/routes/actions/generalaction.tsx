@@ -103,7 +103,8 @@ class EditGeneralAction extends Component<
         <label hidden={!this.state.showActionInput}>
           Action parameter:
           <input
-            type="text"
+            type="number"
+            step="any"
             value={this.state.actionInput}
             onInput={this.onActionParamInput}
           />
