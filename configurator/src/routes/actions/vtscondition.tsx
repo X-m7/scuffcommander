@@ -92,6 +92,7 @@ class EditVTSCondition extends Component<
             }
           })
           .catch((err) => {
+            clearTimeout(timer);
             this.props.msgFunc(`Error occurred: ${err.toString()}`);
           });
         break;

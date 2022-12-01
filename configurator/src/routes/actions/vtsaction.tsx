@@ -132,6 +132,7 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
         }
       })
       .catch((err) => {
+        clearTimeout(timer);
         this.props.msgFunc(`Error occurred: ${err.toString()}`);
       });
   };
