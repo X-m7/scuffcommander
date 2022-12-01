@@ -1,7 +1,7 @@
 export type OBSConfigData = {
   addr: string;
   port: number;
-  password: string;
+  password?: string;
 };
 
 export type VTSConfigData = {

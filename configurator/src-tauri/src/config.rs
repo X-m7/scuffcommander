@@ -41,3 +41,8 @@ pub async fn save_config(
 pub fn get_config(conf_state: tauri::State<'_, AppConfigState>) -> AppConfig {
     conf_state.0.clone()
 }
+
+#[tauri::command]
+pub fn get_config_folder(conf_state: tauri::State<'_, ConfigFolder>) -> String {
+    conf_state.0.clone()
+}

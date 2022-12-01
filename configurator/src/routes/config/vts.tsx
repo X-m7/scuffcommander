@@ -1,4 +1,5 @@
 import { h, Fragment } from "preact";
+import { useEffect, useState } from "preact/hooks";
 import { invoke } from "@tauri-apps/api";
 
 import { VTSConfigData } from "./types";
@@ -9,35 +10,40 @@ import { VTSConfigData } from "./types";
 
 interface VTSFormProps {
   conf?: VTSConfigData;
+  configFolder: string;
   onChange: (newConf: VTSConfigData) => void;
   msgFunc: (msg: string) => void;
 }
 
-const VTSForm = (props: VTSFormProps) => {
-  const conf = props.conf ?? {
+const getVtsDefaults = (configFolder: string) => {
+  return {
     addr: "ws://localhost:8001",
-    token_file: "vts_token.txt",
-  };
+    token_file: `${configFolder}/vts_token.txt`,
+  } as VTSConfigData;
+};
+
+const VTSForm = ({
+  conf: confProp,
+  configFolder,
+  onChange,
+  msgFunc,
+}: VTSFormProps) => {
+  const [conf, setConf] = useState<VTSConfigData>(getVtsDefaults(configFolder));
+
+  useEffect(() => {
+    setConf(confProp ? confProp : getVtsDefaults(configFolder));
+  }, [configFolder, confProp]);
 
   const addrInput = (e: Event) => {
     if (e.target) {
-      props.onChange({ ...conf, addr: (e.target as HTMLInputElement).value });
-    }
-  };
-
-  const tokenFileInput = (e: Event) => {
-    if (e.target) {
-      props.onChange({
-        ...conf,
-        token_file: (e.target as HTMLInputElement).value,
-      });
+      onChange({ ...conf, addr: (e.target as HTMLInputElement).value });
     }
   };
 
   const testConnection = () => {
     invoke("test_vts_connection", { conf }).then((res) => {
       const result = res as boolean;
-      props.msgFunc(
+      msgFunc(
         `VTube Studio connection test ${result ? "successful" : "failed"}`
       );
     });
@@ -51,11 +57,6 @@ const VTSForm = (props: VTSFormProps) => {
         <input type="text" value={conf.addr} onInput={addrInput} />
       </label>
       <br />
-      <label>
-        Token file:{" "}
-        <input type="text" value={conf.token_file} onInput={tokenFileInput} />
-      </label>
-      <br />
       <button type="button" onClick={testConnection}>
         Test connection
       </button>
@@ -63,4 +64,4 @@ const VTSForm = (props: VTSFormProps) => {
   );
 };
 
-export default VTSForm;
+export { VTSForm, getVtsDefaults };

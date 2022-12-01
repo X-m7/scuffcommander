@@ -3,8 +3,8 @@ import { useEffect, useState } from "preact/hooks";
 import style from "./style.css";
 import { invoke } from "@tauri-apps/api";
 
-import VTSForm from "./vts";
-import OBSForm from "./obs";
+import { VTSForm, getVtsDefaults } from "./vts";
+import { OBSForm, getObsDefaults } from "./obs";
 import ServerForm from "./server";
 import {
   AppConfig,
@@ -29,15 +29,29 @@ const Config = () => {
     undefined
   );
   const [statusState, setStatusState] = useState<string>("");
+  const [configFolder, setConfigFolder] = useState<string>("");
 
   // blank array param means only run on component mount (once)
   useEffect(() => {
+    invoke("get_config_folder").then((confRaw) => {
+      setConfigFolder(confRaw as string);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (configFolder.length === 0) {
+      return;
+    }
+
     invoke("get_config").then((conf) => {
       const loadedAppConfig = conf as AppConfig;
       setServerConfig({
         addr: loadedAppConfig.addr,
         port: loadedAppConfig.port,
       });
+
+      let obsLoaded = false;
+      let vtsLoaded = false;
 
       for (const plugin of loadedAppConfig.plugins) {
         if (typeof plugin === "string") {
@@ -46,12 +60,21 @@ const Config = () => {
 
         if ("OBS" in plugin) {
           setObsConfig(plugin.OBS);
+          obsLoaded = true;
         } else if ("VTS" in plugin) {
           setVtsConfig(plugin.VTS);
+          vtsLoaded = true;
         }
       }
+
+      if (!obsLoaded) {
+        setObsConfig(getObsDefaults());
+      }
+      if (!vtsLoaded) {
+        setVtsConfig(getVtsDefaults(configFolder));
+      }
     });
-  }, []);
+  }, [configFolder]);
 
   const onServerConfChange = (newData: ServerConfig) => {
     setServerConfig(newData);
@@ -122,6 +145,7 @@ const Config = () => {
         />
         <VTSForm
           conf={vtsConfig}
+          configFolder={configFolder}
           onChange={onVtsConfChange}
           msgFunc={setStatusState}
         />

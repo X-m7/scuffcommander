@@ -13,18 +13,26 @@ interface OBSFormProps {
   msgFunc: (msg: string) => void;
 }
 
-const OBSForm = (props: OBSFormProps) => {
-  const conf = props.conf ?? { addr: "localhost", port: 4455, password: "" };
+const getObsDefaults = () => {
+  return {
+    addr: "localhost",
+    port: 4455,
+    password: undefined,
+  } as OBSConfigData;
+};
+
+const OBSForm = ({ conf: confProp, onChange, msgFunc }: OBSFormProps) => {
+  const conf = confProp ?? getObsDefaults();
 
   const addrInput = (e: Event) => {
     if (e.target) {
-      props.onChange({ ...conf, addr: (e.target as HTMLInputElement).value });
+      onChange({ ...conf, addr: (e.target as HTMLInputElement).value });
     }
   };
 
   const portInput = (e: Event) => {
     if (e.target) {
-      props.onChange({
+      onChange({
         ...conf,
         port: parseInt((e.target as HTMLInputElement).value, 10),
       });
@@ -33,9 +41,11 @@ const OBSForm = (props: OBSFormProps) => {
 
   const pwInput = (e: Event) => {
     if (e.target) {
-      props.onChange({
+      const pwVal = (e.target as HTMLInputElement).value;
+
+      onChange({
         ...conf,
-        password: (e.target as HTMLInputElement).value,
+        password: pwVal.length === 0 ? undefined : pwVal,
       });
     }
   };
@@ -43,9 +53,7 @@ const OBSForm = (props: OBSFormProps) => {
   const testConnection = () => {
     invoke("test_obs_connection", { conf }).then((res) => {
       const result = res as boolean;
-      props.msgFunc(
-        `OBS Studio connection test ${result ? "successful" : "failed"}`
-      );
+      msgFunc(`OBS Studio connection test ${result ? "successful" : "failed"}`);
     });
   };
 
@@ -63,7 +71,8 @@ const OBSForm = (props: OBSFormProps) => {
       </label>
       <br />
       <label>
-        Password: <input type="text" value={conf.password} onInput={pwInput} />
+        Password:{" "}
+        <input type="password" value={conf.password} onInput={pwInput} />
       </label>
       <br />
       <button type="button" onClick={testConnection}>
@@ -73,4 +82,4 @@ const OBSForm = (props: OBSFormProps) => {
   );
 };
 
-export default OBSForm;
+export { OBSForm, getObsDefaults };

@@ -57,6 +57,7 @@ async fn main() {
             app_mod::plugins::vts::get_vts_hotkey_id_from_name,
             app_mod::config::save_config,
             app_mod::config::get_config,
+            app_mod::config::get_config_folder,
             app_mod::config::save_ui_config,
             app_mod::pages::get_page_names,
             app_mod::pages::get_page_buttons_info,
