@@ -3,44 +3,54 @@
     windows_subsystem = "windows"
 )]
 
+use directories::ProjectDirs;
+use tokio::sync::Mutex;
+
 use scuffcommander_configurator as app_mod;
 use scuffcommander_core::action::ActionConfig;
 use scuffcommander_core::plugins::PluginStates;
 use scuffcommander_core::ui::UIConfig;
 use scuffcommander_core::AppConfig;
-use tokio::sync::Mutex;
 
 #[tokio::main]
 async fn main() {
     tauri::async_runtime::set(tokio::runtime::Handle::current());
 
     let args: Vec<String> = std::env::args().collect();
+    let dirs = ProjectDirs::from("", "", "scuffcommander");
 
-    if args.len() == 1 {
+    let config_dir_path;
+
+    if args.len() > 1 {
+        let mut path = std::path::PathBuf::new();
+        path.push(&args[1]);
+        config_dir_path = path;
+    } else if let Some(dirs) = dirs {
+        config_dir_path = dirs.config_dir().to_path_buf()
+    } else {
         println!("Configuration folder required");
         return;
-    };
+    }
 
-    // cd to config directory so relative paths (for example for the VTS token file) goes there
-    std::env::set_current_dir(&args[1]).expect("Unable to open given config directory");
+    // to_string_lossy does not in fact return a String
+    let config_dir = config_dir_path.to_string_lossy().to_string();
 
-    let conf = AppConfig::from_file("config.json");
+    std::fs::create_dir_all(&config_dir_path).expect("Unable to create config directory");
+
+    println!("Using {config_dir} as the config folder");
+
+    let conf = AppConfig::from_file(&format!("{config_dir}/config.json"));
 
     tauri::Builder::default()
         .manage(app_mod::config::AppConfigState(conf.clone()))
         .manage(PluginStates::init(conf.plugins).await)
         .manage(app_mod::actions::ActionConfigState(Mutex::new(
-            ActionConfig::from_file("actions.json"),
+            ActionConfig::from_file(&format!("{config_dir}/actions.json")),
         )))
         .manage(app_mod::config::UIConfigState(Mutex::new(
-            UIConfig::from_file("ui.json"),
+            UIConfig::from_file(&format!("{config_dir}/ui.json")),
         )))
-        .manage(app_mod::config::ConfigFolder(
-            std::env::current_dir()
-                .expect("Invalid current dir?")
-                .display()
-                .to_string(),
-        ))
+        .manage(app_mod::config::ConfigFolder(config_dir.clone()))
         .invoke_handler(tauri::generate_handler![
             app_mod::plugins::obs::get_obs_scenes,
             app_mod::plugins::obs::test_obs_connection,

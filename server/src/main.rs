@@ -80,7 +80,10 @@ async fn main() -> std::io::Result<()> {
     let conf = AppConfig::from_file(&format!("{config_dir}/config.json"));
     let state = web::Data::new(PluginStates::init(conf.plugins).await);
 
-    println!("Starting the server at address http://{}:{}", conf.addr, conf.port);
+    println!(
+        "Starting the server at address http://{}:{}",
+        conf.addr, conf.port
+    );
 
     // Handlebars uses a repository for the compiled templates. This object must be
     // shared between the application threads, and is therefore passed to the
@@ -98,8 +101,12 @@ async fn main() -> std::io::Result<()> {
             .service(page)
             .app_data(state.clone())
             .app_data(handlebars_ref.clone())
-            .app_data(web::Data::new(ActionConfig::from_file(&format!("{config_dir}/actions.json"))))
-            .app_data(web::Data::new(UIConfig::from_file(&format!("{config_dir}/ui.json"))))
+            .app_data(web::Data::new(ActionConfig::from_file(&format!(
+                "{config_dir}/actions.json"
+            ))))
+            .app_data(web::Data::new(UIConfig::from_file(&format!(
+                "{config_dir}/ui.json"
+            ))))
     })
     .bind((conf.addr, conf.port))?
     .run()
