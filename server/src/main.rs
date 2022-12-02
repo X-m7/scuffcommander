@@ -94,6 +94,12 @@ async fn main() -> std::io::Result<()> {
         .expect("Unable to initialise Handlebars");
     let handlebars_ref = web::Data::new(handlebars);
 
+    let actions_conf = web::Data::new(ActionConfig::from_file(&format!(
+        "{config_dir}/actions.json"
+    )));
+
+    let ui_conf = web::Data::new(UIConfig::from_file(&format!("{config_dir}/ui.json")));
+
     HttpServer::new(move || {
         App::new()
             .service(hello)
@@ -101,12 +107,8 @@ async fn main() -> std::io::Result<()> {
             .service(page)
             .app_data(state.clone())
             .app_data(handlebars_ref.clone())
-            .app_data(web::Data::new(ActionConfig::from_file(&format!(
-                "{config_dir}/actions.json"
-            ))))
-            .app_data(web::Data::new(UIConfig::from_file(&format!(
-                "{config_dir}/ui.json"
-            ))))
+            .app_data(actions_conf.clone())
+            .app_data(ui_conf.clone())
     })
     .bind((conf.addr, conf.port))?
     .run()
