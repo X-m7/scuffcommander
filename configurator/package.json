@@ -17,6 +17,10 @@
       "dist/"
     ]
   },
+  "browserslist": [
+    "last 4 Edge versions",
+    "Safari >= 14.0"
+  ],
   "dependencies": {
     "@tauri-apps/api": "^1.2.0",
     "preact": "^10.11.3",
