@@ -17,7 +17,7 @@ const StyleConfig = lazy(() => import("/routes/style"));
 
 const App = () => (
   <LocationProvider>
-    <div class="app">
+    <div class="app" onContextMenu={(e: Event) => e.preventDefault()}>
       <Header />
       <ErrorBoundary>
         <Router>
