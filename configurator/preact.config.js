@@ -13,3 +13,9 @@ try {
     return origCreateHash(alg === 'md4' ? 'md5' : alg, opts);
   };
 }
+
+module.exports = function (config, env) {
+  if (env.isProd) {
+    config.devtool = false; // disable sourcemaps
+  }
+}
