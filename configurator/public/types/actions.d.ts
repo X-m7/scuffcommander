@@ -2,41 +2,13 @@
  * Action related types
  */
 
+export * from "./obs";
+export * from "./vts";
+
 // only a single possibility at present, tag="Delay" and content=number
 export type GeneralAction = {
   tag: "Delay";
   content: number;
-};
-
-export type VTSMoveModelData = {
-  x: number;
-  y: number;
-  rotation: number;
-  size: number;
-  time_sec: number;
-};
-
-export type VTSActionData = string | VTSMoveModelData;
-
-export type VTSActionTag =
-  | "ToggleExpression"
-  | "LoadModel"
-  | "MoveModel"
-  | "TriggerHotkey"
-  | "CheckConnection";
-
-// content for most is just a single string, or nothing for CheckConnection
-export type VTSAction = {
-  tag: VTSActionTag;
-  content?: VTSActionData;
-};
-
-export type OBSActionTag = "ProgramSceneChange" | "CheckConnection";
-
-// content is just the target scene for ProgramSceneChange or nothing for CheckConnection
-export type OBSAction = {
-  tag: OBSActionTag;
-  content?: string;
 };
 
 export type PluginAction = OBSAction | VTSAction | GeneralAction;
@@ -47,9 +19,6 @@ export type SingleAction = {
   tag: SingleActionTag;
   content: PluginAction;
 };
-
-export type OBSQuery = "CurrentProgramScene" | "Version";
-export type VTSQuery = "ActiveModelId" | "Version";
 
 export type PluginQueryContent = OBSQuery | VTSQuery;
 

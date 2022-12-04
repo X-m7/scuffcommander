@@ -3,9 +3,12 @@ use obws::Client;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
 
+// IsStreaming and IsRecording both return "true" or "false" as strings
 #[derive(Serialize, Deserialize, Clone)]
 pub enum OBSQuery {
     CurrentProgramScene,
+    IsStreaming,
+    IsRecording,
     Version,
 }
 
@@ -13,6 +16,8 @@ impl OBSQuery {
     pub async fn run(&self, conn: &mut OBSConnector) -> Result<String, String> {
         match self {
             OBSQuery::CurrentProgramScene => conn.get_current_program_scene().await,
+            OBSQuery::IsStreaming => conn.get_stream_status_string().await,
+            OBSQuery::IsRecording => conn.get_record_status_string().await,
             OBSQuery::Version => conn.get_obs_version().await,
         }
     }
@@ -22,6 +27,8 @@ impl Display for OBSQuery {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
         match self {
             OBSQuery::CurrentProgramScene => write!(f, "Current Program Scene"),
+            OBSQuery::IsStreaming => write!(f, "Is Streaming"),
+            OBSQuery::IsRecording => write!(f, "Is Recording"),
             OBSQuery::Version => write!(f, "Version"),
         }
     }
@@ -31,6 +38,10 @@ impl Display for OBSQuery {
 #[serde(tag = "tag", content = "content")]
 pub enum OBSAction {
     ProgramSceneChange(String),
+    StartStream,
+    StopStream,
+    StartRecord,
+    StopRecord,
     CheckConnection,
 }
 
@@ -39,6 +50,18 @@ impl Display for OBSAction {
         match self {
             OBSAction::ProgramSceneChange(new_scene) => {
                 write!(f, "Change program scene to {}", new_scene)
+            }
+            OBSAction::StartStream => {
+                write!(f, "Start streaming")
+            }
+            OBSAction::StopStream => {
+                write!(f, "Stop streaming")
+            }
+            OBSAction::StartRecord => {
+                write!(f, "Start recording")
+            }
+            OBSAction::StopRecord => {
+                write!(f, "Stop recording")
             }
             OBSAction::CheckConnection => write!(f, "Check connection"),
         }
@@ -49,6 +72,10 @@ impl OBSAction {
     pub async fn run(&self, conn: &mut OBSConnector) -> Result<(), String> {
         match self {
             OBSAction::ProgramSceneChange(scene) => conn.change_current_program_scene(scene).await,
+            OBSAction::StartStream => conn.start_stream().await,
+            OBSAction::StopStream => conn.stop_stream().await,
+            OBSAction::StartRecord => conn.start_record().await,
+            OBSAction::StopRecord => conn.stop_record().await,
             OBSAction::CheckConnection => conn.get_obs_version().await.map(|_| ()),
         }
     }
@@ -153,6 +180,112 @@ impl OBSConnector {
             .set_current_program_scene(scene)
             .await
         {
+            Ok(_) => Ok(()),
+            Err(e) => {
+                self.client = None;
+                Err(e.to_string())
+            }
+        }
+    }
+
+    async fn get_stream_status(&mut self) -> Result<bool, String> {
+        if !self.check_conn().await {
+            return Err("Unable to create OBS websocket connection".to_string());
+        }
+
+        match self.client.as_ref().unwrap().streaming().status().await {
+            Ok(res) => Ok(res.active),
+            Err(e) => {
+                self.client = None;
+                Err(e.to_string())
+            }
+        }
+    }
+
+    async fn get_record_status(&mut self) -> Result<bool, String> {
+        if !self.check_conn().await {
+            return Err("Unable to create OBS websocket connection".to_string());
+        }
+
+        match self.client.as_ref().unwrap().recording().status().await {
+            Ok(res) => Ok(res.active),
+            Err(e) => {
+                self.client = None;
+                Err(e.to_string())
+            }
+        }
+    }
+
+    // Returns "true" or "false" as strings for the condition query system
+    pub async fn get_stream_status_string(&mut self) -> Result<String, String> {
+        let status = self.get_stream_status().await?;
+
+        if status {
+            Ok("true".to_string())
+        } else {
+            Ok("false".to_string())
+        }
+    }
+
+    // Returns "true" or "false" as strings for the condition query system
+    pub async fn get_record_status_string(&mut self) -> Result<String, String> {
+        let status = self.get_record_status().await?;
+
+        if status {
+            Ok("true".to_string())
+        } else {
+            Ok("false".to_string())
+        }
+    }
+
+    pub async fn start_stream(&mut self) -> Result<(), String> {
+        if !self.check_conn().await {
+            return Err("Unable to create OBS websocket connection".to_string());
+        }
+
+        match self.client.as_ref().unwrap().streaming().start().await {
+            Ok(_) => Ok(()),
+            Err(e) => {
+                self.client = None;
+                Err(e.to_string())
+            }
+        }
+    }
+
+    pub async fn stop_stream(&mut self) -> Result<(), String> {
+        if !self.check_conn().await {
+            return Err("Unable to create OBS websocket connection".to_string());
+        }
+
+        match self.client.as_ref().unwrap().streaming().stop().await {
+            Ok(_) => Ok(()),
+            Err(e) => {
+                self.client = None;
+                Err(e.to_string())
+            }
+        }
+    }
+
+    pub async fn start_record(&mut self) -> Result<(), String> {
+        if !self.check_conn().await {
+            return Err("Unable to create OBS websocket connection".to_string());
+        }
+
+        match self.client.as_ref().unwrap().recording().start().await {
+            Ok(_) => Ok(()),
+            Err(e) => {
+                self.client = None;
+                Err(e.to_string())
+            }
+        }
+    }
+
+    pub async fn stop_record(&mut self) -> Result<(), String> {
+        if !self.check_conn().await {
+            return Err("Unable to create OBS websocket connection".to_string());
+        }
+
+        match self.client.as_ref().unwrap().recording().stop().await {
             Ok(_) => Ok(()),
             Err(e) => {
                 self.client = None;
