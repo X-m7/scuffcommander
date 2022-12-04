@@ -1,8 +1,14 @@
 import { h, Fragment, Component } from "preact";
 import { invoke } from "@tauri-apps/api";
 
-import { Condition, OBSQueryType } from "./types";
+import { Condition } from "/types";
 import SelectOptsGen from "/components/selectoptsgen";
+
+enum OBSQueryType {
+  None,
+  CurrentProgramScene,
+  Version,
+}
 
 interface EditOBSConditionProps {
   data?: Condition;

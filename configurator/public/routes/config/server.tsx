@@ -1,6 +1,6 @@
 import { h, Fragment } from "preact";
 
-import { ServerConfig } from "./types";
+import { ServerConfig } from "/types/config";
 
 /*
  * Server configuration component

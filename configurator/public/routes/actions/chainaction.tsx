@@ -3,7 +3,7 @@ import { invoke } from "@tauri-apps/api";
 
 import EditSingleAction from "./singleaction";
 import EditConditionAction from "./conditionaction";
-import { Action, ActionContent } from "./types";
+import { Action, ActionContent } from "/types";
 import SelectOptsGen from "/components/selectoptsgen";
 import DraggableListItem from "/components/draggablelistitem";
 

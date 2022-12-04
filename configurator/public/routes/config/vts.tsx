@@ -2,7 +2,7 @@ import { h, Fragment } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { invoke } from "@tauri-apps/api";
 
-import { VTSConfigData } from "./types";
+import { VTSConfigData } from "/types/config";
 
 /*
  * VTS configuration component

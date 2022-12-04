@@ -2,8 +2,17 @@ import { h, Fragment, Component } from "preact";
 import { invoke } from "@tauri-apps/api";
 
 import style from "./style.module.css";
-import { VTSActionType, VTSAction, VTSMoveModelData } from "./types";
+import { VTSAction, VTSMoveModelData } from "/types";
 import SelectOptsGen from "/components/selectoptsgen";
+
+enum VTSActionType {
+  None,
+  ToggleExpression,
+  LoadModel,
+  MoveModel,
+  TriggerHotkey,
+  CheckConnection,
+}
 
 interface EditVTSActionProps {
   data?: VTSAction;

@@ -1,8 +1,14 @@
 import { h, Fragment, Component } from "preact";
 import { invoke } from "@tauri-apps/api";
 
-import { Condition, VTSQueryType } from "./types";
+import { Condition } from "/types";
 import SelectOptsGen from "/components/selectoptsgen";
+
+enum VTSQueryType {
+  None,
+  ActiveModelId,
+  Version,
+}
 
 interface EditVTSConditionProps {
   data?: Condition;

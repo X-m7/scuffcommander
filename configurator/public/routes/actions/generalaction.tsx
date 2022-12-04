@@ -1,6 +1,11 @@
 import { h, Fragment, Component } from "preact";
 
-import { GeneralActionType, GeneralAction } from "./types";
+import { GeneralAction } from "/types";
+
+enum GeneralActionType {
+  None,
+  Delay,
+}
 
 interface EditGeneralActionProps {
   data?: GeneralAction;

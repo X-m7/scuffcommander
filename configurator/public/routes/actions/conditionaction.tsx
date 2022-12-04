@@ -3,8 +3,14 @@ import { invoke } from "@tauri-apps/api";
 
 import EditOBSCondition from "./obscondition";
 import EditVTSCondition from "./vtscondition";
-import { Action, ActionContent, Condition, QueryPluginType } from "./types";
+import { Action, ActionContent, Condition } from "/types";
 import SelectOptsGen from "/components/selectoptsgen";
+
+enum QueryPluginType {
+  None,
+  OBS,
+  VTS,
+}
 
 interface EditConditionActionProps {
   data?: [Condition, Action, Action?];

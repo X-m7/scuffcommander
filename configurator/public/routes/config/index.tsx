@@ -12,7 +12,7 @@ import {
   VTSConfigData,
   ServerConfig,
   PluginConfig,
-} from "./types";
+} from "/types/config";
 
 /*
  * Main component

@@ -1,8 +1,14 @@
 import { h, Fragment, Component } from "preact";
 import { invoke } from "@tauri-apps/api";
 
-import { OBSActionType, OBSAction } from "./types";
+import { OBSAction } from "/types";
 import SelectOptsGen from "/components/selectoptsgen";
+
+enum OBSActionType {
+  None,
+  ProgramSceneChange,
+  CheckConnection,
+}
 
 interface EditOBSActionProps {
   data?: OBSAction;

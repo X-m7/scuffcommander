@@ -2,16 +2,17 @@ import { h, Fragment, createRef } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { invoke } from "@tauri-apps/api";
 
-import {
-  ActionType,
-  Action,
-  ActionContent,
-  SingleAction,
-  Condition,
-} from "./types";
+import { Action, ActionContent, SingleAction, Condition } from "/types";
 import EditSingleAction from "./singleaction";
 import EditChainAction from "./chainaction";
 import EditConditionAction from "./conditionaction";
+
+enum ActionType {
+  None,
+  Single,
+  Chain,
+  If,
+}
 
 interface EditActionProps {
   action: string;

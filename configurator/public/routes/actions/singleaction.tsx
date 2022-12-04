@@ -6,12 +6,18 @@ import EditGeneralAction from "./generalaction";
 import {
   ActionContent,
   SingleAction,
-  PluginType,
   PluginAction,
   OBSAction,
   VTSAction,
   GeneralAction,
-} from "./types";
+} from "/types";
+
+enum PluginType {
+  None,
+  OBS,
+  VTS,
+  General,
+}
 
 interface EditSingleActionProps {
   data?: SingleAction;

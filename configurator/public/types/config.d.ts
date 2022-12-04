@@ -1,3 +1,7 @@
+/*
+ * General configuration relevant types
+ */
+
 export type OBSConfigData = {
   addr: string;
   port: number;
