@@ -7,6 +7,8 @@ import SelectOptsGen from "/components/selectoptsgen";
 enum OBSQueryType {
   None,
   CurrentProgramScene,
+  IsStreaming,
+  IsRecording,
   Version,
 }
 
@@ -73,6 +75,16 @@ class EditOBSCondition extends Component<
             this.props.msgFunc(`Error occurred: ${err.toString()}`);
           });
         break;
+      case OBSQueryType.IsStreaming:
+      case OBSQueryType.IsRecording:
+        this.setState({
+          queryType: newQueryType,
+          queryInputList: ["true", "false"],
+          showQueryInput: true,
+          // if called on init leave queryInput alone, otherwise reset
+          queryInput: init ? this.state.queryInput : "none",
+        });
+        break;
       case OBSQueryType.None:
         this.setState({
           queryType: newQueryType,
@@ -109,7 +121,11 @@ class EditOBSCondition extends Component<
   getQueryDisplayString = (queryType: OBSQueryType) => {
     switch (queryType) {
       case OBSQueryType.CurrentProgramScene:
-        return "current program scene";
+        return "the current program scene is";
+      case OBSQueryType.IsStreaming:
+        return "OBS is streaming";
+      case OBSQueryType.IsRecording:
+        return "OBS is recording";
       case OBSQueryType.None:
         return "<none>";
     }
@@ -152,11 +168,13 @@ class EditOBSCondition extends Component<
             <option value={OBSQueryType.CurrentProgramScene}>
               Current Program Scene
             </option>
+            <option value={OBSQueryType.IsStreaming}>Is streaming</option>
+            <option value={OBSQueryType.IsRecording}>Is recording</option>
           </select>
         </label>
         <br />
         <label hidden={!this.state.showQueryInput}>
-          If the {this.getQueryDisplayString(this.state.queryType)} is
+          If {this.getQueryDisplayString(this.state.queryType)}{" "}
           <select
             value={this.state.queryInput}
             onChange={this.onQueryParamSelect}

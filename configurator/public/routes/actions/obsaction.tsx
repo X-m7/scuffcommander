@@ -7,6 +7,10 @@ import SelectOptsGen from "/components/selectoptsgen";
 enum OBSActionType {
   None,
   ProgramSceneChange,
+  StartStream,
+  StopStream,
+  StartRecord,
+  StopRecord,
   CheckConnection,
 }
 
@@ -69,6 +73,10 @@ class EditOBSAction extends Component<EditOBSActionProps, EditOBSActionState> {
             this.props.msgFunc(`Error occurred: ${err.toString()}`);
           });
         break;
+      case OBSActionType.StartStream:
+      case OBSActionType.StopStream:
+      case OBSActionType.StartRecord:
+      case OBSActionType.StopRecord:
       case OBSActionType.None:
         this.setState({
           actionType: newActionType,
@@ -103,24 +111,34 @@ class EditOBSAction extends Component<EditOBSActionProps, EditOBSActionState> {
   };
 
   getActionData = async () => {
-    if (this.state.actionType === OBSActionType.None) {
-      this.props.msgFunc(
-        "Please select an option for the OBS Studio action type"
-      );
-      return undefined;
+    switch (this.state.actionType) {
+      case OBSActionType.None:
+        this.props.msgFunc(
+          "Please select an option for the OBS Studio action type"
+        );
+        return undefined;
+      case OBSActionType.ProgramSceneChange:
+        if (this.state.actionInput === "none") {
+          this.props.msgFunc(
+            "Please select an option for the OBS Studio action parameter"
+          );
+          return undefined;
+        }
+        return {
+          tag: OBSActionType[this.state.actionType],
+          content: this.state.actionInput.substring(2),
+        } as OBSAction;
+      case OBSActionType.StartStream:
+      case OBSActionType.StopStream:
+      case OBSActionType.StartRecord:
+      case OBSActionType.StopRecord:
+        return {
+          tag: OBSActionType[this.state.actionType],
+          content: undefined,
+        } as OBSAction;
     }
 
-    if (this.state.actionInput === "none") {
-      this.props.msgFunc(
-        "Please select an option for the OBS Studio action parameter"
-      );
-      return undefined;
-    }
-
-    return {
-      tag: OBSActionType[this.state.actionType],
-      content: this.state.actionInput.substring(2),
-    } as OBSAction;
+    return undefined;
   };
 
   render() {
@@ -136,6 +154,10 @@ class EditOBSAction extends Component<EditOBSActionProps, EditOBSActionState> {
             <option value={OBSActionType.ProgramSceneChange}>
               Program Scene Change
             </option>
+            <option value={OBSActionType.StartStream}>Start Streaming</option>
+            <option value={OBSActionType.StopStream}>Stop Streaming</option>
+            <option value={OBSActionType.StartRecord}>Start Recording</option>
+            <option value={OBSActionType.StopRecord}>Stop Recording</option>
           </select>
         </label>
         <br />

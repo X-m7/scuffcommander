@@ -12,6 +12,7 @@ export type OBSAction = {
   content?: string;
 };
 
+// IsStreaming and IsRecording both returh "true" and "false" as strings
 export type OBSQuery =
   | "CurrentProgramScene"
   | "IsStreaming"
