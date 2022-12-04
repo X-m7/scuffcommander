@@ -365,12 +365,7 @@ const EditPage = ({
     <Fragment>
       <label>
         Page ID:
-        <input
-          type="text"
-          value={pageId}
-          onInput={onPageIdInput}
-          placeholder="No /, ? or #"
-        />
+        <input type="text" value={pageId} onInput={onPageIdInput} />
       </label>
       <span hidden={pageProp === "new"}>
         <button type="button" onClick={renameCurrentPage}>

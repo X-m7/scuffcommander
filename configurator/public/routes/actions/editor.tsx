@@ -199,12 +199,7 @@ const EditAction = ({
       <hr />
       <label>
         Action ID:
-        <input
-          type="text"
-          value={actionId}
-          onInput={onActionIdInput}
-          placeholder="No /, ? or #"
-        />
+        <input type="text" value={actionId} onInput={onActionIdInput} />
       </label>
       <label>
         Action type:

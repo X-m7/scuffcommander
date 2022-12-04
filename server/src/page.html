@@ -27,13 +27,12 @@
       }
     </style>
     <script>
-      const xhr = new XMLHttpRequest();
       function action(id) {
-        xhr.open("GET", document.location.origin + "/click/" + id);
-        xhr.send();
+        fetch(document.location.origin + "/click/" + encodeURIComponent(id));
       }
       function page(id) {
-        document.location = document.location.origin + "/page/" + id;
+        document.location =
+          document.location.origin + "/page/" + encodeURIComponent(id);
       }
     </script>
   </head>
