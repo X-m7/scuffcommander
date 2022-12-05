@@ -82,13 +82,11 @@ const Home = () => {
   return (
     <div class={style.home}>
       <h1>Preview</h1>
-      <p>
+      <p hidden={statusState.length === 0}>
         {statusState}
-        {statusState.length > 0 && (
-          <button type="button" onClick={clearStatusMsg}>
-            Clear
-          </button>
-        )}
+        <button type="button" onClick={clearStatusMsg}>
+          Clear
+        </button>
       </p>
       {uiStyle !== undefined && (
         <div
