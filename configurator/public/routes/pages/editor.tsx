@@ -188,12 +188,12 @@ const EditPage = ({
         const button = buttonRaw as UIButton;
         let data: ButtonData | undefined;
 
-        if ((button as ExecuteAction).ExecuteAction) {
+        if ("ExecuteAction" in button) {
           setEditButtonType("ExecuteAction");
-          data = (button as ExecuteAction).ExecuteAction;
-        } else if ((button as OpenPage).OpenPage) {
+          data = button.ExecuteAction;
+        } else if ("OpenPage" in button) {
           setEditButtonType("OpenPage");
-          data = (button as OpenPage).OpenPage;
+          data = button.OpenPage;
         }
 
         if (data === undefined) {
