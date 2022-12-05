@@ -33,11 +33,13 @@ const ServerForm = (props: ServerFormProps) => {
     <Fragment>
       <h2>Server</h2>
       <label>
-        Address: <input type="text" value={conf.addr} onInput={addrInput} />
+        Address:
+        <input type="text" value={conf.addr} onInput={addrInput} />
       </label>
       <br />
       <label>
-        Port: <input type="number" value={conf.port} onInput={portInput} />
+        Port:
+        <input type="number" value={conf.port} onInput={portInput} />
       </label>
       <br />
     </Fragment>

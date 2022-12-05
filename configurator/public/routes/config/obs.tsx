@@ -61,17 +61,17 @@ const OBSForm = ({ conf: confProp, onChange, msgFunc }: OBSFormProps) => {
     <Fragment>
       <h2>OBS Studio</h2>
       <label>
-        WebSocket Address:{" "}
+        WebSocket Address:
         <input type="text" value={conf.addr} onInput={addrInput} />
       </label>
       <br />
       <label>
-        WebSocket Port:{" "}
+        WebSocket Port:
         <input type="number" value={conf.port} onInput={portInput} />
       </label>
       <br />
       <label>
-        Password:{" "}
+        Password:
         <input type="password" value={conf.password} onInput={pwInput} />
       </label>
       <br />

@@ -59,7 +59,7 @@ const VTSForm = ({
     <Fragment>
       <h2>VTube Studio</h2>
       <label>
-        WebSocket Full Address:{" "}
+        WebSocket Full Address:
         <input type="text" value={conf.addr} onInput={addrInput} />
       </label>
       <br />

@@ -174,7 +174,7 @@ class EditOBSCondition extends Component<
         </label>
         <br />
         <label hidden={!this.state.showQueryInput}>
-          If {this.getQueryDisplayString(this.state.queryType)}{" "}
+          If {this.getQueryDisplayString(this.state.queryType)}
           <select
             value={this.state.queryInput}
             onChange={this.onQueryParamSelect}
