@@ -27,8 +27,13 @@
       }
     </style>
     <script>
+      var xhr = new XMLHttpRequest();
       function action(id) {
-        fetch(document.location.origin + "/click/" + encodeURIComponent(id));
+        xhr.open(
+          "GET",
+          document.location.origin + "/click/" + encodeURIComponent(id)
+        );
+        xhr.send();
       }
       function page(id) {
         document.location =
