@@ -42,6 +42,10 @@ const EditPage = ({
     []
   );
 
+  // This should just be flipped whenever the target list needs to be refreshed
+  const [triggerButtonTargetListRefresh, setTriggerButtonTargetListRefresh] =
+    useState<boolean>(false);
+
   const [editButtonLoadedTargetId, setEditButtonLoadedTargetId] =
     useState<string>("");
   const [editButtonLoadedStyle, setEditButtonLoadedStyle] = useState<
@@ -101,7 +105,13 @@ const EditPage = ({
       .catch((err) => {
         msgFunc(`Error occurred: ${err.toString()}`);
       });
-  }, [editButtonType, editButtonLoadedTargetId, pageProp, msgFunc]);
+  }, [
+    editButtonType,
+    editButtonLoadedTargetId,
+    triggerButtonTargetListRefresh,
+    pageProp,
+    msgFunc,
+  ]);
 
   const onPageIdInput = (e: Event) => {
     if (e.target) {
@@ -297,6 +307,9 @@ const EditPage = ({
             } in page ${targetPageId} has been modified`
           );
           updatePageButtons();
+          // reset the button form after the edit is done
+          // (not likely to need to edit the same button repeatedly)
+          resetEditButtonForm();
         })
         .catch((err) => {
           msgFunc(`Error occurred: ${err.toString()}`);
@@ -316,6 +329,7 @@ const EditPage = ({
           } else {
             msgFunc(`New button added to page ${targetPageId}`);
             updatePageButtons();
+            setTriggerButtonTargetListRefresh(!triggerButtonTargetListRefresh);
           }
         })
         .catch((err) => {
