@@ -1,6 +1,5 @@
 import { h } from "preact";
 import { useEffect, useState } from "preact/hooks";
-import style from "./style.module.css";
 import { invoke } from "@tauri-apps/api";
 
 import { VTSForm, getVtsDefaults } from "./vts";
@@ -122,7 +121,7 @@ const Config = () => {
   };
 
   return (
-    <div class={style.config}>
+    <div>
       <h1>General Configuration</h1>
 
       <form>

@@ -19,15 +19,17 @@ const App = () => (
   <LocationProvider>
     <div class="app" onContextMenu={(e: Event) => e.preventDefault()}>
       <Header />
-      <ErrorBoundary>
-        <Router>
-          <Route path="/" component={Home} />
-          <Route path="/config/" component={Config} />
-          <Route path="/actions/" component={Actions} />
-          <Route path="/pages/" component={Pages} />
-          <Route path="/style/" component={StyleConfig} />
-        </Router>
-      </ErrorBoundary>
+      <div class="pageContents">
+        <ErrorBoundary>
+          <Router>
+            <Route path="/" component={Home} />
+            <Route path="/config/" component={Config} />
+            <Route path="/actions/" component={Actions} />
+            <Route path="/pages/" component={Pages} />
+            <Route path="/style/" component={StyleConfig} />
+          </Router>
+        </ErrorBoundary>
+      </div>
     </div>
   </LocationProvider>
 );

@@ -2,7 +2,6 @@ import { h } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { invoke } from "@tauri-apps/api";
 
-import style from "./style.module.css";
 import EditAction from "./editor";
 import SelectOptsGen from "/components/selectoptsgen";
 
@@ -52,7 +51,7 @@ const Actions = () => {
   }, []);
 
   return (
-    <div class={style.actions}>
+    <div>
       <h1>Actions Configuration</h1>
 
       <form>

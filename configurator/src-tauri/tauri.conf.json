@@ -56,8 +56,8 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 640,
-        "minHeight": 640,
+        "height": 660,
+        "minHeight": 660,
         "resizable": true,
         "title": "ScuffCommander Configuration",
         "width": 800,

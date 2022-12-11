@@ -2,7 +2,6 @@ import { h } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { invoke } from "@tauri-apps/api";
 
-import style from "./style.module.css";
 import EditPage from "./editor";
 import SelectOptsGen from "/components/selectoptsgen";
 
@@ -56,7 +55,7 @@ const Pages = () => {
   }, []);
 
   return (
-    <div class={style.pages}>
+    <div>
       <h1>Pages Configuration</h1>
 
       <form>

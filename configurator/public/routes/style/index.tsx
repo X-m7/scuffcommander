@@ -2,7 +2,6 @@ import { h, createRef } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { invoke } from "@tauri-apps/api";
 
-import style from "./style.module.css";
 import EditButtonStyle from "/components/editbuttonstyle";
 import { ButtonStyle, UIStyle } from "/types";
 
@@ -71,7 +70,7 @@ const StyleConfig = () => {
   };
 
   return (
-    <div class={style.styleConfig}>
+    <div>
       <h1>Style configuration</h1>
       <form>
         <p>
