@@ -1,5 +1,5 @@
 .draggable:active {
-  color: #888888;
+  color: #aaaaaa;
 }
 
 .draggable:hover {
@@ -7,5 +7,5 @@
 }
 
 .draggedOver {
-  background-color: #cccccc;
+  background-color: #666666;
 }
