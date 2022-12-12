@@ -47,7 +47,13 @@ const Home = () => {
         setButtons(buttonsRaw as UIButton[]);
       })
       .catch((err) => {
-        setStatusState(`Error occurred: ${err.toString()}`);
+        if (currentPage === "home") {
+          setStatusState(
+            'Error occurred: The page with ID "home" appears to be missing.'
+          );
+        } else {
+          setStatusState(`Error occurred: ${err.toString()}`);
+        }
       });
   }, [currentPage]);
 
@@ -79,9 +85,12 @@ const Home = () => {
     setStatusState("");
   };
 
+  const returnToHomePage = () => {
+    setCurrentPage("home");
+  };
+
   return (
     <div class={style.home}>
-      <h1>Preview</h1>
       <p hidden={statusState.length === 0}>
         {statusState}
         <button type="button" onClick={clearStatusMsg}>
@@ -93,6 +102,12 @@ const Home = () => {
           class={style.previewContainer}
           style={{ backgroundColor: uiStyle.bg_color, color: uiStyle.fg_color }}
         >
+          <div hidden={buttons.length !== 0}>
+            No buttons are present in the page with ID {currentPage}.
+            <button type="button" onClick={returnToHomePage}>
+              Return to home page
+            </button>
+          </div>
           {buttons.map((button) => {
             const buttonData = getButtonData(button);
             return (
