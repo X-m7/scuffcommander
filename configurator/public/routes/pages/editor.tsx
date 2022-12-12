@@ -41,6 +41,8 @@ const EditPage = ({
   const [editButtonTargetList, setEditButtonTargetList] = useState<string[]>(
     []
   );
+  const [editButtonFilterTargetList, setEditButtonFilterTargetList] =
+    useState<boolean>(false);
 
   // This should just be flipped whenever the target list needs to be refreshed
   const [triggerButtonTargetListRefresh, setTriggerButtonTargetListRefresh] =
@@ -88,6 +90,7 @@ const EditPage = ({
     invoke("get_page_or_action_name_list", {
       pageId: currentPageId,
       outputType: editButtonType,
+      globalFilter: editButtonFilterTargetList,
     })
       .then((listRaw) => {
         const list = listRaw as string[];
@@ -108,6 +111,7 @@ const EditPage = ({
   }, [
     editButtonType,
     editButtonLoadedTargetId,
+    editButtonFilterTargetList,
     triggerButtonTargetListRefresh,
     pageProp,
     msgFunc,
@@ -360,6 +364,10 @@ const EditPage = ({
     setEditButtonEnableImage(!editButtonEnableImage);
   };
 
+  const toggleEditButtonFilterTargetList = () => {
+    setEditButtonFilterTargetList(!editButtonFilterTargetList);
+  };
+
   const pickImageFile = () => {
     invoke("pick_image_file")
       .then((imgRaw) => {
@@ -437,15 +445,29 @@ const EditPage = ({
           <option value="OpenPage">Open another page</option>
         </select>
       </label>
-      <br />
-      <label hidden={editButtonType === "none"}>
-        ID of {editButtonType === "ExecuteAction" ? "action" : "page"} to
-        activate:
-        <select value={editButtonTargetId} onChange={editButtonTargetIdChange}>
-          <option value="none">Select an option</option>
-          <SelectOptsGen opts={editButtonTargetList} />
-        </select>
-      </label>
+      <div hidden={editButtonType === "none"}>
+        <label>
+          ID of {editButtonType === "ExecuteAction" ? "action" : "page"} to
+          activate:
+          <select
+            value={editButtonTargetId}
+            onChange={editButtonTargetIdChange}
+          >
+            <option value="none">Select an option</option>
+            <SelectOptsGen opts={editButtonTargetList} />
+          </select>
+        </label>
+        <br />
+        <label>
+          Filter out {editButtonType === "ExecuteAction" ? "actions" : "pages"}{" "}
+          that have already been added in any page:
+          <input
+            type="checkbox"
+            checked={editButtonFilterTargetList}
+            onClick={toggleEditButtonFilterTargetList}
+          />
+        </label>
+      </div>
       <br />
       <label>
         Show image instead of{" "}

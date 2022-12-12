@@ -136,17 +136,27 @@ pub async fn get_page_buttons(
 
 async fn get_action_name_list_filtered(
     id: Option<String>,
+    global_filter: bool,
     ui_state: tauri::State<'_, UIConfigState>,
     actions_state: tauri::State<'_, ActionConfigState>,
 ) -> Result<Vec<String>, String> {
     let mut out = Vec::new();
     let actions = &actions_state.0.lock().await.actions;
+    let pages = &ui_state.0.lock().await.pages;
 
-    // if ID is given get the list of actions already targeted and skip them
-    if let Some(id) = id {
-        let mut existing_actions = HashSet::new();
-        let pages = &ui_state.0.lock().await.pages;
+    let mut existing_actions = HashSet::new();
 
+    // Filter out either all actions that have been added in any page,
+    // or just those in the current page, or don't filter at all
+    if global_filter {
+        for page in pages.values() {
+            for button in &page.buttons {
+                if let UIButton::ExecuteAction(data) = button {
+                    existing_actions.insert(&data.target_id);
+                }
+            }
+        }
+    } else if let Some(id) = id {
         let Some(page) = pages.get(&id) else {
             return Err("Page with given ID not found".to_string());
         };
@@ -156,15 +166,17 @@ async fn get_action_name_list_filtered(
                 existing_actions.insert(&data.target_id);
             }
         }
+    }
 
+    if existing_actions.is_empty() {
+        for action in actions.keys() {
+            out.push(action.clone());
+        }
+    } else {
         for action in actions.keys() {
             if !existing_actions.contains(action) {
                 out.push(action.clone());
             }
-        }
-    } else {
-        for action in actions.keys() {
-            out.push(action.clone());
         }
     }
 
@@ -175,36 +187,53 @@ async fn get_action_name_list_filtered(
 
 async fn get_page_name_list_filtered(
     id: Option<String>,
+    global_filter: bool,
     ui_state: tauri::State<'_, UIConfigState>,
 ) -> Result<Vec<String>, String> {
     let mut out = Vec::new();
     let pages = &ui_state.0.lock().await.pages;
 
-    // if ID is given get the list of actions already targeted and skip them
-    if let Some(id) = id {
-        let Some(page) = pages.get(&id) else {
+    let mut existing_pages = HashSet::new();
+
+    // Filter out either all pages that have been added in any page,
+    // or just those in the current page, or don't filter at all
+    if global_filter {
+        for page in pages.values() {
+            for button in &page.buttons {
+                if let UIButton::OpenPage(data) = button {
+                    existing_pages.insert(&data.target_id);
+                }
+            }
+        }
+
+        // also include the current page ID (no point in a recursive link)
+        if let Some(id) = id.as_ref() {
+            existing_pages.insert(id);
+        }
+    } else if let Some(id) = id.as_ref() {
+        let Some(page) = pages.get(id) else {
             return Err("Page with given ID not found".to_string());
         };
 
-        let mut existing_pages = HashSet::new();
-
         // also include the current page ID (no point in a recursive link)
-        existing_pages.insert(&id);
+        existing_pages.insert(id);
 
         for button in &page.buttons {
             if let UIButton::OpenPage(data) = button {
                 existing_pages.insert(&data.target_id);
             }
         }
+    }
 
+    if existing_pages.is_empty() {
+        for page in pages.keys() {
+            out.push(page.clone());
+        }
+    } else {
         for page in pages.keys() {
             if !existing_pages.contains(page) {
                 out.push(page.clone());
             }
-        }
-    } else {
-        for page in pages.keys() {
-            out.push(page.clone());
         }
     }
 
@@ -221,14 +250,17 @@ async fn get_page_name_list_filtered(
 pub async fn get_page_or_action_name_list(
     page_id: Option<String>,
     output_type: UIButtonType,
+    global_filter: bool,
     ui_state: tauri::State<'_, UIConfigState>,
     actions_state: tauri::State<'_, ActionConfigState>,
 ) -> Result<Vec<String>, String> {
     match output_type {
         UIButtonType::ExecuteAction => {
-            get_action_name_list_filtered(page_id, ui_state, actions_state).await
+            get_action_name_list_filtered(page_id, global_filter, ui_state, actions_state).await
         }
-        UIButtonType::OpenPage => get_page_name_list_filtered(page_id, ui_state).await,
+        UIButtonType::OpenPage => {
+            get_page_name_list_filtered(page_id, global_filter, ui_state).await
+        }
     }
 }
 
