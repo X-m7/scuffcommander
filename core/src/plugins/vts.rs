@@ -40,6 +40,8 @@ pub struct VTSMoveModelInput {
 #[serde(tag = "tag", content = "content")]
 pub enum VTSAction {
     ToggleExpression(String),
+    EnableExpression(String),
+    DisableExpression(String),
     LoadModel(String),
     MoveModel(VTSMoveModelInput),
     TriggerHotkey(String),
@@ -50,6 +52,8 @@ impl Display for VTSAction {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
         match self {
             VTSAction::ToggleExpression(expr) => write!(f, "Toggle Expression with ID: {}", expr),
+            VTSAction::EnableExpression(expr) => write!(f, "Enable Expression with ID: {}", expr),
+            VTSAction::DisableExpression(expr) => write!(f, "Disable Expression with ID: {}", expr),
             VTSAction::LoadModel(model) => write!(f, "Load Model with ID: {}", model),
             VTSAction::MoveModel(VTSMoveModelInput {
                 x,
@@ -72,6 +76,8 @@ impl VTSAction {
     pub async fn run(&self, conn: &mut VTSConnector) -> Result<(), String> {
         match self {
             VTSAction::ToggleExpression(expr) => conn.toggle_expression(expr).await,
+            VTSAction::EnableExpression(expr) => conn.change_expression_state(expr, true).await,
+            VTSAction::DisableExpression(expr) => conn.change_expression_state(expr, false).await,
             VTSAction::LoadModel(model) => conn.load_model(model).await,
             VTSAction::MoveModel(info) => conn.move_model(info).await,
             VTSAction::TriggerHotkey(hotkey) => conn.trigger_hotkey(hotkey).await,

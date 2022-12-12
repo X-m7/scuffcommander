@@ -10,6 +10,8 @@ export type VTSActionData = string | VTSMoveModelData;
 
 export type VTSActionTag =
   | "ToggleExpression"
+  | "EnableExpression"
+  | "DisableExpression"
   | "LoadModel"
   | "MoveModel"
   | "TriggerHotkey"

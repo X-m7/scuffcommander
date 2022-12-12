@@ -8,6 +8,8 @@ import SelectOptsGen from "/components/selectoptsgen";
 enum VTSActionType {
   None,
   ToggleExpression,
+  EnableExpression,
+  DisableExpression,
   LoadModel,
   MoveModel,
   TriggerHotkey,
@@ -157,6 +159,8 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
         });
         break;
       case VTSActionType.ToggleExpression:
+      case VTSActionType.EnableExpression:
+      case VTSActionType.DisableExpression:
         this.fillSelectInput(
           actionType,
           "get_vts_expression_names",
@@ -222,6 +226,8 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
         );
         return undefined;
       case VTSActionType.ToggleExpression:
+      case VTSActionType.EnableExpression:
+      case VTSActionType.DisableExpression:
         return await this.getSelectInputData("get_vts_expression_id_from_name");
       case VTSActionType.LoadModel:
         return await this.getSelectInputData("get_vts_model_id_from_name");
@@ -349,6 +355,12 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
             <option value={VTSActionType.None}>Select an option</option>
             <option value={VTSActionType.ToggleExpression}>
               Toggle Expression
+            </option>
+            <option value={VTSActionType.EnableExpression}>
+              Enable Expression
+            </option>
+            <option value={VTSActionType.DisableExpression}>
+              Disable Expression
             </option>
             <option value={VTSActionType.LoadModel}>Load Model</option>
             <option value={VTSActionType.MoveModel}>Move Model</option>
