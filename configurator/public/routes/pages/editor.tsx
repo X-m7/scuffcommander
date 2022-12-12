@@ -434,7 +434,7 @@ const EditPage = ({
           "Currently creating a new button"
         )}
         <button type="button" onClick={saveButton}>
-          Save button
+          {editingButton ? "Save" : "Add"} button
         </button>
       </div>
       <label>
