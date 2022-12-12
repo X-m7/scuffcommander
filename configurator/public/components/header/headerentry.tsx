@@ -3,7 +3,9 @@ import { useLocation } from "preact-iso";
 
 interface HeaderEntryProps {
   href: string;
+  className: string;
   activeClassName: string;
+  onClick: () => void;
   children: ComponentChildren;
 }
 
@@ -13,7 +15,10 @@ const HeaderEntry = (props: HeaderEntryProps) => {
   return (
     <a
       href={props.href}
-      class={url === props.href ? props.activeClassName : ""}
+      class={`${props.className} ${
+        url === props.href ? props.activeClassName : ""
+      }`}
+      onClick={props.onClick}
     >
       {props.children}
     </a>

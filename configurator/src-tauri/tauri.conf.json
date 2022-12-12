@@ -57,11 +57,11 @@
       {
         "fullscreen": false,
         "height": 660,
-        "minHeight": 660,
+        "minHeight": 400,
         "resizable": true,
-        "title": "ScuffCommander Configuration",
+        "title": "ScuffCommander",
         "width": 800,
-        "minWidth": 800,
+        "minWidth": 400,
         "fileDropEnabled": false
       }
     ]
