@@ -50,9 +50,10 @@ const EditPage = ({
 
   const [editButtonLoadedTargetId, setEditButtonLoadedTargetId] =
     useState<string>("");
-  const [editButtonLoadedStyle, setEditButtonLoadedStyle] = useState<
-    ButtonStyle | undefined
-  >(undefined);
+
+  // this is unioned with null because the style_override member of ButtonData is nullable
+  const [editButtonLoadedStyle, setEditButtonLoadedStyle] =
+    useState<ButtonStyle | null>(null);
 
   const updatePageButtons = useCallback(() => {
     invoke("get_page_buttons_info", { id: pageProp.substring(2) })
@@ -161,17 +162,13 @@ const EditPage = ({
       });
   };
 
-  const dataConverter = async (page: string) => {
-    return page;
-  };
-
   const resetEditButtonForm = () => {
     setEditingButton(false);
     setEditButtonType("none");
     setEditButtonTargetId("none");
     setEditButtonEnableStyle(false);
     setEditButtonLoadedTargetId("");
-    setEditButtonLoadedStyle(undefined);
+    setEditButtonLoadedStyle(null);
   };
 
   const movePageInList = (draggedIndex: number, targetIndex: number) => {
@@ -401,13 +398,12 @@ const EditPage = ({
       <ol>
         {buttonsList.map((page, index) => {
           return (
-            <DraggableListItem<string>
+            <DraggableListItem
               key={page}
               pos={index}
-              data={page}
-              dataConverter={dataConverter}
               moveCallback={movePageInList}
             >
+              {page}
               <button
                 type="button"
                 onClick={() => switchToEditingButton(index)}
@@ -507,7 +503,9 @@ const EditPage = ({
           <br />
           <EditButtonStyle
             ref={buttonStyleRef}
-            initialData={editButtonLoadedStyle}
+            initialData={
+              editButtonLoadedStyle !== null ? editButtonLoadedStyle : undefined
+            }
           />
         </Fragment>
       )}

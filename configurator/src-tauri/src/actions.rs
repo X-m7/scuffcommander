@@ -94,8 +94,3 @@ pub async fn run_action(
 
     Ok(())
 }
-
-#[tauri::command]
-pub fn convert_action_to_string(action: Action) -> String {
-    format!("{}", action)
-}

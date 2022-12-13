@@ -22,8 +22,8 @@ export type Base64Image = {
 
 export type ButtonData = {
   target_id: string;
-  style_override?: ButtonStyle;
-  img?: Base64Image;
+  style_override: ButtonStyle | null;
+  img: Base64Image | null;
 };
 
 /*

@@ -3,8 +3,9 @@ import { invoke } from "@tauri-apps/api";
 
 import EditOBSCondition from "./obscondition";
 import EditVTSCondition from "./vtscondition";
-import { Action, ActionContent, Condition } from "/types";
+import { Action, ActionContent, IfAction, Condition } from "/types";
 import SelectOptsGen from "/components/selectoptsgen";
+import ActionDetails from "/components/actiondetails";
 
 enum QueryPluginType {
   None,
@@ -13,7 +14,7 @@ enum QueryPluginType {
 }
 
 interface EditConditionActionProps {
-  data?: [Condition, Action, Action?];
+  data?: IfAction;
   msgFunc: (msg: string) => void;
 }
 
@@ -23,8 +24,6 @@ interface EditConditionActionState {
   actionsList: string[];
   thenActionId: string;
   elseActionId: string;
-  originalThenAction: string;
-  originalElseAction: string;
 }
 
 class EditConditionAction extends Component<
@@ -56,8 +55,6 @@ class EditConditionAction extends Component<
       actionsList: [],
       thenActionId,
       elseActionId,
-      originalThenAction: "-",
-      originalElseAction: "-",
     };
   }
 
@@ -68,43 +65,7 @@ class EditConditionAction extends Component<
         actionsList: actsList as string[],
       });
     });
-
-    this.loadOriginalThenElseActionDisplay();
   }
-
-  loadOriginalThenElseActionDisplay = () => {
-    if (!this.props.data) {
-      return;
-    }
-
-    // Populate the if action display
-    invoke("convert_action_to_string", { action: this.props.data[1] })
-      .then((out) => {
-        this.setState({
-          originalThenAction: out as string,
-        });
-      })
-      .catch((err) => {
-        this.props.msgFunc(`Error occurred: ${err.toString()}`);
-      });
-
-    // Populate the else action display
-    if (this.props.data[2]) {
-      invoke("convert_action_to_string", { action: this.props.data[2] })
-        .then((out) => {
-          this.setState({
-            originalElseAction: out as string,
-          });
-        })
-        .catch((err) => {
-          this.props.msgFunc(`Error occurred: ${err.toString()}`);
-        });
-    } else {
-      this.setState({
-        originalElseAction: "Do nothing",
-      });
-    }
-  };
 
   conditionRef = createRef<EditOBSCondition | EditVTSCondition>();
 
@@ -134,7 +95,7 @@ class EditConditionAction extends Component<
     }
 
     let thenAction: Action | undefined;
-    let elseAction: Action | undefined;
+    let elseAction: Action | null = null;
 
     // Get the initial actions if that is what is required
     if (this.props.data) {
@@ -251,8 +212,26 @@ class EditConditionAction extends Component<
         {this.showSelectedPluginDetails()}
         <div hidden={this.state.queryPluginType === QueryPluginType.None}>
           <hr />
-          <p>Original then action: {this.state.originalThenAction}</p>
-          <p>Original else action: {this.state.originalElseAction}</p>
+          {this.props.data !== undefined && (
+            <Fragment>
+              <p>Original then action:</p>
+              <ActionDetails
+                action={this.props.data[1]}
+                msgFunc={this.props.msgFunc}
+              />
+              <hr />
+              <p>Original else action:</p>
+              {this.props.data[2] !== null ? (
+                <ActionDetails
+                  action={this.props.data[2]}
+                  msgFunc={this.props.msgFunc}
+                />
+              ) : (
+                "Do nothing"
+              )}
+              <hr />
+            </Fragment>
+          )}
           <label>
             Then:
             <select

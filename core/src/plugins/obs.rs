@@ -1,7 +1,6 @@
 use obws::responses::scenes::Scene;
 use obws::Client;
 use serde::{Deserialize, Serialize};
-use std::fmt::{Display, Formatter};
 
 // IsStreaming and IsRecording both return "true" or "false" as strings
 #[derive(Serialize, Deserialize, Clone)]
@@ -23,17 +22,6 @@ impl OBSQuery {
     }
 }
 
-impl Display for OBSQuery {
-    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        match self {
-            OBSQuery::CurrentProgramScene => write!(f, "Current Program Scene"),
-            OBSQuery::IsStreaming => write!(f, "Is Streaming"),
-            OBSQuery::IsRecording => write!(f, "Is Recording"),
-            OBSQuery::Version => write!(f, "Version"),
-        }
-    }
-}
-
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(tag = "tag", content = "content")]
 pub enum OBSAction {
@@ -43,29 +31,6 @@ pub enum OBSAction {
     StartRecord,
     StopRecord,
     CheckConnection,
-}
-
-impl Display for OBSAction {
-    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        match self {
-            OBSAction::ProgramSceneChange(new_scene) => {
-                write!(f, "Change program scene to {}", new_scene)
-            }
-            OBSAction::StartStream => {
-                write!(f, "Start streaming")
-            }
-            OBSAction::StopStream => {
-                write!(f, "Stop streaming")
-            }
-            OBSAction::StartRecord => {
-                write!(f, "Start recording")
-            }
-            OBSAction::StopRecord => {
-                write!(f, "Stop recording")
-            }
-            OBSAction::CheckConnection => write!(f, "Check connection"),
-        }
-    }
 }
 
 impl OBSAction {

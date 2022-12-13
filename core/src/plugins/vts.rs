@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use std::fmt::{Display, Formatter};
 use tokio::fs::{read_to_string, write};
 use vtubestudio::Client;
 
@@ -14,15 +13,6 @@ impl VTSQuery {
         match self {
             VTSQuery::ActiveModelId => conn.get_current_model_id().await,
             VTSQuery::Version => conn.get_vts_version().await,
-        }
-    }
-}
-
-impl Display for VTSQuery {
-    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        match self {
-            VTSQuery::ActiveModelId => write!(f, "Active Model ID"),
-            VTSQuery::Version => write!(f, "Version"),
         }
     }
 }
@@ -46,30 +36,6 @@ pub enum VTSAction {
     MoveModel(VTSMoveModelInput),
     TriggerHotkey(String),
     CheckConnection,
-}
-
-impl Display for VTSAction {
-    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        match self {
-            VTSAction::ToggleExpression(expr) => write!(f, "Toggle Expression with ID: {}", expr),
-            VTSAction::EnableExpression(expr) => write!(f, "Enable Expression with ID: {}", expr),
-            VTSAction::DisableExpression(expr) => write!(f, "Disable Expression with ID: {}", expr),
-            VTSAction::LoadModel(model) => write!(f, "Load Model with ID: {}", model),
-            VTSAction::MoveModel(VTSMoveModelInput {
-                x,
-                y,
-                rotation,
-                size,
-                time_sec,
-            }) => write!(
-                f,
-                "Move Model to coordinates ({}, {}), with rotation {} and size {} for {} seconds",
-                x, y, rotation, size, time_sec
-            ),
-            VTSAction::TriggerHotkey(hotkey) => write!(f, "Trigger hotkey with ID: {}", hotkey),
-            VTSAction::CheckConnection => write!(f, "Check Connection"),
-        }
-    }
 }
 
 impl VTSAction {

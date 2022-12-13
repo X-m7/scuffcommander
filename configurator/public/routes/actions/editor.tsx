@@ -2,7 +2,7 @@ import { h, Fragment, createRef } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { invoke } from "@tauri-apps/api";
 
-import { Action, ActionContent, SingleAction, Condition } from "/types";
+import { Action, ActionContent, SingleAction, IfAction } from "/types";
 import EditSingleAction from "./singleaction";
 import EditChainAction from "./chainaction";
 import EditConditionAction from "./conditionaction";
@@ -130,7 +130,7 @@ const EditAction = ({
         return (
           <EditConditionAction
             ref={actionRef}
-            data={actionData as [Condition, Action, Action?] | undefined}
+            data={actionData as IfAction | undefined}
             msgFunc={msgFunc}
           />
         );

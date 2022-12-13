@@ -29,11 +29,10 @@ export type Condition = {
   target: string;
 };
 
+export type IfAction = [Condition, Action, Action | null];
+
 // single action, chain action, conditional
-export type ActionContent =
-  | SingleAction
-  | Action[]
-  | [Condition, Action, Action?];
+export type ActionContent = SingleAction | Action[] | IfAction;
 
 export type ActionTag = "Single" | "Chain" | "If";
 

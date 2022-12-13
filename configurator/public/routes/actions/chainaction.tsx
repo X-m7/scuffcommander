@@ -6,6 +6,7 @@ import EditConditionAction from "./conditionaction";
 import { Action, ActionContent } from "/types";
 import SelectOptsGen from "/components/selectoptsgen";
 import DraggableListItem from "/components/draggablelistitem";
+import ActionDetails from "/components/actiondetails";
 
 interface CopyActionState {
   selectedActionId: string;
@@ -209,32 +210,18 @@ class EditChainAction extends Component<
     this.setState({ chain: this.state.chain.concat([newActionData]) });
   };
 
-  convertActionToString = async (inp: Action) => {
-    try {
-      return (await invoke("convert_action_to_string", {
-        action: inp,
-      })) as string;
-    } catch (err) {
-      if (typeof err === "string") {
-        this.props.msgFunc(`Error occurred: ${err.toString()}`);
-      }
-      return "";
-    }
-  };
-
   render() {
     return (
       <Fragment>
         <ol>
           {this.state.chain.map((act, index) => {
             return (
-              <DraggableListItem<Action>
+              <DraggableListItem
                 key={act}
                 pos={index}
-                data={act}
-                dataConverter={this.convertActionToString}
                 moveCallback={this.moveActionInChain}
               >
+                <ActionDetails action={act} msgFunc={this.props.msgFunc} />
                 <button
                   type="button"
                   onClick={() => this.deleteActionInChain(index)}

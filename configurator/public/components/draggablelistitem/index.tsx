@@ -1,36 +1,24 @@
-import { h, Fragment, ComponentChildren } from "preact";
-import { useEffect, useState } from "preact/hooks";
+import { h, ComponentChildren } from "preact";
+import { useState } from "preact/hooks";
 
 import style from "./style.module.css";
 
 /*
- * Generic draggable list element, where the given data will be converted to a string
- * in an async manner (so the outer element does not have to do it for all items manually)
+ * Generic draggable list element
  */
 
-interface DraggableListItemProps<T> {
+interface DraggableListItemProps {
   pos: number;
-  data: T;
-  dataConverter: (inp: T) => Promise<string>;
   moveCallback: (start: number, end: number) => void;
   children: ComponentChildren;
 }
 
-function DraggableListItem<T>({
+function DraggableListItem({
   pos,
-  data,
-  dataConverter,
   moveCallback,
   children,
-}: DraggableListItemProps<T>) {
-  const [dataStr, setDataStr] = useState<string | undefined>(undefined);
+}: DraggableListItemProps) {
   const [draggedOver, setDraggedOver] = useState<boolean>(false);
-
-  useEffect(() => {
-    dataConverter(data).then((inp) => {
-      setDataStr(inp);
-    });
-  }, [data, dataConverter]);
 
   const onDragStart = (e: DragEvent) => {
     if (e.dataTransfer === null) {
@@ -74,10 +62,6 @@ function DraggableListItem<T>({
     moveCallback(parseInt(initialIndexStr, 10), pos);
   };
 
-  if (dataStr === undefined) {
-    return <Fragment />;
-  }
-
   return (
     <li
       class={`${style.draggable} ${draggedOver ? style.draggedOver : ""}`}
@@ -89,7 +73,6 @@ function DraggableListItem<T>({
       onDragLeave={onDragLeave}
       onDrop={onDrop}
     >
-      {dataStr}
       {children}
     </li>
   );

@@ -89,7 +89,6 @@ async fn main() {
             app_mod::actions::run_action,
             app_mod::actions::save_actions,
             app_mod::actions::delete_action,
-            app_mod::actions::convert_action_to_string,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
