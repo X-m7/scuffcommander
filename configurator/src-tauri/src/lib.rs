@@ -10,7 +10,13 @@ pub mod general {
     pub async fn pick_image_file() -> Result<String, String> {
         tauri::api::dialog::blocking::FileDialogBuilder::new()
             .set_title("Open Image")
-            .add_filter("Supported images", &["png", "jpg"])
+            .add_filter(
+                "Supported images",
+                &[
+                    "png", "jpg", "jpeg", "jfif", "pjpeg", "pjp", "avif", "gif", "webp", "bmp",
+                    "ico",
+                ],
+            )
             .pick_file()
             .ok_or_else(|| "File dialog closed".to_string())
             .map(|x| format!("{}", x.display()))

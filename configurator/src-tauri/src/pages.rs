@@ -266,17 +266,22 @@ pub async fn get_page_or_action_name_list(
 
 async fn get_base64image_from_path(path: &str) -> Result<Base64Image, String> {
     let path = std::path::Path::new(path);
-    let ext = path
-        .extension()
-        .ok_or_else(|| "Can't get file extension".to_string())?
-        .to_str()
-        .ok_or_else(|| "File extension is not valid Unicode".to_string())?;
     let raw_img_data = tokio::fs::read(path).await.map_err(|e| e.to_string())?;
 
-    Ok(Base64Image {
-        format: format!("image/{}", ext),
-        data: base64::encode(raw_img_data),
-    })
+    let kind = infer::get(&raw_img_data);
+
+    let Some(kind) = kind else {
+        return Err("Unable to determine selected file type".to_string());
+    };
+
+    if let infer::MatcherType::Image = kind.matcher_type() {
+        Ok(Base64Image {
+            format: kind.mime_type().to_string(),
+            data: base64::encode(raw_img_data),
+        })
+    } else {
+        Err("Selected file does not appear to be an image".to_string())
+    }
 }
 
 #[tauri::command]
