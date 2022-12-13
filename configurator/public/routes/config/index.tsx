@@ -29,6 +29,7 @@ const Config = () => {
   );
   const [statusState, setStatusState] = useState<string>("");
   const [configFolder, setConfigFolder] = useState<string>("");
+  const [savedRecently, setSavedRecently] = useState<boolean>(false);
 
   // blank array param means only run on component mount (once)
   useEffect(() => {
@@ -114,10 +115,15 @@ const Config = () => {
     invoke("save_config", { conf: appConfig })
       .then(() => {
         setStatusState("Configuration saved, please restart the app to apply");
+        setSavedRecently(true);
       })
       .catch((err) => {
         setStatusState(`Error occurred: ${err.toString()}`);
       });
+  };
+
+  const restartApp = () => {
+    invoke("restart_app");
   };
 
   return (
@@ -128,6 +134,11 @@ const Config = () => {
         <button type="button" onClick={saveConfig}>
           Save
         </button>
+        {savedRecently && (
+          <button type="button" onClick={restartApp}>
+            Restart App
+          </button>
+        )}
         <p>
           {statusState}
           {statusState.length > 0 && (

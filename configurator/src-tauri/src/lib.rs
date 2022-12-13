@@ -21,4 +21,9 @@ pub mod general {
             .ok_or_else(|| "File dialog closed".to_string())
             .map(|x| format!("{}", x.display()))
     }
+
+    #[tauri::command]
+    pub async fn restart_app(app_handle: tauri::AppHandle) {
+        app_handle.restart();
+    }
 }
