@@ -19,7 +19,7 @@ The core library and the server are both written in Rust, while the configurator
 ## Compiling
 
 ### Requirements
-- Rust and Cargo (tested with 1.65)
+- Rust and Cargo (tested with 1.66)
 - NodeJS and npm (tested with 19.1)
 - [Tauri specific dependencies for the configurator](https://tauri.app/v1/guides/getting-started/prerequisites)
 

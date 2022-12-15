@@ -70,10 +70,7 @@ impl PluginAction {
             (PluginAction::VTS(action), PluginInstance::VTS(conn)) => {
                 action.run(&mut *conn.lock().await).await
             }
-            (PluginAction::General(action), PluginInstance::General) => {
-                action.run().await;
-                Ok(())
-            }
+            (PluginAction::General(action), PluginInstance::General) => action.run().await,
             _ => Err("Mismatched action and plugin instance".to_string()),
         }
     }
