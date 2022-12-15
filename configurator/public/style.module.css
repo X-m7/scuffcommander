@@ -1,0 +1,6 @@
+/*
+ * Marked as important to override the dark mode class when it is active
+ */
+.invalid {
+  border: 2px solid red !important;
+}

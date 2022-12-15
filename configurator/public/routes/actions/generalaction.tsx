@@ -1,5 +1,6 @@
 import { h, Fragment, Component } from "preact";
 
+import sharedStyle from "/style.module.css";
 import { GeneralAction } from "/types";
 
 enum GeneralActionType {
@@ -16,6 +17,7 @@ interface EditGeneralActionState {
   actionType: GeneralActionType;
   actionInput: string;
   showActionInput: boolean;
+  actionInputValid: boolean;
 }
 
 class EditGeneralAction extends Component<
@@ -28,18 +30,21 @@ class EditGeneralAction extends Component<
     let actionType = GeneralActionType.None;
     let actionInput = "";
     let showActionInput = false;
+    let actionInputValid = false;
 
     if (props.data) {
       actionType =
         GeneralActionType[props.data.tag as keyof typeof GeneralActionType];
       actionInput = props.data.content.toString();
       showActionInput = true;
+      actionInputValid = true;
     }
 
     this.state = {
       actionType,
       actionInput,
       showActionInput,
+      actionInputValid,
     };
   }
 
@@ -74,8 +79,14 @@ class EditGeneralAction extends Component<
       return;
     }
 
+    const value = (e.target as HTMLInputElement).value;
+    const parsedVal = parseFloat(value);
+
+    const valid = !Number.isNaN(parsedVal) && parsedVal >= 0;
+
     this.setState({
-      actionInput: (e.target as HTMLInputElement).value,
+      actionInput: value,
+      actionInputValid: valid,
     });
   };
 
@@ -83,6 +94,11 @@ class EditGeneralAction extends Component<
     if (this.state.actionType === GeneralActionType.None) {
       this.props.msgFunc("Please select an option for the General action type");
       return undefined;
+    }
+
+    if (!this.state.actionInputValid) {
+      this.props.msgFunc("Invalid input");
+      return;
     }
 
     return {
@@ -101,15 +117,15 @@ class EditGeneralAction extends Component<
             onChange={this.onActionTypeChange}
           >
             <option value={GeneralActionType.None}>Select an option</option>
-            <option value={GeneralActionType.Delay}>Delay (s)</option>
+            <option value={GeneralActionType.Delay}>Delay</option>
           </select>
         </label>
         <br />
         <label hidden={!this.state.showActionInput}>
-          Action parameter:
+          Delay time (seconds):
           <input
+            class={this.state.actionInputValid ? "" : sharedStyle.invalid}
             type="number"
-            step="any"
             value={this.state.actionInput}
             onInput={this.onActionParamInput}
           />

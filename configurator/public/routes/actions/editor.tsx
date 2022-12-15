@@ -2,6 +2,7 @@ import { h, Fragment, createRef } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { invoke } from "@tauri-apps/api";
 
+import sharedStyle from "/style.module.css";
 import { Action, ActionContent, SingleAction, IfAction } from "/types";
 import EditSingleAction from "./singleaction";
 import EditChainAction from "./chainaction";
@@ -199,7 +200,12 @@ const EditAction = ({
       <hr />
       <label>
         Action ID:
-        <input type="text" value={actionId} onInput={onActionIdInput} />
+        <input
+          class={actionId.length === 0 ? sharedStyle.invalid : ""}
+          type="text"
+          value={actionId}
+          onInput={onActionIdInput}
+        />
       </label>
       <label>
         Action type:

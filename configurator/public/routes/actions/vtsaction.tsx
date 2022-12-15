@@ -1,8 +1,8 @@
-import { h, Fragment, Component } from "preact";
+import { h, Fragment, Component, createRef } from "preact";
 import { invoke } from "@tauri-apps/api";
 
-import style from "./style.module.css";
 import { VTSAction, VTSMoveModelData } from "/types";
+import EditVTSMoveModelData from "./vtsmovemodel";
 import SelectOptsGen from "/components/selectoptsgen";
 
 enum VTSActionType {
@@ -27,36 +27,8 @@ interface EditVTSActionState {
   selectInputValue: string;
   selectInputOptions: string[];
   showModelPosInput: boolean;
-  modelPosValue: VTSMoveModelDataStr;
+  loadedModelPosData?: VTSMoveModelData;
 }
-
-type VTSMoveModelDataStr = {
-  x: string;
-  y: string;
-  rotation: string;
-  size: string;
-  time_sec: string;
-};
-
-const convertModelPosValueToNumbers = (inp: VTSMoveModelDataStr) => {
-  return {
-    x: parseFloat(inp.x),
-    y: parseFloat(inp.y),
-    rotation: parseFloat(inp.rotation),
-    size: parseFloat(inp.size),
-    time_sec: parseFloat(inp.time_sec),
-  } as VTSMoveModelData;
-};
-
-const convertModelPosValueToString = (inp: VTSMoveModelData) => {
-  return {
-    x: inp.x.toString(),
-    y: inp.y.toString(),
-    rotation: inp.rotation.toString(),
-    size: inp.size.toString(),
-    time_sec: inp.time_sec.toString(),
-  } as VTSMoveModelDataStr;
-};
 
 class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
   constructor(props: EditVTSActionProps) {
@@ -64,22 +36,14 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
 
     let actionType = VTSActionType.None;
     let showModelPosInput = false;
-    let modelPosValue: VTSMoveModelDataStr = {
-      x: "0",
-      y: "0",
-      rotation: "0",
-      size: "0",
-      time_sec: "0",
-    };
+    let loadedModelPosData: VTSMoveModelData | undefined;
 
     if (props.data) {
       actionType = VTSActionType[props.data.tag as keyof typeof VTSActionType];
 
       if (actionType === VTSActionType.MoveModel) {
-        modelPosValue = convertModelPosValueToString(
-          props.data.content as VTSMoveModelData
-        );
         showModelPosInput = true;
+        loadedModelPosData = props.data.content as VTSMoveModelData;
       }
     }
 
@@ -89,7 +53,7 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
       selectInputValue: "none",
       selectInputOptions: [],
       showModelPosInput,
-      modelPosValue,
+      loadedModelPosData,
     };
   }
 
@@ -218,7 +182,11 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
     }
   };
 
+  moveModelEditorRef = createRef<EditVTSMoveModelData>();
+
   getActionData = async () => {
+    let moveModelData: VTSMoveModelData | undefined;
+
     switch (this.state.actionType) {
       case VTSActionType.None:
         this.props.msgFunc(
@@ -234,9 +202,19 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
       case VTSActionType.TriggerHotkey:
         return await this.getSelectInputData("get_vts_hotkey_id_from_name");
       case VTSActionType.MoveModel:
+        if (!this.moveModelEditorRef.current) {
+          return undefined;
+        }
+
+        moveModelData = this.moveModelEditorRef.current.getData();
+
+        if (!moveModelData) {
+          return undefined;
+        }
+
         return {
           tag: "MoveModel",
-          content: convertModelPosValueToNumbers(this.state.modelPosValue),
+          content: moveModelData,
         } as VTSAction;
     }
   };
@@ -262,85 +240,6 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
     this.setState({
       selectInputValue: (e.target as HTMLInputElement).value,
     });
-  };
-
-  onPosXInput = (e: Event) => {
-    if (!e.target) {
-      return;
-    }
-
-    this.setState({
-      modelPosValue: {
-        ...this.state.modelPosValue,
-        x: (e.target as HTMLInputElement).value,
-      },
-    });
-  };
-
-  onPosYInput = (e: Event) => {
-    if (!e.target) {
-      return;
-    }
-
-    this.setState({
-      modelPosValue: {
-        ...this.state.modelPosValue,
-        y: (e.target as HTMLInputElement).value,
-      },
-    });
-  };
-
-  onPosRotateInput = (e: Event) => {
-    if (!e.target) {
-      return;
-    }
-
-    this.setState({
-      modelPosValue: {
-        ...this.state.modelPosValue,
-        rotation: (e.target as HTMLInputElement).value,
-      },
-    });
-  };
-
-  onPosSizeInput = (e: Event) => {
-    if (!e.target) {
-      return;
-    }
-
-    this.setState({
-      modelPosValue: {
-        ...this.state.modelPosValue,
-        size: (e.target as HTMLInputElement).value,
-      },
-    });
-  };
-
-  onPosTimeInput = (e: Event) => {
-    if (!e.target) {
-      return;
-    }
-
-    this.setState({
-      modelPosValue: {
-        ...this.state.modelPosValue,
-        time_sec: (e.target as HTMLInputElement).value,
-      },
-    });
-  };
-
-  getCurrentModelPos = () => {
-    invoke("get_vts_current_model_pos")
-      .then((posRaw) => {
-        this.setState({
-          modelPosValue: convertModelPosValueToString(
-            posRaw as VTSMoveModelData
-          ),
-        });
-      })
-      .catch((err) => {
-        this.props.msgFunc(`Error occurred: ${err.toString()}`);
-      });
   };
 
   render() {
@@ -378,67 +277,13 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
             <SelectOptsGen opts={this.state.selectInputOptions} />
           </select>
         </label>
-        <div
-          class={this.state.showModelPosInput ? style.tableDisp : style.hidden}
-        >
-          <button
-            type="button"
-            class={style.rowDisp}
-            onClick={this.getCurrentModelPos}
-          >
-            Get current model position
-          </button>
-          <label class={style.rowDisp}>
-            <span class={style.cellDisp}>X:</span>
-            <input
-              class={style.cellDisp}
-              type="number"
-              step="any"
-              value={this.state.modelPosValue.x}
-              onInput={this.onPosXInput}
-            />
-          </label>
-          <label class={style.rowDisp}>
-            <span class={style.cellDisp}>Y:</span>
-            <input
-              class={style.cellDisp}
-              type="number"
-              step="any"
-              value={this.state.modelPosValue.y}
-              onInput={this.onPosYInput}
-            />
-          </label>
-          <label class={style.rowDisp}>
-            <span class={style.cellDisp}>Rotation (degrees):</span>
-            <input
-              class={style.cellDisp}
-              type="number"
-              step="any"
-              value={this.state.modelPosValue.rotation}
-              onInput={this.onPosRotateInput}
-            />
-          </label>
-          <label class={style.rowDisp}>
-            <span class={style.cellDisp}>Size:</span>
-            <input
-              class={style.cellDisp}
-              type="number"
-              step="any"
-              value={this.state.modelPosValue.size}
-              onInput={this.onPosSizeInput}
-            />
-          </label>
-          <label class={style.rowDisp}>
-            <span class={style.cellDisp}>Animation time (0-2s):</span>
-            <input
-              class={style.cellDisp}
-              type="number"
-              step="any"
-              value={this.state.modelPosValue.time_sec}
-              onInput={this.onPosTimeInput}
-            />
-          </label>
-        </div>
+        {this.state.showModelPosInput && (
+          <EditVTSMoveModelData
+            ref={this.moveModelEditorRef}
+            data={this.state.loadedModelPosData}
+            msgFunc={this.props.msgFunc}
+          />
+        )}
       </Fragment>
     );
   }

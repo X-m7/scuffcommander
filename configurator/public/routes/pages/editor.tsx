@@ -2,6 +2,7 @@ import { h, Fragment, createRef } from "preact";
 import { useEffect, useState, useCallback } from "preact/hooks";
 import { invoke } from "@tauri-apps/api";
 
+import sharedStyle from "/style.module.css";
 import DraggableListItem from "/components/draggablelistitem";
 import SelectOptsGen from "/components/selectoptsgen";
 import EditButtonStyle from "/components/editbuttonstyle";
@@ -145,6 +146,12 @@ const EditPage = ({
 
   const renameCurrentPage = () => {
     const newId = pageId;
+
+    if (newId.length === 0) {
+      msgFunc("Page ID cannot be empty");
+      return;
+    }
+
     const currentId = pageProp.substring(2);
     invoke("rename_page", { currentId, newId })
       .then(() => {
@@ -319,6 +326,12 @@ const EditPage = ({
       // when creating a new button in a new page use the ID from the input field,
       // else use the one from the prop since that is the saved one
       const targetPageId = pageProp === "new" ? pageId : pageProp.substring(2);
+
+      if (targetPageId.length === 0) {
+        msgFunc("Page ID cannot be empty");
+        return;
+      }
+
       invoke("add_new_button_to_page", {
         id: targetPageId,
         data,
@@ -384,7 +397,12 @@ const EditPage = ({
     <Fragment>
       <label>
         Page ID:
-        <input type="text" value={pageId} onInput={onPageIdInput} />
+        <input
+          type="text"
+          value={pageId}
+          onInput={onPageIdInput}
+          class={pageId.length === 0 ? sharedStyle.invalid : ""}
+        />
       </label>
       <span hidden={pageProp === "new"}>
         <button type="button" onClick={renameCurrentPage}>

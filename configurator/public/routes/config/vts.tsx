@@ -17,7 +17,7 @@ interface VTSFormProps {
 
 const getVtsDefaults = (configFolder: string) => {
   return {
-    addr: "ws://localhost:8001",
+    addr: "ws://0.0.0.0:8001",
     token_file: `${configFolder}/vts_token.txt`,
   } as VTSConfigData;
 };

@@ -16,6 +16,10 @@
   color: #444;
 }
 
+/*
+ * Using a class and checking with Tauri for dark mode since
+ * the media query does not work in some cases (e.g. Linux)
+ */
 .darkTheme {
   background: #2f2f2f;
   color: #e6e6e6;
