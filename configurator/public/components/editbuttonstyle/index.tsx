@@ -1,5 +1,6 @@
 import { h, Component } from "preact";
 
+import sharedStyle from "/style.module.css";
 import style from "./style.module.css";
 import { ButtonStyle } from "/types";
 
@@ -12,6 +13,8 @@ interface EditButtonStyleState {
   height: string;
   bgColor: string;
   fgColor: string;
+  widthValid: boolean;
+  heightValid: boolean;
 }
 
 class EditButtonStyle extends Component<
@@ -28,6 +31,9 @@ class EditButtonStyle extends Component<
         height: parseFloat(props.initialData.height).toString(),
         bgColor: props.initialData.bg_color,
         fgColor: props.initialData.fg_color,
+        // assume loaded data is valid
+        widthValid: true,
+        heightValid: true,
       } as EditButtonStyleState;
     } else {
       this.state = {
@@ -35,6 +41,9 @@ class EditButtonStyle extends Component<
         height: "3",
         bgColor: "#FFFFFF",
         fgColor: "#000000",
+        // also start as true since we provide default values
+        widthValid: true,
+        heightValid: true,
       } as EditButtonStyleState;
     }
   }
@@ -44,8 +53,14 @@ class EditButtonStyle extends Component<
       return;
     }
 
+    const value = (e.target as HTMLInputElement).value;
+    const parsedVal = parseFloat(value);
+
+    const valid = !Number.isNaN(parsedVal) && parsedVal > 0;
+
     this.setState({
-      width: (e.target as HTMLInputElement).value,
+      width: value,
+      widthValid: valid,
     });
   };
 
@@ -54,8 +69,14 @@ class EditButtonStyle extends Component<
       return;
     }
 
+    const value = (e.target as HTMLInputElement).value;
+    const parsedVal = parseFloat(value);
+
+    const valid = !Number.isNaN(parsedVal) && parsedVal > 0;
+
     this.setState({
-      height: (e.target as HTMLInputElement).value,
+      height: value,
+      heightValid: valid,
     });
   };
 
@@ -94,7 +115,9 @@ class EditButtonStyle extends Component<
         <label class={style.rowDisp}>
           <span class={style.cellDisp}>Button width (cm):</span>
           <input
-            class={style.cellDisp}
+            class={`${style.cellDisp} ${
+              this.state.widthValid ? "" : sharedStyle.invalid
+            }`}
             type="number"
             step="any"
             value={this.state.width}
@@ -104,7 +127,9 @@ class EditButtonStyle extends Component<
         <label class={style.rowDisp}>
           <span class={style.cellDisp}>Button height (cm):</span>
           <input
-            class={style.cellDisp}
+            class={`${style.cellDisp} ${
+              this.state.heightValid ? "" : sharedStyle.invalid
+            }`}
             type="number"
             step="any"
             value={this.state.height}

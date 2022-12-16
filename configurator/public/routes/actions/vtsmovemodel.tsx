@@ -66,7 +66,10 @@ class EditVTSMoveModelData extends Component<
     }
 
     const value = (e.target as HTMLInputElement).value;
-    const valid = !Number.isNaN(parseFloat(value));
+
+    // Since the input type is number the value attribute will be empty
+    // if the input is not a valid number
+    const valid = value.length > 0;
 
     this.setState({
       x: value,
@@ -80,7 +83,10 @@ class EditVTSMoveModelData extends Component<
     }
 
     const value = (e.target as HTMLInputElement).value;
-    const valid = !Number.isNaN(parseFloat(value));
+
+    // Since the input type is number the value attribute will be empty
+    // if the input is not a valid number
+    const valid = value.length > 0;
 
     this.setState({
       y: value,
