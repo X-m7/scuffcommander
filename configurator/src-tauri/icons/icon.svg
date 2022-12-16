@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="200mm"
+   height="200mm"
+   viewBox="0 0 200 200"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   sodipodi:docname="icon.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <title
+     id="title916">ScuffCommander</title>
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#505050"
+     bordercolor="#ffffff"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#505050"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="0.5"
+     inkscape:cx="1209"
+     inkscape:cy="272"
+     inkscape:window-width="1920"
+     inkscape:window-height="1013"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="fill:#3366cc;stroke:#000000;stroke-width:0.316056;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="M 193.03511,4.7835014 C 6.4147331,8.8425281 41.65901,82.548083 41.65901,82.548083 c 0,0 184.3589,-57.741942 155.02119,-4.162775 -29.33772,53.579162 -128.866928,89.043232 -128.866928,89.043232 0,0 -93.610634,28.66857 -60.605721,12.43246 C 40.212461,163.62489 160.82301,103.95718 164.08275,88.126982 167.34248,72.296765 54.689792,107.57865 54.689792,107.57865 c 0,0 -29.95149,4.68051 -36.323798,-3.47876 C 12.725716,96.87793 8.2489536,34.250438 43.291208,12.331686 78.333461,-9.5870662 193.03511,4.7835014 193.03511,4.7835014 Z"
+       id="path126"
+       sodipodi:nodetypes="ccscsscssc" />
+    <path
+       style="fill:#669900;stroke:#000000;stroke-width:0.727427px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 175.13282,145.388 c 0,0 -27.40965,-1.85343 -37.60221,26.53083 -7.09538,19.75925 4.70462,23.05506 14.22753,22.69106 32.09922,-1.2269 36.48431,-3.6378 36.48431,-3.6378 0,0 9.16565,-3.27681 3.63028,-8.67332 -2.42886,-2.36793 -32.2153,1.36824 -32.2153,1.36824 0,0 -25.32107,3.49044 -6.14439,-18.0568 16.97563,-19.0741 33.23664,-2.59994 40.60113,-13.55385 4.28043,-6.36667 -18.98135,-6.66836 -18.98135,-6.66836 z"
+       id="path1181"
+       sodipodi:nodetypes="csscscssc" />
+  </g>
+  <metadata
+     id="metadata914">
+    <rdf:RDF>
+      <cc:License
+         rdf:about="http://creativecommons.org/publicdomain/zero/1.0/">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+      </cc:License>
+      <cc:Work
+         rdf:about="">
+        <cc:license
+           rdf:resource="http://creativecommons.org/publicdomain/zero/1.0/" />
+        <dc:title>ScuffCommander</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>
