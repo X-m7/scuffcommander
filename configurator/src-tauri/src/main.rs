@@ -55,6 +55,7 @@ async fn main() {
             app_mod::plugins::obs::get_obs_scenes,
             app_mod::plugins::obs::test_obs_connection,
             app_mod::plugins::vts::test_vts_connection,
+            app_mod::plugins::vts::generate_buttons_for_hotkeys,
             app_mod::plugins::vts::get_vts_expression_names,
             app_mod::plugins::vts::get_vts_model_names,
             app_mod::plugins::vts::get_vts_hotkey_names,

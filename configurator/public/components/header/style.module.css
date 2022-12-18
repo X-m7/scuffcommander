@@ -74,7 +74,7 @@
   display: none;
 }
 
-@media screen and (max-width: 590px) {
+@media screen and (max-width: 675px) {
   #navHamburger {
     display: block;
   }

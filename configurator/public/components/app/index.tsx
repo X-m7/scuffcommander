@@ -18,6 +18,7 @@ const Config = lazy(() => import("/routes/config"));
 const Actions = lazy(() => import("/routes/actions"));
 const Pages = lazy(() => import("/routes/pages"));
 const StyleConfig = lazy(() => import("/routes/style"));
+const Utilities = lazy(() => import("/routes/utilities"));
 
 const App = () => {
   const [darkTheme, setDarkTheme] = useState<boolean>(false);
@@ -59,6 +60,7 @@ const App = () => {
               <Route path="/actions/" component={Actions} />
               <Route path="/pages/" component={Pages} />
               <Route path="/style/" component={StyleConfig} />
+              <Route path="/utilities/" component={Utilities} />
             </Router>
           </ErrorBoundary>
         </div>

@@ -78,6 +78,16 @@ const Header = () => {
               Style
             </HeaderEntry>
           </li>
+          <li>
+            <HeaderEntry
+              className={style.navLink}
+              activeClassName={style.active}
+              onClick={closeMobileMenu}
+              href="/utilities"
+            >
+              Utilities
+            </HeaderEntry>
+          </li>
         </ul>
       </nav>
     </header>

@@ -71,7 +71,7 @@ const StyleConfig = () => {
 
   return (
     <div>
-      <h1>Style configuration</h1>
+      <h1>Style Configuration</h1>
       <form>
         <p>
           {statusState}

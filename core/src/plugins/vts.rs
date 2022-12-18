@@ -301,11 +301,14 @@ impl VTSConnector {
         Err("No model found with the given ID".to_string())
     }
 
-    async fn get_hotkey_list(&mut self) -> Result<Vec<vtubestudio::data::Hotkey>, String> {
+    async fn get_hotkey_list(
+        &mut self,
+        model_id: Option<String>,
+    ) -> Result<Vec<vtubestudio::data::Hotkey>, String> {
         let resp = self
             .client
             .send(&vtubestudio::data::HotkeysInCurrentModelRequest {
-                model_id: None,
+                model_id,
                 live2d_item_file_name: None,
             })
             .await;
@@ -316,7 +319,7 @@ impl VTSConnector {
     }
 
     pub async fn get_hotkey_id_from_name(&mut self, name: &str) -> Result<String, String> {
-        for hotkey in self.get_hotkey_list().await? {
+        for hotkey in self.get_hotkey_list(None).await? {
             if name == hotkey.name {
                 return Ok(hotkey.hotkey_id);
             }
@@ -326,7 +329,7 @@ impl VTSConnector {
     }
 
     pub async fn get_hotkey_name_from_id(&mut self, id: &str) -> Result<String, String> {
-        for hotkey in self.get_hotkey_list().await? {
+        for hotkey in self.get_hotkey_list(None).await? {
             if id == hotkey.hotkey_id {
                 return Ok(hotkey.name);
             }
@@ -335,9 +338,23 @@ impl VTSConnector {
         Err("Hotkey with given ID not found in current model".to_string())
     }
 
+
+    // This also includes the name of each hotkey as the second part of the tuple
+    pub async fn get_hotkey_id_list(
+        &mut self,
+        model_id: Option<String>,
+    ) -> Result<Vec<(String, String)>, String> {
+        let mut out = Vec::new();
+        for hotkey in self.get_hotkey_list(model_id).await? {
+            out.push((hotkey.hotkey_id, hotkey.name));
+        }
+
+        Ok(out)
+    }
+
     pub async fn get_hotkey_name_list(&mut self) -> Result<Vec<String>, String> {
         let mut out = Vec::new();
-        for hotkey in self.get_hotkey_list().await? {
+        for hotkey in self.get_hotkey_list(None).await? {
             out.push(hotkey.name);
         }
 
