@@ -37,6 +37,15 @@ pub async fn save_config(
     }
 }
 
+// Just checks if the config.json file exists, if not then it means first time setup is required
+// since the blank defaults would have been loaded
+#[tauri::command]
+pub async fn is_config_default(conf_state: tauri::State<'_, ConfigFolder>) -> Result<bool, ()> {
+    let confpath = format!("{}/config.json", &conf_state.0);
+
+    return Ok(!std::path::Path::new(&confpath).exists());
+}
+
 #[tauri::command]
 pub fn get_config(conf_state: tauri::State<'_, AppConfigState>) -> AppConfig {
     conf_state.0.clone()

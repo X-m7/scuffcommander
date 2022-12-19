@@ -61,6 +61,15 @@ const Home = () => {
     invoke("get_ui_style").then((styleRaw) => {
       setUiStyle(styleRaw as UIStyle);
     });
+
+    invoke("is_config_default").then((raw) => {
+      const isConfigDefault = raw as boolean;
+      if (isConfigDefault) {
+        setStatusState(
+          "This appears to the first time this app has been started, please go to the General section, update the settings if required and save the configuration there before proceeding further."
+        );
+      }
+    });
   }, []);
 
   const onButtonClick = async (button: UIButton) => {
