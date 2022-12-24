@@ -47,11 +47,13 @@ pub async fn is_config_default(conf_state: tauri::State<'_, ConfigFolder>) -> Re
 }
 
 #[tauri::command]
+#[must_use]
 pub fn get_config(conf_state: tauri::State<'_, AppConfigState>) -> AppConfig {
     conf_state.0.clone()
 }
 
 #[tauri::command]
+#[must_use]
 pub fn get_config_folder(conf_state: tauri::State<'_, ConfigFolder>) -> String {
     conf_state.0.clone()
 }

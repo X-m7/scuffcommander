@@ -45,6 +45,7 @@ impl PluginQuery {
         }
     }
 
+    #[must_use]
     pub fn get_required_type(&self) -> PluginType {
         match self {
             PluginQuery::OBS(_) => PluginType::OBS,
@@ -75,6 +76,7 @@ impl PluginAction {
         }
     }
 
+    #[must_use]
     pub fn get_required_type(&self) -> PluginType {
         match self {
             PluginAction::OBS(_) => PluginType::OBS,
@@ -92,6 +94,7 @@ pub enum PluginConfig {
 }
 
 impl PluginConfig {
+    #[must_use]
     pub fn get_default_vec() -> Vec<PluginConfig> {
         vec![PluginConfig::General]
     }

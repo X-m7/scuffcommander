@@ -77,7 +77,7 @@ pub async fn generate_buttons_for_hotkeys(
 
         action_name_set.insert(hotkey.1.clone());
 
-        let action_id = format!("{}{}{}", prefix, hotkey.1, suffix);
+        let action_id = format!("{prefix}{}{suffix}", hotkey.1);
         if actions.contains_key(&action_id) {
             return Err(format!("Action with ID {} already exists", hotkey.1));
         }

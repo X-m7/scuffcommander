@@ -85,10 +85,10 @@ impl VTSConnector {
             // We can handle it by saving it somewhere, etc.
             while let Some(event) = events.next().await {
                 if let vtubestudio::client::ClientEvent::NewAuthToken(token) = event {
-                    println!("Got new auth token: {}", token);
+                    println!("Got new auth token: {token}");
                     match write(&token_file, token).await {
-                        Ok(_) => println!("Saved new token to {}", token_file),
-                        Err(e) => println!("Failed to save token: {}", e),
+                        Ok(_) => println!("Saved new token to {token_file}"),
+                        Err(e) => println!("Failed to save token: {e}"),
                     }
                 }
             }
@@ -337,7 +337,6 @@ impl VTSConnector {
 
         Err("Hotkey with given ID not found in current model".to_string())
     }
-
 
     // This also includes the name of each hotkey as the second part of the tuple
     pub async fn get_hotkey_id_list(

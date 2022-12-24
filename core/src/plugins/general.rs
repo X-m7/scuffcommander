@@ -13,7 +13,7 @@ impl GeneralAction {
                 tokio::time::sleep(
                     std::time::Duration::try_from_secs_f64(*dur).map_err(|e| e.to_string())?,
                 )
-                .await
+                .await;
             }
         }
 

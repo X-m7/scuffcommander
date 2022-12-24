@@ -16,13 +16,14 @@ pub struct AppConfig {
 }
 
 impl AppConfig {
+    #[must_use]
     pub fn from_file(path: &str) -> AppConfig {
         serde_json::from_str(&read_to_string(path).unwrap_or_else(|e| {
-            println!("{}", e);
+            println!("{e}");
             String::new()
         }))
         .unwrap_or_else(|e| {
-            println!("Unable to parse config: {}", e);
+            println!("Unable to parse config: {e}");
             println!("Using defaults");
 
             AppConfig {

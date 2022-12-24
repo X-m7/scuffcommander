@@ -333,9 +333,9 @@ pub async fn add_new_button_to_page(
     if let Some(img) = &data.get_data().img {
         if img.format == "keeporiginal" {
             return Err("No original image to keep since this is adding a new button".to_string());
-        } else {
-            data.get_mut_data().img = Some(get_base64image_from_path(&img.data).await?);
         }
+
+        data.get_mut_data().img = Some(get_base64image_from_path(&img.data).await?);
     }
 
     let pages = &mut ui_state.0.lock().await.pages;

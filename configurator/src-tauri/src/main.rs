@@ -26,7 +26,7 @@ async fn main() {
         path.push(&args[1]);
         config_dir_path = path;
     } else if let Some(dirs) = dirs {
-        config_dir_path = dirs.config_dir().to_path_buf()
+        config_dir_path = dirs.config_dir().to_path_buf();
     } else {
         println!("Configuration folder required");
         return;

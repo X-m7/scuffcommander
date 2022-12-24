@@ -11,13 +11,14 @@ pub struct UIConfig {
 }
 
 impl UIConfig {
+    #[must_use]
     pub fn from_file(path: &str) -> UIConfig {
         serde_json::from_str(&read_to_string(path).unwrap_or_else(|e| {
-            println!("{}", e);
+            println!("{e}");
             String::new()
         }))
         .unwrap_or_else(|e| {
-            println!("Unable to parse UI config: {}", e);
+            println!("Unable to parse UI config: {e}");
             println!("Using defaults");
 
             let mut pages = HashMap::new();
@@ -92,17 +93,16 @@ pub enum UIButton {
 }
 
 impl UIButton {
+    #[must_use]
     pub fn get_data(&self) -> &ButtonData {
         match self {
-            UIButton::ExecuteAction(data) => data,
-            UIButton::OpenPage(data) => data,
+            UIButton::ExecuteAction(data) | UIButton::OpenPage(data) => data,
         }
     }
 
     pub fn get_mut_data(&mut self) -> &mut ButtonData {
         match self {
-            UIButton::ExecuteAction(data) => data,
-            UIButton::OpenPage(data) => data,
+            UIButton::ExecuteAction(data) | UIButton::OpenPage(data) => data,
         }
     }
 }
@@ -114,7 +114,7 @@ impl Display for UIButton {
             UIButton::OpenPage(data) => (data, "Open page"),
         };
 
-        write!(f, "{} with {}", button_type_str, data)
+        write!(f, "{button_type_str} with {data}")
     }
 }
 
@@ -133,12 +133,10 @@ impl Display for ButtonData {
             self.target_id,
             self.style_override
                 .as_ref()
-                .map(|x| x.to_string())
-                .unwrap_or_else(|| "None".to_string()),
+                .map_or_else(|| "None".to_string(), std::string::ToString::to_string),
             self.img
                 .as_ref()
-                .map(|x| x.to_string())
-                .unwrap_or_else(|| "None".to_string())
+                .map_or_else(|| "None".to_string(), std::string::ToString::to_string)
         )
     }
 }

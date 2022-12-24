@@ -42,7 +42,7 @@ async fn click(
     let actions = &actions_data.actions;
 
     let Some(action) = actions.get(button.as_str()) else {
-        return format!("Action with ID {} not configured", button);
+        return format!("Action with ID {button} not configured");
     };
 
     if let Err(e) = action.run(&data.plugins).await {
@@ -64,7 +64,7 @@ async fn main() -> std::io::Result<()> {
         path.push(&args[1]);
         config_dir_path = path;
     } else if let Some(dirs) = dirs {
-        config_dir_path = dirs.config_dir().to_path_buf()
+        config_dir_path = dirs.config_dir().to_path_buf();
     } else {
         println!("Configuration folder required");
         return Ok(());

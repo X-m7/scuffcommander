@@ -12,13 +12,14 @@ pub struct ActionConfig {
 }
 
 impl ActionConfig {
+    #[must_use]
     pub fn from_file(path: &str) -> ActionConfig {
         serde_json::from_str(&read_to_string(path).unwrap_or_else(|e| {
-            println!("{}", e);
+            println!("{e}");
             String::new()
         }))
         .unwrap_or_else(|e| {
-            println!("Unable to parse action config: {}", e);
+            println!("Unable to parse action config: {e}");
             println!("Using defaults");
             ActionConfig {
                 actions: HashMap::new(),
@@ -41,7 +42,7 @@ impl Condition {
         let plugin_type = self.query.get_required_type();
 
         let Some(plugin) = plugins.get(&plugin_type) else {
-            return Err(format!("Plugin {} not configured", plugin_type));
+            return Err(format!("Plugin {plugin_type} not configured"));
         };
 
         Ok(self.query.get(plugin).await? == self.target)
@@ -65,18 +66,19 @@ impl Action {
         let plugin_type = action.get_required_type();
         match plugins.get(&plugin_type) {
             Some(p) => action.run(p).await,
-            None => Err(format!("Plugin {} not configured", plugin_type)),
+            None => Err(format!("Plugin {plugin_type} not configured")),
         }
     }
 
     #[async_recursion]
+    #[must_use]
     pub async fn run(&self, plugins: &HashMap<PluginType, PluginInstance>) -> Result<(), String> {
         match self {
             Action::Single(action) => Action::run_single(action, plugins).await,
             Action::Chain(actions) => {
                 for action in actions {
                     if let Err(e) = action.run(plugins).await {
-                        return Err(format!("Action chain failed: {}", e));
+                        return Err(format!("Action chain failed: {e}"));
                     }
                 }
                 Ok(())
