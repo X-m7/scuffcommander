@@ -83,6 +83,8 @@ async fn main() {
             app_mod::pages::get_page_or_action_name_list,
             app_mod::pages::rename_page,
             app_mod::general::pick_image_file,
+            app_mod::general::pick_executable_file,
+            app_mod::general::pick_folder,
             app_mod::general::restart_app,
             app_mod::style::store_ui_style,
             app_mod::style::get_ui_style,

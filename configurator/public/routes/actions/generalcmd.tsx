@@ -1,4 +1,5 @@
 import { h, Fragment, Component } from "preact";
+import { invoke } from "@tauri-apps/api";
 
 import sharedStyle from "/style.module.css";
 import { GeneralActionCommand } from "/types";
@@ -95,6 +96,30 @@ class EditGeneralCommand extends Component<
     });
   };
 
+  selectExe = () => {
+    invoke("pick_executable_file")
+      .then((pathRaw) => {
+        this.setState({
+          cmd: pathRaw as string,
+        });
+      })
+      .catch((err) => {
+        this.props.msgFunc(`Error occurred: ${err.toString()}`);
+      });
+  };
+
+  selectCurrentDir = () => {
+    invoke("pick_folder")
+      .then((pathRaw) => {
+        this.setState({
+          currentDir: pathRaw as string,
+        });
+      })
+      .catch((err) => {
+        this.props.msgFunc(`Error occurred: ${err.toString()}`);
+      });
+  };
+
   toggleShowCurrentDir = () => {
     this.setState({
       showCurrentDir: !this.state.showCurrentDir,
@@ -138,6 +163,9 @@ class EditGeneralCommand extends Component<
             onInput={this.onCmdInput}
           />
         </label>
+        <button type="button" onClick={this.selectExe}>
+          Select executable
+        </button>
         <br />
         <button type="button" onClick={this.addArg}>
           Add argument
@@ -180,6 +208,9 @@ class EditGeneralCommand extends Component<
               onInput={this.onCurrentDirInput}
             />
           </label>
+          <button type="button" onClick={this.selectCurrentDir}>
+            Select directory
+          </button>
         </div>
       </Fragment>
     );
