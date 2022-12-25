@@ -242,15 +242,12 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
     });
   };
 
-  render() {
+  render(props: EditVTSActionProps, state: EditVTSActionState) {
     return (
       <Fragment>
         <label>
           VTube Studio action type:
-          <select
-            value={this.state.actionType}
-            onChange={this.onActionTypeChange}
-          >
+          <select value={state.actionType} onChange={this.onActionTypeChange}>
             <option value={VTSActionType.None}>Select an option</option>
             <option value={VTSActionType.ToggleExpression}>
               Toggle Expression
@@ -267,21 +264,21 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
           </select>
         </label>
         <br />
-        <label hidden={!this.state.showSelectInput}>
+        <label hidden={!state.showSelectInput}>
           Action parameter:
           <select
-            value={this.state.selectInputValue}
+            value={state.selectInputValue}
             onChange={this.onSelectInputChange}
           >
             <option value="none">Select an option</option>
-            <SelectOptsGen opts={this.state.selectInputOptions} />
+            <SelectOptsGen opts={state.selectInputOptions} />
           </select>
         </label>
-        {this.state.showModelPosInput && (
+        {state.showModelPosInput && (
           <EditVTSMoveModelData
             ref={this.moveModelEditorRef}
-            data={this.state.loadedModelPosData}
-            msgFunc={this.props.msgFunc}
+            data={state.loadedModelPosData}
+            msgFunc={props.msgFunc}
           />
         )}
       </Fragment>

@@ -194,13 +194,13 @@ class EditConditionAction extends Component<
     });
   };
 
-  render() {
+  render(props: EditConditionActionProps, state: EditConditionActionState) {
     return (
       <Fragment>
         <label>
           Query plugin type:
           <select
-            value={this.state.queryPluginType}
+            value={state.queryPluginType}
             onChange={this.onQueryPluginTypeChange}
           >
             <option value={QueryPluginType.None}>Select an option</option>
@@ -210,22 +210,16 @@ class EditConditionAction extends Component<
         </label>
         <hr />
         {this.showSelectedPluginDetails()}
-        <div hidden={this.state.queryPluginType === QueryPluginType.None}>
+        <div hidden={state.queryPluginType === QueryPluginType.None}>
           <hr />
-          {this.props.data !== undefined && (
+          {props.data !== undefined && (
             <Fragment>
               <p>Original then action:</p>
-              <ActionDetails
-                action={this.props.data[1]}
-                msgFunc={this.props.msgFunc}
-              />
+              <ActionDetails action={props.data[1]} msgFunc={props.msgFunc} />
               <hr />
               <p>Original else action:</p>
-              {this.props.data[2] !== null ? (
-                <ActionDetails
-                  action={this.props.data[2]}
-                  msgFunc={this.props.msgFunc}
-                />
+              {props.data[2] !== null ? (
+                <ActionDetails action={props.data[2]} msgFunc={props.msgFunc} />
               ) : (
                 "Do nothing"
               )}
@@ -235,28 +229,28 @@ class EditConditionAction extends Component<
           <label>
             Then:
             <select
-              value={this.state.thenActionId}
+              value={state.thenActionId}
               onChange={this.onThenActionChange}
             >
               <option value="none">Select an option</option>
-              {this.props.data && (
+              {props.data && (
                 <option value="current">Keep original action</option>
               )}
-              <SelectOptsGen opts={this.state.actionsList} />
+              <SelectOptsGen opts={state.actionsList} />
             </select>
           </label>
           <br />
           <label>
             Else:
             <select
-              value={this.state.elseActionId}
+              value={state.elseActionId}
               onChange={this.onElseActionChange}
             >
               <option value="none">Do nothing</option>
-              {this.props.data && (
+              {props.data && (
                 <option value="current">Keep original action</option>
               )}
-              <SelectOptsGen opts={this.state.actionsList} />
+              <SelectOptsGen opts={state.actionsList} />
             </select>
           </label>
         </div>

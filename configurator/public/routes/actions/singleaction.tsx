@@ -133,15 +133,12 @@ class EditSingleAction extends Component<
     } as ActionContent;
   };
 
-  render() {
+  render(props: EditSingleActionProps, state: EditSingleActionState) {
     return (
       <Fragment>
         <label>
           Plugin type:
-          <select
-            value={this.state.pluginType}
-            onChange={this.onPluginTypeChange}
-          >
+          <select value={state.pluginType} onChange={this.onPluginTypeChange}>
             <option value={PluginType.None}>Select an option</option>
             <option value={PluginType.General}>General</option>
             <option value={PluginType.OBS}>OBS Studio</option>

@@ -195,7 +195,7 @@ class EditVTSMoveModelData extends Component<
     } as VTSMoveModelData;
   };
 
-  render() {
+  render(props: EditVTSMoveModelDataProps, state: EditVTSMoveModelDataState) {
     return (
       <div class={style.tableDisp}>
         <button
@@ -209,10 +209,10 @@ class EditVTSMoveModelData extends Component<
           <span class={style.cellDisp}>X:</span>
           <input
             class={`${style.cellDisp} ${
-              this.state.xValid ? "" : sharedStyle.invalid
+              state.xValid ? "" : sharedStyle.invalid
             }`}
             type="number"
-            value={this.state.x}
+            value={state.x}
             onInput={this.onPosXInput}
           />
         </label>
@@ -220,10 +220,10 @@ class EditVTSMoveModelData extends Component<
           <span class={style.cellDisp}>Y:</span>
           <input
             class={`${style.cellDisp} ${
-              this.state.yValid ? "" : sharedStyle.invalid
+              state.yValid ? "" : sharedStyle.invalid
             }`}
             type="number"
-            value={this.state.y}
+            value={state.y}
             onInput={this.onPosYInput}
           />
         </label>
@@ -233,10 +233,10 @@ class EditVTSMoveModelData extends Component<
           </span>
           <input
             class={`${style.cellDisp} ${
-              this.state.rotationValid ? "" : sharedStyle.invalid
+              state.rotationValid ? "" : sharedStyle.invalid
             }`}
             type="number"
-            value={this.state.rotation}
+            value={state.rotation}
             onInput={this.onPosRotateInput}
           />
         </label>
@@ -244,10 +244,10 @@ class EditVTSMoveModelData extends Component<
           <span class={style.cellDisp}>Size (range: -100 to 100):</span>
           <input
             class={`${style.cellDisp} ${
-              this.state.sizeValid ? "" : sharedStyle.invalid
+              state.sizeValid ? "" : sharedStyle.invalid
             }`}
             type="number"
-            value={this.state.size}
+            value={state.size}
             onInput={this.onPosSizeInput}
           />
         </label>
@@ -255,10 +255,10 @@ class EditVTSMoveModelData extends Component<
           <span class={style.cellDisp}>Animation time (0-2s):</span>
           <input
             class={`${style.cellDisp} ${
-              this.state.timeValid ? "" : sharedStyle.invalid
+              state.timeValid ? "" : sharedStyle.invalid
             }`}
             type="number"
-            value={this.state.time}
+            value={state.time}
             onInput={this.onPosTimeInput}
           />
         </label>

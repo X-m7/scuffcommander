@@ -184,28 +184,22 @@ class EditVTSCondition extends Component<
     } as Condition;
   };
 
-  render() {
+  render(props: EditVTSConditionProps, state: EditVTSConditionState) {
     return (
       <Fragment>
         <label>
           VTube Studio query type:
-          <select
-            value={this.state.queryType}
-            onChange={this.onQueryTypeChange}
-          >
+          <select value={state.queryType} onChange={this.onQueryTypeChange}>
             <option value={VTSQueryType.None}>Select an option</option>
             <option value={VTSQueryType.ActiveModelId}>Active Model</option>
           </select>
         </label>
         <br />
-        <label hidden={!this.state.showQueryInput}>
-          If the {this.getQueryDisplayString(this.state.queryType)} is
-          <select
-            value={this.state.queryInput}
-            onChange={this.onQueryParamSelect}
-          >
+        <label hidden={!state.showQueryInput}>
+          If the {this.getQueryDisplayString(state.queryType)} is
+          <select value={state.queryInput} onChange={this.onQueryParamSelect}>
             <option value="none">Select an option</option>
-            <SelectOptsGen opts={this.state.queryInputList} />
+            <SelectOptsGen opts={state.queryInputList} />
           </select>
         </label>
       </Fragment>

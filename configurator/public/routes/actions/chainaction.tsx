@@ -56,16 +56,16 @@ class CopyAction extends Component<CopyActionProps, CopyActionState> {
     });
   };
 
-  render() {
+  render(props: CopyActionProps, state: CopyActionState) {
     return (
       <label>
         Action to copy:
         <select
-          value={this.state.selectedActionId}
+          value={state.selectedActionId}
           onChange={this.onSelectedActionChange}
         >
           <option value="none">Select an option</option>
-          <SelectOptsGen opts={this.state.actionsList} />
+          <SelectOptsGen opts={state.actionsList} />
         </select>
       </label>
     );
@@ -210,18 +210,18 @@ class EditChainAction extends Component<
     this.setState({ chain: this.state.chain.concat([newActionData]) });
   };
 
-  render() {
+  render(props: EditChainActionProps, state: EditChainActionState) {
     return (
       <Fragment>
         <ol>
-          {this.state.chain.map((act, index) => {
+          {state.chain.map((act, index) => {
             return (
               <DraggableListItem
                 key={act}
                 pos={index}
                 moveCallback={this.moveActionInChain}
               >
-                <ActionDetails action={act} msgFunc={this.props.msgFunc} />
+                <ActionDetails action={act} msgFunc={props.msgFunc} />
                 <button
                   type="button"
                   onClick={() => this.deleteActionInChain(index)}
@@ -236,7 +236,7 @@ class EditChainAction extends Component<
         <label>
           Action type to add to chain:
           <select
-            value={this.state.newActionType}
+            value={state.newActionType}
             onChange={this.onActionTypeToAddChange}
           >
             <option value={NewActionType.None}>Select an option</option>
@@ -247,7 +247,7 @@ class EditChainAction extends Component<
         </label>
         <button
           type="button"
-          hidden={this.state.newActionType === NewActionType.None}
+          hidden={state.newActionType === NewActionType.None}
           onClick={this.addActionToChain}
         >
           Add action to chain

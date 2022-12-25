@@ -109,18 +109,18 @@ class EditButtonStyle extends Component<
     } as ButtonStyle;
   };
 
-  render() {
+  render(props: EditButtonStyleProps, state: EditButtonStyleState) {
     return (
       <div class={style.tableDisp}>
         <label class={style.rowDisp}>
           <span class={style.cellDisp}>Button width (cm):</span>
           <input
             class={`${style.cellDisp} ${
-              this.state.widthValid ? "" : sharedStyle.invalid
+              state.widthValid ? "" : sharedStyle.invalid
             }`}
             type="number"
             step="any"
-            value={this.state.width}
+            value={state.width}
             onInput={this.onWidthInput}
           />
         </label>
@@ -128,11 +128,11 @@ class EditButtonStyle extends Component<
           <span class={style.cellDisp}>Button height (cm):</span>
           <input
             class={`${style.cellDisp} ${
-              this.state.heightValid ? "" : sharedStyle.invalid
+              state.heightValid ? "" : sharedStyle.invalid
             }`}
             type="number"
             step="any"
-            value={this.state.height}
+            value={state.height}
             onInput={this.onHeightInput}
           />
         </label>
@@ -141,7 +141,7 @@ class EditButtonStyle extends Component<
           <input
             class={style.cellDisp}
             type="color"
-            value={this.state.bgColor}
+            value={state.bgColor}
             onInput={this.onBgColorInput}
           />
         </label>
@@ -150,7 +150,7 @@ class EditButtonStyle extends Component<
           <input
             class={style.cellDisp}
             type="color"
-            value={this.state.fgColor}
+            value={state.fgColor}
             onInput={this.onFgColorInput}
           />
         </label>

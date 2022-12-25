@@ -141,15 +141,12 @@ class EditOBSAction extends Component<EditOBSActionProps, EditOBSActionState> {
     return undefined;
   };
 
-  render() {
+  render(props: EditOBSActionProps, state: EditOBSActionState) {
     return (
       <Fragment>
         <label>
           OBS Studio action type:
-          <select
-            value={this.state.actionType}
-            onChange={this.onActionTypeChange}
-          >
+          <select value={state.actionType} onChange={this.onActionTypeChange}>
             <option value={OBSActionType.None}>Select an option</option>
             <option value={OBSActionType.ProgramSceneChange}>
               Program Scene Change
@@ -161,14 +158,11 @@ class EditOBSAction extends Component<EditOBSActionProps, EditOBSActionState> {
           </select>
         </label>
         <br />
-        <label hidden={!this.state.showActionInput}>
+        <label hidden={!state.showActionInput}>
           Action parameter:
-          <select
-            value={this.state.actionInput}
-            onChange={this.onActionParamSelect}
-          >
+          <select value={state.actionInput} onChange={this.onActionParamSelect}>
             <option value="none">Select an option</option>
-            <SelectOptsGen opts={this.state.actionInputList} />
+            <SelectOptsGen opts={state.actionInputList} />
           </select>
         </label>
       </Fragment>

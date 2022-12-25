@@ -155,15 +155,12 @@ class EditOBSCondition extends Component<
     } as Condition;
   };
 
-  render() {
+  render(props: EditOBSConditionProps, state: EditOBSConditionState) {
     return (
       <Fragment>
         <label>
           OBS Studio query type:
-          <select
-            value={this.state.queryType}
-            onChange={this.onQueryTypeChange}
-          >
+          <select value={state.queryType} onChange={this.onQueryTypeChange}>
             <option value={OBSQueryType.None}>Select an option</option>
             <option value={OBSQueryType.CurrentProgramScene}>
               Current Program Scene
@@ -173,14 +170,11 @@ class EditOBSCondition extends Component<
           </select>
         </label>
         <br />
-        <label hidden={!this.state.showQueryInput}>
-          If {this.getQueryDisplayString(this.state.queryType)}
-          <select
-            value={this.state.queryInput}
-            onChange={this.onQueryParamSelect}
-          >
+        <label hidden={!state.showQueryInput}>
+          If {this.getQueryDisplayString(state.queryType)}
+          <select value={state.queryInput} onChange={this.onQueryParamSelect}>
             <option value="none">Select an option</option>
-            <SelectOptsGen opts={this.state.queryInputList} />
+            <SelectOptsGen opts={state.queryInputList} />
           </select>
         </label>
       </Fragment>
