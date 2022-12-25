@@ -4,8 +4,7 @@
     "dev": "wmr",
     "build": "wmr build",
     "serve": "wmr build && wmr serve",
-    "lint": "eslint public",
-    "check": "tsc"
+    "check": "tsc && eslint public"
   },
   "eslintConfig": {
     "parser": "@typescript-eslint/parser",

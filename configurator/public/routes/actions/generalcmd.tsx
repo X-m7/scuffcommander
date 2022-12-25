@@ -147,7 +147,7 @@ class EditGeneralCommand extends Component<
             <Fragment key={index}>
               <br />
               <label>
-                Argument {index}:
+                Argument {index + 1}:
                 <input
                   type="text"
                   class={argState.length === 0 ? sharedStyle.invalid : ""}
