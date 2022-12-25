@@ -1,11 +1,18 @@
-import { h, Fragment, Component } from "preact";
+import { h, Fragment, Component, createRef } from "preact";
 
 import sharedStyle from "/style.module.css";
-import { GeneralAction } from "/types";
+import {
+  GeneralAction,
+  GeneralActionCommand,
+  GeneralActionDelay,
+  GeneralActionRunCmd,
+} from "/types";
+import EditGeneralCommand from "./generalcmd";
 
 enum GeneralActionType {
   None,
   Delay,
+  RunCommand,
 }
 
 interface EditGeneralActionProps {
@@ -15,9 +22,11 @@ interface EditGeneralActionProps {
 
 interface EditGeneralActionState {
   actionType: GeneralActionType;
-  actionInput: string;
-  showActionInput: boolean;
-  actionInputValid: boolean;
+  actionNumberInput: string;
+  showCmdInput: boolean;
+  loadedCmd?: GeneralActionCommand;
+  showActionNumberInput: boolean;
+  actionNumberInputValid: boolean;
 }
 
 class EditGeneralAction extends Component<
@@ -28,23 +37,36 @@ class EditGeneralAction extends Component<
     super(props);
 
     let actionType = GeneralActionType.None;
-    let actionInput = "";
-    let showActionInput = false;
-    let actionInputValid = false;
+    let actionNumberInput = "";
+    let showCmdInput = false;
+    let loadedCmd: GeneralActionCommand | undefined;
+    let showActionNumberInput = false;
+    let actionNumberInputValid = false;
 
     if (props.data) {
       actionType =
         GeneralActionType[props.data.tag as keyof typeof GeneralActionType];
-      actionInput = props.data.content.toString();
-      showActionInput = true;
-      actionInputValid = true;
+
+      switch (actionType) {
+        case GeneralActionType.Delay:
+          actionNumberInput = props.data.content.toString();
+          showActionNumberInput = true;
+          actionNumberInputValid = true;
+          break;
+        case GeneralActionType.RunCommand:
+          showCmdInput = true;
+          loadedCmd = props.data.content as GeneralActionCommand;
+          break;
+      }
     }
 
     this.state = {
       actionType,
-      actionInput,
-      showActionInput,
-      actionInputValid,
+      showCmdInput,
+      loadedCmd,
+      actionNumberInput,
+      showActionNumberInput,
+      actionNumberInputValid,
     };
   }
 
@@ -62,13 +84,22 @@ class EditGeneralAction extends Component<
       case GeneralActionType.None:
         this.setState({
           actionType,
-          showActionInput: false,
+          showActionNumberInput: false,
+          showCmdInput: false,
         });
         break;
       case GeneralActionType.Delay:
         this.setState({
           actionType,
-          showActionInput: true,
+          showActionNumberInput: true,
+          showCmdInput: false,
+        });
+        break;
+      case GeneralActionType.RunCommand:
+        this.setState({
+          actionType,
+          showActionNumberInput: false,
+          showCmdInput: true,
         });
         break;
     }
@@ -85,51 +116,80 @@ class EditGeneralAction extends Component<
     const valid = !Number.isNaN(parsedVal) && parsedVal >= 0;
 
     this.setState({
-      actionInput: value,
-      actionInputValid: valid,
+      actionNumberInput: value,
+      actionNumberInputValid: valid,
     });
   };
 
+  cmdInputRef = createRef<EditGeneralCommand>();
+
   getActionData = async () => {
-    if (this.state.actionType === GeneralActionType.None) {
-      this.props.msgFunc("Please select an option for the General action type");
-      return undefined;
-    }
+    let cmdData: GeneralActionCommand | undefined;
 
-    if (!this.state.actionInputValid) {
-      this.props.msgFunc("Invalid input");
-      return;
-    }
+    switch (this.state.actionType) {
+      case GeneralActionType.None:
+        this.props.msgFunc(
+          "Please select an option for the General action type"
+        );
+        return undefined;
+      case GeneralActionType.Delay:
+        if (!this.state.actionNumberInputValid) {
+          this.props.msgFunc("Invalid delay input");
+          return undefined;
+        }
 
-    return {
-      tag: GeneralActionType[this.state.actionType],
-      content: parseFloat(this.state.actionInput),
-    } as GeneralAction;
+        return {
+          tag: "Delay",
+          content: parseFloat(this.state.actionNumberInput),
+        } as GeneralActionDelay;
+      case GeneralActionType.RunCommand:
+        if (!this.cmdInputRef.current) {
+          return undefined;
+        }
+
+        cmdData = this.cmdInputRef.current.getCmdData();
+
+        if (!cmdData) {
+          return undefined;
+        }
+
+        return {
+          tag: "RunCommand",
+          content: cmdData,
+        } as GeneralActionRunCmd;
+      default:
+        return undefined;
+    }
   };
 
-  render() {
+  render(props: EditGeneralActionProps, state: EditGeneralActionState) {
     return (
       <Fragment>
         <label>
           General action type:
-          <select
-            value={this.state.actionType}
-            onChange={this.onActionTypeChange}
-          >
+          <select value={state.actionType} onChange={this.onActionTypeChange}>
             <option value={GeneralActionType.None}>Select an option</option>
             <option value={GeneralActionType.Delay}>Delay</option>
+            <option value={GeneralActionType.RunCommand}>Run command</option>
           </select>
         </label>
         <br />
-        <label hidden={!this.state.showActionInput}>
+        <label hidden={!state.showActionNumberInput}>
           Delay time (seconds):
           <input
-            class={this.state.actionInputValid ? "" : sharedStyle.invalid}
+            class={state.actionNumberInputValid ? "" : sharedStyle.invalid}
             type="number"
-            value={this.state.actionInput}
+            value={state.actionNumberInput}
             onInput={this.onActionParamInput}
           />
         </label>
+        {state.showCmdInput && (
+          <EditGeneralCommand
+            ref={this.cmdInputRef}
+            data={state.loadedCmd}
+            msgFunc={props.msgFunc}
+          />
+        )}
       </Fragment>
     );
   }
