@@ -28,8 +28,7 @@ Run `cargo build --release` in the `server` directory, the executable will be `s
 
 ### Configurator
 1. Run `npm install` in the `configurator` folder
-2. Run `cargo install tauri-cli` or `npm install --save-dev @tauri-apps/cli` (see [here](https://tauri.app/v1/guides/faq#node-or-cargo) for the differences))
-3. Run `cargo tauri build` in the `configurator/src-tauri` folder, the executable will be `configurator/src-tauri/target/release/scuffcommander-configurator`, with installers and such in `configurator/src-tauri/target/release/bundle`
+2. Run `npm run tauri build` in the `configurator/src-tauri` folder, the executable will be `configurator/src-tauri/target/release/scuffcommander-configurator`, with installers and such in `configurator/src-tauri/target/release/bundle`
 
 ## Running in development mode
 - For the server run `cargo run` in the `server` directory
