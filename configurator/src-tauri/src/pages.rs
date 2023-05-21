@@ -1,5 +1,6 @@
 use crate::actions::ActionConfigState;
 use crate::config::UIConfigState;
+use base64::Engine;
 use scuffcommander_core::ui::{Base64Image, UIButton, UIButtonType, UIPage};
 use std::collections::HashSet;
 
@@ -277,7 +278,7 @@ async fn get_base64image_from_path(path: &str) -> Result<Base64Image, String> {
     if let infer::MatcherType::Image = kind.matcher_type() {
         Ok(Base64Image {
             format: kind.mime_type().to_string(),
-            data: base64::encode(raw_img_data),
+            data: base64::engine::general_purpose::STANDARD.encode(raw_img_data),
         })
     } else {
         Err("Selected file does not appear to be an image".to_string())
