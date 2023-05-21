@@ -1,5 +1,4 @@
 import { h } from "preact";
-import { useState, useEffect } from "preact/hooks";
 import {
   Route,
   Router,
@@ -7,8 +6,6 @@ import {
   lazy,
   ErrorBoundary,
 } from "preact-iso";
-import { appWindow } from "@tauri-apps/api/window";
-import { UnlistenFn } from "@tauri-apps/api/event";
 
 import style from "./style.module.css";
 import Header from "../header";
@@ -21,34 +18,9 @@ const StyleConfig = lazy(() => import("/routes/style"));
 const Utilities = lazy(() => import("/routes/utilities"));
 
 const App = () => {
-  const [darkTheme, setDarkTheme] = useState<boolean>(false);
-
-  useEffect(() => {
-    appWindow.theme().then((theme) => {
-      setDarkTheme(theme === "dark");
-    });
-
-    let cleanupListener: UnlistenFn | undefined;
-
-    appWindow
-      .onThemeChanged(({ payload: theme }) => {
-        setDarkTheme(theme === "dark");
-      })
-      .then((unlisten) => {
-        cleanupListener = unlisten;
-      });
-
-    return () => {
-      if (cleanupListener !== undefined) {
-        cleanupListener();
-      }
-    };
-  }, []);
-
   return (
     <LocationProvider>
       <div
-        class={`${style.app} ${darkTheme ? style.darkTheme : style.lightTheme}`}
         onContextMenu={(e: Event) => e.preventDefault()}
       >
         <Header />
