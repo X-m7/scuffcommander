@@ -1,7 +1,7 @@
 import { h, Fragment, Component, createRef } from "preact";
 import { invoke } from "@tauri-apps/api";
 
-import { VTSAction, VTSMoveModelData } from "/types";
+import { VTSAction, VTSMoveModelData, VTSRestoreModelPositionData } from "/types";
 import EditVTSMoveModelData from "./vtsmovemodel";
 import SelectOptsGen from "/components/selectoptsgen";
 
@@ -30,6 +30,8 @@ interface EditVTSActionState {
   selectInputOptions: string[];
   showModelPosInput: boolean;
   loadedModelPosData?: VTSMoveModelData;
+  showTextInput: boolean;
+  textInputValue: string;
 }
 
 class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
@@ -56,6 +58,8 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
       selectInputOptions: [],
       showModelPosInput,
       loadedModelPosData,
+      showTextInput: false,
+      textInputValue: "",
     };
   }
 
@@ -122,6 +126,8 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
           showSelectInput: false,
           showModelPosInput: false,
           selectInputValue: "none",
+          showTextInput: false,
+          textInputValue: "",
         });
         break;
       case VTSActionType.ToggleExpression:
@@ -156,6 +162,19 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
           showSelectInput: false,
           selectInputValue: "none",
           showModelPosInput: true,
+          showTextInput: false,
+          textInputValue: "",
+        });
+        break;
+      case VTSActionType.SaveCurrentModelPosition:
+      case VTSActionType.RestoreModelPosition:
+        this.setState({
+          actionType,
+          showSelectInput: false,
+          selectInputValue: "none",
+          showModelPosInput: false,
+          showTextInput: true,
+          textInputValue: "",
         });
         break;
     }
@@ -188,6 +207,7 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
 
   getActionData = async () => {
     let moveModelData: VTSMoveModelData | undefined;
+    let restoreModelData: VTSRestoreModelPositionData;
 
     switch (this.state.actionType) {
       case VTSActionType.None:
@@ -218,6 +238,35 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
           tag: "MoveModel",
           content: moveModelData,
         } as VTSAction;
+      case VTSActionType.SaveCurrentModelPosition:
+        if (this.state.textInputValue === "") {
+          this.props.msgFunc(
+            "Please enter a variable name to save the model position to"
+          );
+          return undefined;
+        }
+
+        return {
+          tag: "SaveCurrentModelPosition",
+          content: this.state.textInputValue,
+        } as VTSAction;
+      case VTSActionType.RestoreModelPosition:
+        if (this.state.textInputValue === "") {
+          this.props.msgFunc(
+            "Please enter a variable name to load the model position from"
+          );
+          return undefined;
+        }
+
+        restoreModelData = {
+          var_id: this.state.textInputValue,
+          time_sec: 0.2,
+        } as VTSRestoreModelPositionData;
+
+        return {
+          tag: "RestoreModelPosition",
+          content: restoreModelData,
+        } as VTSAction;
     }
   };
 
@@ -244,6 +293,16 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
     });
   };
 
+  onTextInputChange = (e: Event) => {
+    if (!e.target) {
+      return;
+    }
+
+    this.setState({
+      textInputValue: (e.target as HTMLInputElement).value,
+    });
+  };
+
   render(props: EditVTSActionProps, state: EditVTSActionState) {
     return (
       <Fragment>
@@ -263,6 +322,12 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
             <option value={VTSActionType.LoadModel}>Load Model</option>
             <option value={VTSActionType.MoveModel}>Move Model</option>
             <option value={VTSActionType.TriggerHotkey}>Trigger Hotkey</option>
+            <option value={VTSActionType.SaveCurrentModelPosition}>
+              Save Current Model Position
+            </option>
+            <option value={VTSActionType.RestoreModelPosition}>
+              Restore Model Position
+            </option>
           </select>
         </label>
         <br />
@@ -275,6 +340,14 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
             <option value="none">Select an option</option>
             <SelectOptsGen opts={state.selectInputOptions} />
           </select>
+        </label>
+        <label hidden={!state.showTextInput}>
+          Action parameter:
+          <input
+            type="text"
+            value={state.textInputValue}
+            onInput={this.onTextInputChange}
+          />
         </label>
         {state.showModelPosInput && (
           <EditVTSMoveModelData

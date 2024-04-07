@@ -71,7 +71,7 @@ const VTSActionDetails = ({ content, msgFunc }: VTSActionDetailsProps) => {
       return `(${data.x}, ${data.y}), with rotation ${data.rotation}, size ${data.size}, with duration ${data.time_sec}`;
     }
 
-    return `${data.var_id} with duration ${data.time_sec}`;
+    return `"${data.var_id}" with duration ${data.time_sec}`;
 
   };
 
