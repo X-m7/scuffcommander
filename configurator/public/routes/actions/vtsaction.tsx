@@ -13,6 +13,8 @@ enum VTSActionType {
   LoadModel,
   MoveModel,
   TriggerHotkey,
+  SaveCurrentModelPosition,
+  RestoreModelPosition,
   CheckConnection,
 }
 

@@ -29,6 +29,12 @@ pub struct VTSMoveModelInput {
 }
 
 #[derive(Serialize, Deserialize, Clone)]
+pub struct VTSRestoreModelPositionInput {
+    pub var_id: String,
+    pub time_sec: f64,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
 #[serde(tag = "tag", content = "content")]
 pub enum VTSAction {
     ToggleExpression(String),
@@ -38,7 +44,7 @@ pub enum VTSAction {
     MoveModel(VTSMoveModelInput),
     TriggerHotkey(String),
     SaveCurrentModelPosition(String),
-    RestoreModelPosition(String, f64),
+    RestoreModelPosition(VTSRestoreModelPositionInput),
     CheckConnection,
 }
 
@@ -54,9 +60,7 @@ impl VTSAction {
             VTSAction::SaveCurrentModelPosition(var_id) => {
                 conn.save_current_model_position(var_id).await
             }
-            VTSAction::RestoreModelPosition(var_id, time_sec) => {
-                conn.restore_model_position(var_id, time_sec).await
-            }
+            VTSAction::RestoreModelPosition(data) => conn.restore_model_position(data).await,
             VTSAction::CheckConnection => conn.get_vts_version().await.map(|_| ()),
         }
     }
@@ -195,15 +199,18 @@ impl VTSConnector {
 
     // Takes the model position stored under var_id and moves the model to said position
     // time_sec is the same as in the move model action
-    async fn restore_model_position(&mut self, var_id: &str, time_sec: &f64) -> Result<(), String> {
-        if let Some(mut pos_struct) = self.position_store.remove(var_id) {
-            pos_struct.time_sec = *time_sec;
+    async fn restore_model_position(
+        &mut self,
+        data: &VTSRestoreModelPositionInput,
+    ) -> Result<(), String> {
+        if let Some(mut pos_struct) = self.position_store.remove(&data.var_id) {
+            pos_struct.time_sec = data.time_sec;
             return self.move_model(&pos_struct).await;
         }
 
         Err(format!(
             "Variable {} does not have a stored position",
-            var_id
+            data.var_id
         ))
     }
 

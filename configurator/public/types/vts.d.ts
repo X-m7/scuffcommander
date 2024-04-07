@@ -6,7 +6,12 @@ export type VTSMoveModelData = {
   time_sec: number;
 };
 
-export type VTSActionData = string | VTSMoveModelData;
+export type VTSRestoreModelPositionData = {
+  var_id: string;
+  time_sec: number;
+}
+
+export type VTSActionData = string | VTSMoveModelData | VTSRestoreModelPositionData;
 
 export type VTSActionTag =
   | "ToggleExpression"
@@ -15,6 +20,8 @@ export type VTSActionTag =
   | "LoadModel"
   | "MoveModel"
   | "TriggerHotkey"
+  | "SaveCurrentModelPosition"
+  | "RestoreModelPosition"
   | "CheckConnection";
 
 // content for most is just a single string, or nothing for CheckConnection

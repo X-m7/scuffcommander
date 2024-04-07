@@ -22,6 +22,8 @@ const VTSActionDetails = ({ content, msgFunc }: VTSActionDetailsProps) => {
   tagToStringMap.set("LoadModel", "Load VTube Studio model:");
   tagToStringMap.set("MoveModel", "Move VTube Studio model to:");
   tagToStringMap.set("TriggerHotkey", "Trigger VTube Studio hotkey:");
+  tagToStringMap.set("SaveCurrentModelPosition", "Save VTube Studio model position as:");
+  tagToStringMap.set("RestoreModelPosition", "Restore VTube Studio model position from:");
 
   const convertIdToStr = useCallback(
     (id: string, invokeCmd: string) => {
@@ -65,7 +67,12 @@ const VTSActionDetails = ({ content, msgFunc }: VTSActionDetailsProps) => {
       return data;
     }
 
-    return `(${data.x}, ${data.y}), with rotation ${data.rotation}, size ${data.size}, with duration ${data.time_sec}`;
+    if ("x" in data) {
+      return `(${data.x}, ${data.y}), with rotation ${data.rotation}, size ${data.size}, with duration ${data.time_sec}`;
+    }
+
+    return `${data.var_id} with duration ${data.time_sec}`;
+
   };
 
   return (
