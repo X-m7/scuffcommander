@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use serde::{Deserialize, Serialize};
 use tokio::fs::{read_to_string, write};
 use vtubestudio::Client;
@@ -35,6 +37,8 @@ pub enum VTSAction {
     LoadModel(String),
     MoveModel(VTSMoveModelInput),
     TriggerHotkey(String),
+    SaveCurrentModelPosition(String),
+    RestoreModelPosition(String, f64),
     CheckConnection,
 }
 
@@ -47,6 +51,12 @@ impl VTSAction {
             VTSAction::LoadModel(model) => conn.load_model(model).await,
             VTSAction::MoveModel(info) => conn.move_model(info).await,
             VTSAction::TriggerHotkey(hotkey) => conn.trigger_hotkey(hotkey).await,
+            VTSAction::SaveCurrentModelPosition(var_id) => {
+                conn.save_current_model_position(var_id).await
+            }
+            VTSAction::RestoreModelPosition(var_id, time_sec) => {
+                conn.restore_model_position(var_id, time_sec).await
+            }
             VTSAction::CheckConnection => conn.get_vts_version().await.map(|_| ()),
         }
     }
@@ -60,6 +70,7 @@ pub struct VTSConfig {
 
 pub struct VTSConnector {
     client: Client,
+    position_store: HashMap<String, VTSMoveModelInput>,
 }
 
 impl VTSConnector {
@@ -94,7 +105,10 @@ impl VTSConnector {
             }
         });
 
-        VTSConnector { client }
+        VTSConnector {
+            client,
+            position_store: HashMap::new(),
+        }
     }
 
     pub async fn get_vts_version(&mut self) -> Result<String, String> {
@@ -160,6 +174,37 @@ impl VTSConnector {
             Ok(_) => Ok(()),
             Err(e) => Err(e.to_string()),
         }
+    }
+
+    // Takes the current model position and stores it under var_id
+    async fn save_current_model_position(&mut self, var_id: &str) -> Result<(), String> {
+        let (x, y, rotation, size) = self.get_current_model_position().await?;
+
+        let pos_struct = VTSMoveModelInput {
+            x,
+            y,
+            rotation,
+            size,
+            time_sec: 0.0,
+        };
+
+        self.position_store.insert(var_id.to_string(), pos_struct);
+
+        Ok(())
+    }
+
+    // Takes the model position stored under var_id and moves the model to said position
+    // time_sec is the same as in the move model action
+    async fn restore_model_position(&mut self, var_id: &str, time_sec: &f64) -> Result<(), String> {
+        if let Some(mut pos_struct) = self.position_store.remove(var_id) {
+            pos_struct.time_sec = *time_sec;
+            return self.move_model(&pos_struct).await;
+        }
+
+        Err(format!(
+            "Variable {} does not have a stored position",
+            var_id
+        ))
     }
 
     // Takes the expression ID/file name and whether to enable or disable the expression
