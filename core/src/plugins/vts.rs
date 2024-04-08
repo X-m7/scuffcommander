@@ -7,6 +7,7 @@ use vtubestudio::Client;
 #[derive(Serialize, Deserialize, Clone)]
 pub enum VTSQuery {
     ActiveModelId,
+    StoredModelPositionExists,
     Version,
 }
 
@@ -14,6 +15,13 @@ impl VTSQuery {
     pub async fn run(&self, conn: &mut VTSConnector) -> Result<String, String> {
         match self {
             VTSQuery::ActiveModelId => conn.get_current_model_id().await,
+            VTSQuery::StoredModelPositionExists => {
+                if conn.get_stored_model_position_exists() {
+                    Ok("true".to_string())
+                } else {
+                    Ok("false".to_string())
+                }
+            }
             VTSQuery::Version => conn.get_vts_version().await,
         }
     }
@@ -212,6 +220,10 @@ impl VTSConnector {
             "Variable {} does not have a stored position",
             data.var_id
         ))
+    }
+
+    fn get_stored_model_position_exists(&self) -> bool {
+        !self.position_store.is_empty()
     }
 
     // Takes the expression ID/file name and whether to enable or disable the expression

@@ -7,6 +7,7 @@ import SelectOptsGen from "/components/selectoptsgen";
 enum VTSQueryType {
   None,
   ActiveModelId,
+  StoredModelPositionExists,
   Version,
 }
 
@@ -102,6 +103,15 @@ class EditVTSCondition extends Component<
             this.props.msgFunc(`Error occurred: ${err.toString()}`);
           });
         break;
+      case VTSQueryType.StoredModelPositionExists:
+        this.setState({
+          queryType: newQueryType,
+          showQueryInput: true,
+          queryInputList: ["true", "false"],
+          queryInput: init && this.props.data ? `x-${this.props.data.target}` : "none",
+        });
+
+        break;
       case VTSQueryType.None:
         this.setState({
           queryType: newQueryType,
@@ -139,6 +149,8 @@ class EditVTSCondition extends Component<
     switch (queryType) {
       case VTSQueryType.ActiveModelId:
         return "active model";
+      case VTSQueryType.StoredModelPositionExists:
+        return "the statement \"There exists a stored model position\"";
       case VTSQueryType.None:
         return "<none>";
     }
@@ -173,6 +185,18 @@ class EditVTSCondition extends Component<
             return undefined;
           }
         }
+
+        break;
+      case VTSQueryType.StoredModelPositionExists:
+        if (queryInput === "none") {
+          this.props.msgFunc(
+            "Please select an option for the VTube Studio query parameter"
+          );
+          return undefined;
+        }
+
+        queryInput = queryInput.substring(2);
+        break;
     }
 
     return {
@@ -192,6 +216,7 @@ class EditVTSCondition extends Component<
           <select value={state.queryType} onChange={this.onQueryTypeChange}>
             <option value={VTSQueryType.None}>Select an option</option>
             <option value={VTSQueryType.ActiveModelId}>Active Model</option>
+            <option value={VTSQueryType.StoredModelPositionExists}>Stored Model Position Exists</option>
           </select>
         </label>
         <br />

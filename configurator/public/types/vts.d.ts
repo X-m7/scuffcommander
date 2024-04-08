@@ -30,4 +30,4 @@ export type VTSAction = {
   content?: VTSActionData;
 };
 
-export type VTSQuery = "ActiveModelId" | "Version";
+export type VTSQuery = "ActiveModelId" | "StoredModelPositionExists" | "Version";
