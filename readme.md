@@ -32,7 +32,7 @@ Run `cargo build --release` in the `server` directory, the executable will be `s
 
 ## Running in development mode
 - For the server run `cargo run` in the `server` directory
-- For the configurator run `cargo tauri dev` in the `configurator` directory
+- For the configurator run `npm run tauri dev` in the `configurator` directory
 
 ## Additional notes
 - If the address used is `localhost` the server will not be accessible to any other devices, to allow other devices to connect use `0.0.0.0` instead
