@@ -49,7 +49,7 @@ const Home = () => {
       .catch((err) => {
         if (currentPage === "home") {
           setStatusState(
-            'Error occurred: The page with ID "home" appears to be missing.'
+            'Error occurred: The page with ID "home" appears to be missing.',
           );
         } else {
           setStatusState(`Error occurred: ${err.toString()}`);
@@ -66,7 +66,7 @@ const Home = () => {
       const isConfigDefault = raw as boolean;
       if (isConfigDefault) {
         setStatusState(
-          "This appears to the first time this app has been started, please go to the General section, update the settings if required and save the configuration there before proceeding further."
+          "This appears to the first time this app has been started, please go to the General section, update the settings if required and save the configuration there before proceeding further.",
         );
       }
     });

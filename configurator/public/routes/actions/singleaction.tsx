@@ -57,7 +57,7 @@ class EditSingleAction extends Component<
       this.setState({
         pluginType: parseInt(
           (e.target as HTMLInputElement).value,
-          10
+          10,
         ) as PluginType,
         // clear this once the plugin type is changed manually
         // since it means the original loaded data is irrelevant

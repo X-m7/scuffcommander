@@ -64,7 +64,7 @@ class EditVTSCondition extends Component<
       case VTSQueryType.ActiveModelId:
         timer = setTimeout(() => {
           this.props.msgFunc(
-            "Warning: A request to VTube Studio is taking an extended amount of time (there may be a pending authentication request that needs to be allowed)"
+            "Warning: A request to VTube Studio is taking an extended amount of time (there may be a pending authentication request that needs to be allowed)",
           );
         }, 1000);
         invoke("get_vts_model_names")
@@ -108,7 +108,8 @@ class EditVTSCondition extends Component<
           queryType: newQueryType,
           showQueryInput: true,
           queryInputList: ["true", "false"],
-          queryInput: init && this.props.data ? `x-${this.props.data.target}` : "none",
+          queryInput:
+            init && this.props.data ? `x-${this.props.data.target}` : "none",
         });
 
         break;
@@ -129,7 +130,7 @@ class EditVTSCondition extends Component<
 
     const newQueryType = parseInt(
       (e.target as HTMLInputElement).value,
-      10
+      10,
     ) as VTSQueryType;
 
     this.queryTypeUpdate(newQueryType, false);
@@ -150,7 +151,7 @@ class EditVTSCondition extends Component<
       case VTSQueryType.ActiveModelId:
         return "active model";
       case VTSQueryType.StoredModelPositionExists:
-        return "the statement \"There exists a stored model position\"";
+        return 'the statement "There exists a stored model position"';
       case VTSQueryType.None:
         return "<none>";
     }
@@ -162,13 +163,13 @@ class EditVTSCondition extends Component<
     switch (this.state.queryType) {
       case VTSQueryType.None:
         this.props.msgFunc(
-          "Please select an option for the VTube Studio query type"
+          "Please select an option for the VTube Studio query type",
         );
         return undefined;
       case VTSQueryType.ActiveModelId:
         if (queryInput === "none") {
           this.props.msgFunc(
-            "Please select an option for the VTube Studio query parameter"
+            "Please select an option for the VTube Studio query parameter",
           );
           return undefined;
         }
@@ -180,7 +181,7 @@ class EditVTSCondition extends Component<
         } catch (err) {
           if (typeof err === "string") {
             this.props.msgFunc(
-              "Please select an option for the VTube Studio query type"
+              "Please select an option for the VTube Studio query type",
             );
             return undefined;
           }
@@ -190,7 +191,7 @@ class EditVTSCondition extends Component<
       case VTSQueryType.StoredModelPositionExists:
         if (queryInput === "none") {
           this.props.msgFunc(
-            "Please select an option for the VTube Studio query parameter"
+            "Please select an option for the VTube Studio query parameter",
           );
           return undefined;
         }
@@ -216,7 +217,9 @@ class EditVTSCondition extends Component<
           <select value={state.queryType} onChange={this.onQueryTypeChange}>
             <option value={VTSQueryType.None}>Select an option</option>
             <option value={VTSQueryType.ActiveModelId}>Active Model</option>
-            <option value={VTSQueryType.StoredModelPositionExists}>Stored Model Position Exists</option>
+            <option value={VTSQueryType.StoredModelPositionExists}>
+              Stored Model Position Exists
+            </option>
           </select>
         </label>
         <br />

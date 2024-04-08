@@ -29,7 +29,7 @@ const EditAction = ({
   const [actionId, setActionId] = useState<string>("");
   const [actionType, setActionType] = useState<ActionType>(ActionType.None);
   const [actionData, setActionData] = useState<ActionContent | undefined>(
-    undefined
+    undefined,
   );
 
   // run only when the selected action changes (from outside)
@@ -81,7 +81,7 @@ const EditAction = ({
   const onActionTypeChange = (e: Event) => {
     if (e.target) {
       setActionType(
-        parseInt((e.target as HTMLInputElement).value, 10) as ActionType
+        parseInt((e.target as HTMLInputElement).value, 10) as ActionType,
       );
 
       // clear this once the plugin type is changed manually

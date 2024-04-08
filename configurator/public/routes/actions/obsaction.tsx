@@ -94,7 +94,7 @@ class EditOBSAction extends Component<EditOBSActionProps, EditOBSActionState> {
 
     const newActionType = parseInt(
       (e.target as HTMLInputElement).value,
-      10
+      10,
     ) as OBSActionType;
 
     this.actionTypeUpdate(newActionType, false);
@@ -114,13 +114,13 @@ class EditOBSAction extends Component<EditOBSActionProps, EditOBSActionState> {
     switch (this.state.actionType) {
       case OBSActionType.None:
         this.props.msgFunc(
-          "Please select an option for the OBS Studio action type"
+          "Please select an option for the OBS Studio action type",
         );
         return undefined;
       case OBSActionType.ProgramSceneChange:
         if (this.state.actionInput === "none") {
           this.props.msgFunc(
-            "Please select an option for the OBS Studio action parameter"
+            "Please select an option for the OBS Studio action parameter",
           );
           return undefined;
         }

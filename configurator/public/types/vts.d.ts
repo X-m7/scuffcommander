@@ -9,9 +9,12 @@ export type VTSMoveModelData = {
 export type VTSRestoreModelPositionData = {
   var_id: string;
   time_sec: number;
-}
+};
 
-export type VTSActionData = string | VTSMoveModelData | VTSRestoreModelPositionData;
+export type VTSActionData =
+  | string
+  | VTSMoveModelData
+  | VTSRestoreModelPositionData;
 
 export type VTSActionTag =
   | "ToggleExpression"
@@ -30,4 +33,7 @@ export type VTSAction = {
   content?: VTSActionData;
 };
 
-export type VTSQuery = "ActiveModelId" | "StoredModelPositionExists" | "Version";
+export type VTSQuery =
+  | "ActiveModelId"
+  | "StoredModelPositionExists"
+  | "Version";

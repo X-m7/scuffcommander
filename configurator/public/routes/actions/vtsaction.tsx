@@ -1,7 +1,11 @@
 import { h, Fragment, Component, createRef } from "preact";
 import { invoke } from "@tauri-apps/api";
 
-import { VTSAction, VTSMoveModelData, VTSRestoreModelPositionData } from "/types";
+import {
+  VTSAction,
+  VTSMoveModelData,
+  VTSRestoreModelPositionData,
+} from "/types";
 import EditVTSMoveModelData from "./vtsmovemodel";
 import EditVTSRestoreModelPositionData from "./vtsrestorepos";
 import SelectOptsGen from "/components/selectoptsgen";
@@ -57,7 +61,8 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
 
       if (actionType === VTSActionType.RestoreModelPosition) {
         showRestorePosInput = true;
-        loadedRestorePosData = props.data.content as VTSRestoreModelPositionData;
+        loadedRestorePosData = props.data
+          .content as VTSRestoreModelPositionData;
       }
     }
 
@@ -83,11 +88,11 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
     actionType: VTSActionType,
     invokeArgOuter: string,
     invokeArgInner: string,
-    init: boolean
+    init: boolean,
   ) => {
     const timer = setTimeout(() => {
       this.props.msgFunc(
-        "Warning: A request to VTube Studio is taking an extended amount of time (there may be a pending authentication request that needs to be allowed)"
+        "Warning: A request to VTube Studio is taking an extended amount of time (there may be a pending authentication request that needs to be allowed)",
       );
     }, 1000);
     invoke(invokeArgOuter)
@@ -152,7 +157,7 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
           actionType,
           "get_vts_expression_names",
           "get_vts_expression_name_from_id",
-          init
+          init,
         );
         break;
       case VTSActionType.TriggerHotkey:
@@ -160,7 +165,7 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
           actionType,
           "get_vts_hotkey_names",
           "get_vts_hotkey_name_from_id",
-          init
+          init,
         );
         break;
       case VTSActionType.LoadModel:
@@ -168,7 +173,7 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
           actionType,
           "get_vts_model_names",
           "get_vts_model_name_from_id",
-          init
+          init,
         );
         break;
       case VTSActionType.MoveModel:
@@ -213,7 +218,7 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
   getSelectInputData = async (invokeCmd: string) => {
     if (this.state.selectInputValue === "none") {
       this.props.msgFunc(
-        "Please select an option for the VTube Studio action parameter"
+        "Please select an option for the VTube Studio action parameter",
       );
       return undefined;
     }
@@ -243,7 +248,7 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
     switch (this.state.actionType) {
       case VTSActionType.None:
         this.props.msgFunc(
-          "Please select an option for the VTube Studio action type"
+          "Please select an option for the VTube Studio action type",
         );
         return undefined;
       case VTSActionType.ToggleExpression:
@@ -272,7 +277,7 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
       case VTSActionType.SaveCurrentModelPosition:
         if (this.state.textInputValue === "") {
           this.props.msgFunc(
-            "Please enter a variable name to save the model position to"
+            "Please enter a variable name to save the model position to",
           );
           return undefined;
         }
@@ -306,7 +311,7 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
 
     const newActionType = parseInt(
       (e.target as HTMLInputElement).value,
-      10
+      10,
     ) as VTSActionType;
 
     this.actionTypeUpdate(newActionType, false);

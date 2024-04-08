@@ -77,7 +77,7 @@ class EditGeneralAction extends Component<
 
     const actionType = parseInt(
       (e.target as HTMLInputElement).value,
-      10
+      10,
     ) as GeneralActionType;
 
     switch (actionType) {
@@ -129,7 +129,7 @@ class EditGeneralAction extends Component<
     switch (this.state.actionType) {
       case GeneralActionType.None:
         this.props.msgFunc(
-          "Please select an option for the General action type"
+          "Please select an option for the General action type",
         );
         return undefined;
       case GeneralActionType.Delay:

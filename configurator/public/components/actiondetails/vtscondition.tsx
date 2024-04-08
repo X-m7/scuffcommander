@@ -15,7 +15,10 @@ const VTSConditionDetails = ({ cond, msgFunc }: VTSConditionDetailsProps) => {
   const tagToStringMap = new Map<string, string>();
 
   tagToStringMap.set("ActiveModelId", "the current VTube Studio model is");
-  tagToStringMap.set("StoredModelPositionExists", "the statement \"There exists a stored VTube Studio model position\" is");
+  tagToStringMap.set(
+    "StoredModelPositionExists",
+    'the statement "There exists a stored VTube Studio model position" is',
+  );
 
   useEffect(() => {
     switch (cond.query.content as VTSQuery) {
@@ -26,7 +29,7 @@ const VTSConditionDetails = ({ cond, msgFunc }: VTSConditionDetailsProps) => {
           })
           .catch((err) => {
             msgFunc(
-              `Error occurred when displaying VTS query: ${err.toString()}`
+              `Error occurred when displaying VTS query: ${err.toString()}`,
             );
           });
         break;

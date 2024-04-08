@@ -102,7 +102,7 @@ class EditOBSCondition extends Component<
 
     const newQueryType = parseInt(
       (e.target as HTMLInputElement).value,
-      10
+      10,
     ) as OBSQueryType;
 
     this.queryTypeUpdate(newQueryType, false);
@@ -134,14 +134,14 @@ class EditOBSCondition extends Component<
   getConditionData = async () => {
     if (this.state.queryType === OBSQueryType.None) {
       this.props.msgFunc(
-        "Please select an option for the OBS Studio query type"
+        "Please select an option for the OBS Studio query type",
       );
       return undefined;
     }
 
     if (this.state.queryInput === "none") {
       this.props.msgFunc(
-        "Please select an option for the OBS Studio query parameter"
+        "Please select an option for the OBS Studio query parameter",
       );
       return undefined;
     }

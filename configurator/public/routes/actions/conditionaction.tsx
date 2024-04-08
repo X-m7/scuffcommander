@@ -77,7 +77,7 @@ class EditConditionAction extends Component<
 
     if (this.state.thenActionId === "none") {
       this.props.msgFunc(
-        "Please select an action to perform if the condition is true"
+        "Please select an action to perform if the condition is true",
       );
       return undefined;
     }
@@ -166,7 +166,7 @@ class EditConditionAction extends Component<
     this.setState({
       queryPluginType: parseInt(
         (e.target as HTMLInputElement).value,
-        10
+        10,
       ) as QueryPluginType,
       // clear this once the plugin type is changed manually
       // since it means the original loaded data is irrelevant

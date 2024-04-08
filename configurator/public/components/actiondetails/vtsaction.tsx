@@ -11,7 +11,7 @@ interface VTSActionDetailsProps {
 
 const VTSActionDetails = ({ content, msgFunc }: VTSActionDetailsProps) => {
   const [actionData, setActionData] = useState<VTSActionData | undefined>(
-    content.content
+    content.content,
   );
 
   const tagToStringMap = new Map<string, string>();
@@ -22,8 +22,14 @@ const VTSActionDetails = ({ content, msgFunc }: VTSActionDetailsProps) => {
   tagToStringMap.set("LoadModel", "Load VTube Studio model:");
   tagToStringMap.set("MoveModel", "Move VTube Studio model to:");
   tagToStringMap.set("TriggerHotkey", "Trigger VTube Studio hotkey:");
-  tagToStringMap.set("SaveCurrentModelPosition", "Save VTube Studio model position as:");
-  tagToStringMap.set("RestoreModelPosition", "Restore VTube Studio model position from:");
+  tagToStringMap.set(
+    "SaveCurrentModelPosition",
+    "Save VTube Studio model position as:",
+  );
+  tagToStringMap.set(
+    "RestoreModelPosition",
+    "Restore VTube Studio model position from:",
+  );
 
   const convertIdToStr = useCallback(
     (id: string, invokeCmd: string) => {
@@ -33,11 +39,11 @@ const VTSActionDetails = ({ content, msgFunc }: VTSActionDetailsProps) => {
         })
         .catch((err) => {
           msgFunc(
-            `Error occurred while displaying VTS action: ${err.toString()}`
+            `Error occurred while displaying VTS action: ${err.toString()}`,
           );
         });
     },
-    [msgFunc]
+    [msgFunc],
   );
 
   useEffect(() => {
@@ -47,13 +53,13 @@ const VTSActionDetails = ({ content, msgFunc }: VTSActionDetailsProps) => {
       case "DisableExpression":
         convertIdToStr(
           content.content as string,
-          "get_vts_expression_name_from_id"
+          "get_vts_expression_name_from_id",
         );
         break;
       case "TriggerHotkey":
         convertIdToStr(
           content.content as string,
-          "get_vts_hotkey_name_from_id"
+          "get_vts_hotkey_name_from_id",
         );
         break;
       case "LoadModel":
@@ -72,7 +78,6 @@ const VTSActionDetails = ({ content, msgFunc }: VTSActionDetailsProps) => {
     }
 
     return `"${data.var_id}" with duration ${data.time_sec}`;
-
   };
 
   return (

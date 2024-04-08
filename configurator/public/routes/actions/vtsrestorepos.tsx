@@ -84,7 +84,10 @@ class EditVTSRestoreModelPositionData extends Component<
     } as VTSRestoreModelPositionData;
   };
 
-  render(props: EditVTSRestoreModelPositionDataProps, state: EditVTSRestoreModelPositionDataState) {
+  render(
+    props: EditVTSRestoreModelPositionDataProps,
+    state: EditVTSRestoreModelPositionDataState,
+  ) {
     return (
       <div class={style.tableDisp}>
         <label class={style.rowDisp}>

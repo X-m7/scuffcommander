@@ -137,7 +137,7 @@ class EditChainAction extends Component<
     this.setState({
       newActionType: parseInt(
         (e.target as HTMLInputElement).value,
-        10
+        10,
       ) as NewActionType,
     });
   };

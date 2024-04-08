@@ -40,7 +40,7 @@ const EditPage = ({
   const [editButtonEnableStyle, setEditButtonEnableStyle] =
     useState<boolean>(false);
   const [editButtonTargetList, setEditButtonTargetList] = useState<string[]>(
-    []
+    [],
   );
   const [editButtonFilterTargetList, setEditButtonFilterTargetList] =
     useState<boolean>(false);
@@ -132,7 +132,7 @@ const EditPage = ({
       .then(() => {
         if (id === "home") {
           msgFunc(
-            'Warning: The page with ID "home" has been deleted, which is the default page'
+            'Warning: The page with ID "home" has been deleted, which is the default page',
           );
         } else {
           msgFunc(`Page with ID "${id}" deleted`);
@@ -157,7 +157,7 @@ const EditPage = ({
       .then(() => {
         if (currentId === "home") {
           msgFunc(
-            'Warning: The page with ID "home" has been renamed, which is the default page'
+            'Warning: The page with ID "home" has been renamed, which is the default page',
           );
         } else {
           msgFunc(`Page with ID "${currentId}" renamed to "${newId}"`);
@@ -312,7 +312,7 @@ const EditPage = ({
           msgFunc(
             `Button at position ${
               editButtonIndex + 1
-            } in page ${targetPageId} has been modified`
+            } in page ${targetPageId} has been modified`,
           );
           updatePageButtons();
           // reset the button form after the edit is done

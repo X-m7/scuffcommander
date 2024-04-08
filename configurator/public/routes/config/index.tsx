@@ -19,13 +19,13 @@ import {
 
 const Config = () => {
   const [obsConfig, setObsConfig] = useState<OBSConfigData | undefined>(
-    undefined
+    undefined,
   );
   const [vtsConfig, setVtsConfig] = useState<VTSConfigData | undefined>(
-    undefined
+    undefined,
   );
   const [serverConfig, setServerConfig] = useState<ServerConfig | undefined>(
-    undefined
+    undefined,
   );
   const [statusState, setStatusState] = useState<string>("");
   const [configFolder, setConfigFolder] = useState<string>("");

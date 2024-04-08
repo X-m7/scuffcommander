@@ -20,7 +20,7 @@ const VTSAutoButtonGen = ({ msgFunc }: VTSAutoButtonGenProps) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       msgFunc(
-        "Warning: Requesting the list of models from VTube Studio is taking an extended amount of time (there may be a pending authentication request that needs to be allowed)"
+        "Warning: Requesting the list of models from VTube Studio is taking an extended amount of time (there may be a pending authentication request that needs to be allowed)",
       );
     }, 1000);
 

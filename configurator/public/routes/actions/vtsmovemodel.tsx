@@ -147,7 +147,7 @@ class EditVTSMoveModelData extends Component<
   getCurrentModelPos = () => {
     const timer = setTimeout(() => {
       this.props.msgFunc(
-        "Warning: A request to VTube Studio is taking an extended amount of time (there may be a pending authentication request that needs to be allowed)"
+        "Warning: A request to VTube Studio is taking an extended amount of time (there may be a pending authentication request that needs to be allowed)",
       );
     }, 1000);
     invoke("get_vts_current_model_pos")
