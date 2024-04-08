@@ -3,6 +3,7 @@ import { invoke } from "@tauri-apps/api";
 
 import { VTSAction, VTSMoveModelData, VTSRestoreModelPositionData } from "/types";
 import EditVTSMoveModelData from "./vtsmovemodel";
+import EditVTSRestoreModelPositionData from "./vtsrestorepos";
 import SelectOptsGen from "/components/selectoptsgen";
 
 enum VTSActionType {
@@ -32,6 +33,8 @@ interface EditVTSActionState {
   loadedModelPosData?: VTSMoveModelData;
   showTextInput: boolean;
   textInputValue: string;
+  showRestorePosInput: boolean;
+  loadedRestorePosData?: VTSRestoreModelPositionData;
 }
 
 class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
@@ -41,6 +44,8 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
     let actionType = VTSActionType.None;
     let showModelPosInput = false;
     let loadedModelPosData: VTSMoveModelData | undefined;
+    let showRestorePosInput = false;
+    let loadedRestorePosData: VTSRestoreModelPositionData | undefined;
 
     if (props.data) {
       actionType = VTSActionType[props.data.tag as keyof typeof VTSActionType];
@@ -48,6 +53,11 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
       if (actionType === VTSActionType.MoveModel) {
         showModelPosInput = true;
         loadedModelPosData = props.data.content as VTSMoveModelData;
+      }
+
+      if (actionType === VTSActionType.RestoreModelPosition) {
+        showRestorePosInput = true;
+        loadedRestorePosData = props.data.content as VTSRestoreModelPositionData;
       }
     }
 
@@ -60,6 +70,8 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
       loadedModelPosData,
       showTextInput: false,
       textInputValue: "",
+      showRestorePosInput,
+      loadedRestorePosData,
     };
   }
 
@@ -130,6 +142,7 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
           selectInputValue: "none",
           showTextInput: false,
           textInputValue,
+          showRestorePosInput: false,
         });
         break;
       case VTSActionType.ToggleExpression:
@@ -166,6 +179,7 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
           showModelPosInput: true,
           showTextInput: false,
           textInputValue,
+          showRestorePosInput: false,
         });
         break;
       case VTSActionType.SaveCurrentModelPosition:
@@ -179,19 +193,18 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
           showModelPosInput: false,
           showTextInput: true,
           textInputValue,
+          showRestorePosInput: false,
         });
         break;
       case VTSActionType.RestoreModelPosition:
-        if (init && this.props.data && typeof this.props.data.content === "object" && "var_id" in this.props.data.content) {
-          textInputValue = this.props.data.content.var_id;
-        }
         this.setState({
           actionType,
           showSelectInput: false,
           selectInputValue: "none",
           showModelPosInput: false,
-          showTextInput: true,
+          showTextInput: false,
           textInputValue,
+          showRestorePosInput: true,
         });
         break;
     }
@@ -221,10 +234,11 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
   };
 
   moveModelEditorRef = createRef<EditVTSMoveModelData>();
+  restoreModelEditorRef = createRef<EditVTSRestoreModelPositionData>();
 
   getActionData = async () => {
     let moveModelData: VTSMoveModelData | undefined;
-    let restoreModelData: VTSRestoreModelPositionData;
+    let restoreModelData: VTSRestoreModelPositionData | undefined;
 
     switch (this.state.actionType) {
       case VTSActionType.None:
@@ -268,17 +282,15 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
           content: this.state.textInputValue,
         } as VTSAction;
       case VTSActionType.RestoreModelPosition:
-        if (this.state.textInputValue === "") {
-          this.props.msgFunc(
-            "Please enter a variable name to load the model position from"
-          );
+        if (!this.restoreModelEditorRef.current) {
           return undefined;
         }
 
-        restoreModelData = {
-          var_id: this.state.textInputValue,
-          time_sec: 0.2,
-        } as VTSRestoreModelPositionData;
+        restoreModelData = this.restoreModelEditorRef.current.getData();
+
+        if (!restoreModelData) {
+          return undefined;
+        }
 
         return {
           tag: "RestoreModelPosition",
@@ -370,6 +382,13 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
           <EditVTSMoveModelData
             ref={this.moveModelEditorRef}
             data={state.loadedModelPosData}
+            msgFunc={props.msgFunc}
+          />
+        )}
+        {state.showRestorePosInput && (
+          <EditVTSRestoreModelPositionData
+            ref={this.restoreModelEditorRef}
+            data={state.loadedRestorePosData}
             msgFunc={props.msgFunc}
           />
         )}
