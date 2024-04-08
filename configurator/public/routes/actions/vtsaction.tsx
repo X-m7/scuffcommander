@@ -340,10 +340,10 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
             <option value={VTSActionType.MoveModel}>Move Model</option>
             <option value={VTSActionType.TriggerHotkey}>Trigger Hotkey</option>
             <option value={VTSActionType.SaveCurrentModelPosition}>
-              Save Current Model Position
+              Save Current Model Position As
             </option>
             <option value={VTSActionType.RestoreModelPosition}>
-              Restore Model Position
+              Restore Model Position From
             </option>
           </select>
         </label>
