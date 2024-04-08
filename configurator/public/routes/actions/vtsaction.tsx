@@ -119,6 +119,8 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
   };
 
   actionTypeUpdate = (actionType: VTSActionType, init: boolean) => {
+    let textInputValue = "";
+
     switch (actionType) {
       case VTSActionType.None:
         this.setState({
@@ -127,7 +129,7 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
           showModelPosInput: false,
           selectInputValue: "none",
           showTextInput: false,
-          textInputValue: "",
+          textInputValue,
         });
         break;
       case VTSActionType.ToggleExpression:
@@ -163,18 +165,33 @@ class EditVTSAction extends Component<EditVTSActionProps, EditVTSActionState> {
           selectInputValue: "none",
           showModelPosInput: true,
           showTextInput: false,
-          textInputValue: "",
+          textInputValue,
         });
         break;
       case VTSActionType.SaveCurrentModelPosition:
-      case VTSActionType.RestoreModelPosition:
+        if (init && this.props.data && this.props.data.content) {
+          textInputValue = this.props.data.content as string;
+        }
         this.setState({
           actionType,
           showSelectInput: false,
           selectInputValue: "none",
           showModelPosInput: false,
           showTextInput: true,
-          textInputValue: "",
+          textInputValue,
+        });
+        break;
+      case VTSActionType.RestoreModelPosition:
+        if (init && this.props.data && typeof this.props.data.content === "object" && "var_id" in this.props.data.content) {
+          textInputValue = this.props.data.content.var_id;
+        }
+        this.setState({
+          actionType,
+          showSelectInput: false,
+          selectInputValue: "none",
+          showModelPosInput: false,
+          showTextInput: true,
+          textInputValue,
         });
         break;
     }
