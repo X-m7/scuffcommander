@@ -11,7 +11,7 @@ const OBSConditionDetails = (props: OBSConditionDetailsProps) => {
     case "CurrentProgramScene":
       return (
         <Fragment>
-          If the OBS current program scene is {props.cond.query.content}
+          If the OBS current program scene is {props.cond.target}
         </Fragment>
       );
     case "IsStreaming":
