@@ -15,7 +15,7 @@ pub async fn get_obs_scenes(
 
     let mut scene_names = Vec::new();
     for scene in scenes {
-        scene_names.push(scene.name);
+        scene_names.push(scene.id.name);
     }
     Ok(scene_names)
 }

@@ -124,7 +124,7 @@ impl OBSConnector {
             .current_program_scene()
             .await
         {
-            Ok(s) => Ok(s),
+            Ok(s) => Ok(s.id.name),
             Err(e) => {
                 self.client = None;
                 Err(e.to_string())
