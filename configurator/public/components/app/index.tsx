@@ -7,11 +7,12 @@ import {
   lazy,
   ErrorBoundary,
 } from "preact-iso";
-import { appWindow } from "@tauri-apps/api/window";
+import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { UnlistenFn } from "@tauri-apps/api/event";
 
 import style from "./style.module.css";
 import Header from "../header";
+const appWindow = getCurrentWebviewWindow()
 
 const Home = lazy(() => import("/routes/home"));
 const Config = lazy(() => import("/routes/config"));
