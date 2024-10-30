@@ -1,6 +1,6 @@
 import { h, Fragment, createRef } from "preact";
 import { useEffect, useState, useCallback } from "preact/hooks";
-import { invoke } from "@tauri-apps/api";
+import { invoke } from "@tauri-apps/api/core";
 
 import sharedStyle from "/style.module.css";
 import DraggableListItem from "/components/draggablelistitem";

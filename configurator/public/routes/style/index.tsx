@@ -1,6 +1,6 @@
 import { h, createRef } from "preact";
 import { useEffect, useState } from "preact/hooks";
-import { invoke } from "@tauri-apps/api";
+import { invoke } from "@tauri-apps/api/core";
 
 import EditButtonStyle from "/components/editbuttonstyle";
 import { ButtonStyle, UIStyle } from "/types";

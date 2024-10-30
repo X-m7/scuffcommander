@@ -1,5 +1,5 @@
 import { h, Fragment, Component } from "preact";
-import { invoke } from "@tauri-apps/api";
+import { invoke } from "@tauri-apps/api/core";
 
 import sharedStyle from "/style.module.css";
 import { GeneralActionCommand } from "/types";

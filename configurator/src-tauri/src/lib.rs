@@ -6,11 +6,18 @@ pub mod style;
 
 // needed to make a module here since commands can't be defined at the root directly
 pub mod general {
-    use tauri::api::dialog::blocking::FileDialogBuilder;
+    use tauri_plugin_dialog::{DialogExt, FilePath};
+
+    fn file_path_to_string(fp: FilePath) -> String {
+        match fp {
+            FilePath::Url(url) => url.as_str().to_string(),
+            FilePath::Path(path) => format!("{}", path.display()),
+        }
+    }
 
     #[tauri::command]
-    pub async fn pick_image_file() -> Result<String, String> {
-        FileDialogBuilder::new()
+    pub async fn pick_image_file(app: tauri::AppHandle) -> Result<String, String> {
+        app.dialog().file()
             .set_title("Open Image")
             .add_filter(
                 "Supported images",
@@ -19,14 +26,14 @@ pub mod general {
                     "ico",
                 ],
             )
-            .pick_file()
+            .blocking_pick_file()
             .ok_or_else(|| "File dialog closed".to_string())
-            .map(|x| format!("{}", x.display()))
+            .map(file_path_to_string)
     }
 
     #[tauri::command]
-    pub async fn pick_executable_file() -> Result<String, String> {
-        let mut builder = FileDialogBuilder::new();
+    pub async fn pick_executable_file(app: tauri::AppHandle) -> Result<String, String> {
+        let mut builder = app.dialog().file();
 
         builder = builder.set_title("Select executable");
 
@@ -37,18 +44,18 @@ pub mod general {
         }
 
         builder
-            .pick_file()
+            .blocking_pick_file()
             .ok_or_else(|| "File dialog closed".to_string())
-            .map(|x| format!("{}", x.display()))
+            .map(file_path_to_string)
     }
 
     #[tauri::command]
-    pub async fn pick_folder() -> Result<String, String> {
-        FileDialogBuilder::new()
+    pub async fn pick_folder(app: tauri::AppHandle) -> Result<String, String> {
+        app.dialog().file()
             .set_title("Select folder")
-            .pick_folder()
+            .blocking_pick_folder()
             .ok_or_else(|| "File dialog closed".to_string())
-            .map(|x| format!("{}", x.display()))
+            .map(file_path_to_string)
     }
 
     #[tauri::command]

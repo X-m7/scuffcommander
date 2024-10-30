@@ -1,6 +1,6 @@
 import { h, Fragment } from "preact";
 import { useEffect, useState } from "preact/hooks";
-import { invoke } from "@tauri-apps/api";
+import { invoke } from "@tauri-apps/api/core";
 
 import { VTSConfigData } from "/types/config";
 

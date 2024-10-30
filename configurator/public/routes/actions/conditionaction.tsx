@@ -1,5 +1,5 @@
 import { h, Fragment, Component, createRef } from "preact";
-import { invoke } from "@tauri-apps/api";
+import { invoke } from "@tauri-apps/api/core";
 
 import EditOBSCondition from "./obscondition";
 import EditVTSCondition from "./vtscondition";

@@ -1,5 +1,5 @@
 import { h, Fragment } from "preact";
-import { invoke } from "@tauri-apps/api";
+import { invoke } from "@tauri-apps/api/core";
 
 import { OBSConfigData } from "/types/config";
 

@@ -42,6 +42,7 @@ async fn main() {
     let conf = AppConfig::from_file(&format!("{config_dir}/config.json"));
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_dialog::init())
         .manage(app_mod::config::AppConfigState(conf.clone()))
         .manage(PluginStates::init(conf.plugins).await)
         .manage(app_mod::actions::ActionConfigState(Mutex::new(

@@ -1,5 +1,5 @@
 import { h, Component } from "preact";
-import { invoke } from "@tauri-apps/api";
+import { invoke } from "@tauri-apps/api/core";
 
 import style from "./style.module.css";
 import sharedStyle from "/style.module.css";

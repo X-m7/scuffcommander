@@ -1,5 +1,5 @@
 import { h, Fragment, Component } from "preact";
-import { invoke } from "@tauri-apps/api";
+import { invoke } from "@tauri-apps/api/core";
 
 import { OBSAction } from "/types";
 import SelectOptsGen from "/components/selectoptsgen";
